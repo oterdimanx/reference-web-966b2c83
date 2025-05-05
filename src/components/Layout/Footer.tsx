@@ -9,10 +9,10 @@ export function Footer() {
           <div className="text-center md:text-left mb-4 md:mb-0">
             <div className="flex items-center justify-center md:justify-start">
               <div className="h-6 w-6 rounded gradient-bg flex items-center justify-center mr-2">
-                <span className="text-white font-bold text-xs">WRB</span>
+                <span className="text-white font-bold text-xs">RW</span>
               </div>
               <span className="font-bold text-lg text-rank-blue dark:text-white">
-                Web<span className="text-rank-teal">Rank</span>Beacon
+                Reference<span className="text-rank-teal">-Web</span>
               </span>
             </div>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
@@ -33,7 +33,7 @@ export function Footer() {
           </div>
         </div>
         <div className="text-center text-xs text-gray-400 dark:text-gray-500 mt-6">
-          © {new Date().getFullYear()} WebRankBeacon. All rights reserved.
+          © {new Date().getFullYear()} Reference-Web. All rights reserved.
         </div>
       </div>
     </footer>

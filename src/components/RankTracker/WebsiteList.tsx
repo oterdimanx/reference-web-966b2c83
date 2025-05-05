@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RankingSummary } from '@/lib/mockData';
+import { useNavigate } from 'react-router-dom';
 
 interface WebsiteListProps {
   websites: RankingSummary[];
@@ -13,6 +14,7 @@ interface WebsiteListProps {
 export function WebsiteList({ websites, onSelectWebsite, selectedWebsiteId }: WebsiteListProps) {
   const [sortBy, setSortBy] = useState<'domain' | 'position' | 'change'>('position');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const navigate = useNavigate();
 
   const sortedWebsites = [...websites].sort((a, b) => {
     if (sortBy === 'domain') {
@@ -45,6 +47,10 @@ export function WebsiteList({ websites, onSelectWebsite, selectedWebsiteId }: We
     return sortOrder === 'asc' 
       ? <span className="ml-1">↑</span>
       : <span className="ml-1">↓</span>;
+  };
+
+  const handleViewAll = () => {
+    navigate('/all-websites');
   };
 
   return (
@@ -146,7 +152,7 @@ export function WebsiteList({ websites, onSelectWebsite, selectedWebsiteId }: We
         </div>
         
         <div className="mt-4 flex justify-end">
-          <Button variant="outline" size="sm">View All</Button>
+          <Button variant="outline" size="sm" onClick={handleViewAll}>View All</Button>
         </div>
       </CardContent>
     </Card>

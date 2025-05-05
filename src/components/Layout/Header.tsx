@@ -38,10 +38,10 @@ export function Header() {
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
               <div className="h-8 w-8 rounded gradient-bg flex items-center justify-center mr-2">
-                <span className="text-white font-bold text-sm">WRB</span>
+                <span className="text-white font-bold text-sm">RW</span>
               </div>
               <span className="font-bold text-xl text-rank-blue dark:text-white">
-                Web<span className="text-rank-teal">Rank</span>Beacon
+                Reference<span className="text-rank-teal">-Web</span>
               </span>
             </Link>
           </div>

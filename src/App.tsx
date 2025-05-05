@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/Auth/ProtectedRoute";
+import AllWebsites from "./pages/AllWebsites";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,11 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/all-websites" element={
+              <ProtectedRoute>
+                <AllWebsites />
+              </ProtectedRoute>
+            } />
             <Route 
               path="/rankings" 
               element={
