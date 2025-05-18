@@ -1,9 +1,9 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Header } from '@/components/Layout/Header';
 import { Footer } from '@/components/Layout/Footer';
 import { WebsiteList } from '@/components/RankTracker/WebsiteList';
-import { getRankingSummaries } from '@/lib/mockData';
+import { getRankingSummaries, RankingSummary } from '@/lib/mockData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
@@ -11,8 +11,24 @@ import { useNavigate } from 'react-router-dom';
 
 const AllWebsites = () => {
   const [selectedWebsiteId, setSelectedWebsiteId] = useState<string | undefined>(undefined);
-  const rankingSummaries = getRankingSummaries();
+  const [websites, setWebsites] = useState<RankingSummary[]>([]);
   const navigate = useNavigate();
+
+  // Initialize websites from mock data
+  useEffect(() => {
+    setWebsites(getRankingSummaries());
+    
+    // Check for any websites added via localStorage
+    const storedWebsites = localStorage.getItem('additionalWebsites');
+    if (storedWebsites) {
+      try {
+        const parsedWebsites = JSON.parse(storedWebsites) as RankingSummary[];
+        setWebsites(prevWebsites => [...parsedWebsites, ...prevWebsites]);
+      } catch (error) {
+        console.error('Error parsing stored websites:', error);
+      }
+    }
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -36,7 +52,7 @@ const AllWebsites = () => {
           </CardHeader>
           <CardContent>
             <WebsiteList 
-              websites={rankingSummaries}
+              websites={websites}
               onSelectWebsite={setSelectedWebsiteId}
               selectedWebsiteId={selectedWebsiteId}
             />

@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { StatCard } from '@/components/common/StatCard';
 import { AddWebsiteForm } from '@/components/RankTracker/AddWebsiteForm';
 import { WebsiteList } from '@/components/RankTracker/WebsiteList';
@@ -7,19 +7,36 @@ import { RankingChart } from '@/components/RankTracker/RankingChart';
 import { 
   mockRankingData, 
   getRankingSummaries, 
-  getOverallStats 
+  getOverallStats,
+  RankingSummary 
 } from '@/lib/mockData';
 import { Check, Globe, Search, TrendingUp, Award } from 'lucide-react';
 
 export function DashboardView() {
   const [selectedWebsiteId, setSelectedWebsiteId] = useState<string>('1');
+  const [websites, setWebsites] = useState<RankingSummary[]>([]);
+  const [overallStats, setOverallStats] = useState(getOverallStats());
   
-  const rankingSummaries = getRankingSummaries();
-  const overallStats = getOverallStats();
+  // Initialize websites from mock data
+  useEffect(() => {
+    setWebsites(getRankingSummaries());
+  }, []);
   
   const websiteRankingData = mockRankingData.filter(
     data => data.websiteId === selectedWebsiteId
   );
+  
+  const handleAddWebsite = (newWebsite: RankingSummary) => {
+    setWebsites(prevWebsites => [newWebsite, ...prevWebsites]);
+    
+    // Update overall stats
+    setOverallStats(prevStats => ({
+      ...prevStats,
+      totalWebsites: prevStats.totalWebsites + 1,
+      totalKeywords: prevStats.totalKeywords + newWebsite.keywordCount,
+      improvingWebsites: prevStats.improvingWebsites + (newWebsite.change >= 0 ? 1 : 0)
+    }));
+  };
   
   return (
     <div className="py-6">
@@ -58,7 +75,7 @@ export function DashboardView() {
             
             {/* Website list */}
             <WebsiteList
-              websites={rankingSummaries}
+              websites={websites}
               onSelectWebsite={setSelectedWebsiteId}
               selectedWebsiteId={selectedWebsiteId}
             />
@@ -66,7 +83,7 @@ export function DashboardView() {
           
           {/* Right sidebar */}
           <div className="space-y-6 animate-fade-in" style={{ animationDelay: '300ms' }}>
-            <AddWebsiteForm />
+            <AddWebsiteForm onAddWebsite={handleAddWebsite} />
             
             {/* Quick tips */}
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-100 dark:border-gray-700">

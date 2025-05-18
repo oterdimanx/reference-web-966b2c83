@@ -5,8 +5,14 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import { RankingSummary } from '@/lib/mockData';
+import { v4 as uuidv4 } from 'uuid';
 
-export function AddWebsiteForm() {
+interface AddWebsiteFormProps {
+  onAddWebsite: (website: RankingSummary) => void;
+}
+
+export function AddWebsiteForm({ onAddWebsite }: AddWebsiteFormProps) {
   const { toast } = useToast();
   const [domain, setDomain] = useState('');
   const [keywords, setKeywords] = useState('');
@@ -16,8 +22,19 @@ export function AddWebsiteForm() {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate API call
+    // Create a new website entry
+    const newWebsite: RankingSummary = {
+      websiteId: uuidv4(),
+      domain: domain,
+      avgPosition: Math.floor(Math.random() * 15) + 1, // Random position between 1-15
+      change: Math.floor(Math.random() * 5), // Random change between 0-4
+      keywordCount: keywords.split(',').filter(k => k.trim().length > 0).length,
+    };
+    
+    // Simulate API call delay
     setTimeout(() => {
+      onAddWebsite(newWebsite);
+      
       toast({
         title: "Website Added",
         description: `${domain} has been added for tracking`,
