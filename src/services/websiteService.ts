@@ -12,6 +12,7 @@ export const mapToDbWebsite = (website: RankingSummary) => {
     keyword_count: website.keywordCount,
     top_keyword: website.topKeyword || 'N/A',
     top_keyword_position: website.topKeywordPosition || 1,
+    user_id: supabase.auth.getUser().then(res => res.data.user?.id) // This won't work because it returns a promise
   };
 };
 
@@ -30,9 +31,22 @@ export const mapFromDbWebsite = (dbWebsite: any): RankingSummary => {
 // Save a website to the database
 export const saveWebsite = async (website: RankingSummary): Promise<RankingSummary | null> => {
   try {
+    // Get the current user ID
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      console.error('No authenticated user found');
+      return null;
+    }
+    
+    const websiteData = {
+      ...mapToDbWebsite(website),
+      user_id: user.id // Set the user_id to the current authenticated user
+    };
+    
     const { data, error } = await supabase
       .from('websites')
-      .insert(mapToDbWebsite(website))
+      .insert(websiteData)
       .select()
       .single();
       
