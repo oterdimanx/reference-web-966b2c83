@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { RankingSummary } from '@/lib/mockData';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -29,6 +29,8 @@ export function AddWebsiteForm({ onAddWebsite }: AddWebsiteFormProps) {
       avgPosition: Math.floor(Math.random() * 15) + 1, // Random position between 1-15
       change: Math.floor(Math.random() * 5), // Random change between 0-4
       keywordCount: keywords.split(',').filter(k => k.trim().length > 0).length,
+      topKeyword: keywords.split(',')[0]?.trim() || 'N/A', // Add first keyword as top keyword
+      topKeywordPosition: Math.floor(Math.random() * 10) + 1, // Random position for top keyword
     };
     
     // Simulate API call delay
