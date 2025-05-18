@@ -3,31 +3,34 @@ import { useState, useEffect } from 'react';
 import { Header } from '@/components/Layout/Header';
 import { Footer } from '@/components/Layout/Footer';
 import { WebsiteList } from '@/components/RankTracker/WebsiteList';
-import { getRankingSummaries, RankingSummary } from '@/lib/mockData';
+import { RankingSummary } from '@/lib/mockData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { getUserWebsites } from '@/services/websiteService';
 
 const AllWebsites = () => {
   const [selectedWebsiteId, setSelectedWebsiteId] = useState<string | undefined>(undefined);
   const [websites, setWebsites] = useState<RankingSummary[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Initialize websites from mock data
+  // Fetch websites from Supabase
   useEffect(() => {
-    setWebsites(getRankingSummaries());
-    
-    // Check for any websites added via localStorage
-    const storedWebsites = localStorage.getItem('additionalWebsites');
-    if (storedWebsites) {
-      try {
-        const parsedWebsites = JSON.parse(storedWebsites) as RankingSummary[];
-        setWebsites(prevWebsites => [...parsedWebsites, ...prevWebsites]);
-      } catch (error) {
-        console.error('Error parsing stored websites:', error);
+    const fetchWebsites = async () => {
+      setIsLoading(true);
+      const userWebsites = await getUserWebsites();
+      setWebsites(userWebsites);
+      
+      if (userWebsites.length > 0) {
+        setSelectedWebsiteId(userWebsites[0].websiteId);
       }
-    }
+      
+      setIsLoading(false);
+    };
+    
+    fetchWebsites();
   }, []);
 
   return (
@@ -51,11 +54,15 @@ const AllWebsites = () => {
             <CardTitle>Complete Website Rankings</CardTitle>
           </CardHeader>
           <CardContent>
-            <WebsiteList 
-              websites={websites}
-              onSelectWebsite={setSelectedWebsiteId}
-              selectedWebsiteId={selectedWebsiteId}
-            />
+            {isLoading ? (
+              <div className="py-8 text-center text-gray-500">Loading websites...</div>
+            ) : (
+              <WebsiteList 
+                websites={websites}
+                onSelectWebsite={setSelectedWebsiteId}
+                selectedWebsiteId={selectedWebsiteId}
+              />
+            )}
           </CardContent>
         </Card>
       </main>

@@ -39,6 +39,45 @@ export type Database = {
         }
         Relationships: []
       }
+      websites: {
+        Row: {
+          avg_position: number
+          created_at: string | null
+          domain: string
+          id: string
+          keyword_count: number
+          position_change: number
+          top_keyword: string | null
+          top_keyword_position: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          avg_position: number
+          created_at?: string | null
+          domain: string
+          id?: string
+          keyword_count: number
+          position_change: number
+          top_keyword?: string | null
+          top_keyword_position?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          avg_position?: number
+          created_at?: string | null
+          domain?: string
+          id?: string
+          keyword_count?: number
+          position_change?: number
+          top_keyword?: string | null
+          top_keyword_position?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

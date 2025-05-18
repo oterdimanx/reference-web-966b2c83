@@ -11,31 +11,67 @@ import {
   RankingSummary 
 } from '@/lib/mockData';
 import { Check, Globe, Search, TrendingUp, Award } from 'lucide-react';
+import { getUserWebsites } from '@/services/websiteService';
 
 export function DashboardView() {
   const [selectedWebsiteId, setSelectedWebsiteId] = useState<string>('1');
   const [websites, setWebsites] = useState<RankingSummary[]>([]);
   const [overallStats, setOverallStats] = useState(getOverallStats());
   
-  // Initialize websites from mock data
+  // Fetch websites from Supabase on component mount
   useEffect(() => {
-    setWebsites(getRankingSummaries());
+    const fetchWebsites = async () => {
+      const userWebsites = await getUserWebsites();
+      
+      if (userWebsites.length > 0) {
+        setWebsites(userWebsites);
+        // Set the first website as selected if we have any
+        setSelectedWebsiteId(userWebsites[0].websiteId);
+        
+        // Update overall stats based on the loaded websites
+        updateOverallStats(userWebsites);
+      } else {
+        // Fall back to mock data if no user websites exist
+        const mockWebsites = getRankingSummaries();
+        setWebsites(mockWebsites);
+      }
+    };
+    
+    fetchWebsites();
   }, []);
+  
+  // Calculate and update overall stats based on the website list
+  const updateOverallStats = (websitesList: RankingSummary[]) => {
+    if (websitesList.length === 0) return;
+    
+    const totalKeywords = websitesList.reduce((sum, site) => sum + site.keywordCount, 0);
+    const avgPosition = Math.round(
+      websitesList.reduce((sum, site) => sum + site.avgPosition, 0) / websitesList.length
+    );
+    const improvingWebsites = websitesList.filter(site => site.change >= 0).length;
+    
+    setOverallStats({
+      totalWebsites: websitesList.length,
+      totalKeywords: totalKeywords,
+      avgPosition: avgPosition,
+      improvingWebsites: improvingWebsites
+    });
+  };
   
   const websiteRankingData = mockRankingData.filter(
     data => data.websiteId === selectedWebsiteId
   );
   
   const handleAddWebsite = (newWebsite: RankingSummary) => {
-    setWebsites(prevWebsites => [newWebsite, ...prevWebsites]);
+    // Add the new website to the state
+    const updatedWebsites = [newWebsite, ...websites];
+    setWebsites(updatedWebsites);
     
     // Update overall stats
-    setOverallStats(prevStats => ({
-      ...prevStats,
-      totalWebsites: prevStats.totalWebsites + 1,
-      totalKeywords: prevStats.totalKeywords + newWebsite.keywordCount,
-      improvingWebsites: prevStats.improvingWebsites + (newWebsite.change >= 0 ? 1 : 0)
-    }));
+    updateOverallStats(updatedWebsites);
+    
+    // Set the new website as selected
+    setSelectedWebsiteId(newWebsite.websiteId);
   };
   
   return (

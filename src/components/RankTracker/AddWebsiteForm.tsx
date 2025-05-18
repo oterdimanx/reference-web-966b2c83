@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { RankingSummary } from '@/lib/mockData';
 import { v4 as uuidv4 } from 'uuid';
+import { saveWebsite } from '@/services/websiteService';
 
 interface AddWebsiteFormProps {
   onAddWebsite: (website: RankingSummary) => void;
@@ -18,7 +19,7 @@ export function AddWebsiteForm({ onAddWebsite }: AddWebsiteFormProps) {
   const [keywords, setKeywords] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
@@ -33,18 +34,28 @@ export function AddWebsiteForm({ onAddWebsite }: AddWebsiteFormProps) {
       topKeywordPosition: Math.floor(Math.random() * 10) + 1, // Random position for top keyword
     };
     
-    // Simulate API call delay
-    setTimeout(() => {
-      onAddWebsite(newWebsite);
+    // Save to Supabase
+    const savedWebsite = await saveWebsite(newWebsite);
+    
+    if (savedWebsite) {
+      onAddWebsite(savedWebsite);
       
       toast({
         title: "Website Added",
         description: `${domain} has been added for tracking`,
       });
-      setIsLoading(false);
+      
       setDomain('');
       setKeywords('');
-    }, 1000);
+    } else {
+      toast({
+        title: "Error",
+        description: "Failed to add website. Please try again.",
+        variant: "destructive",
+      });
+    }
+    
+    setIsLoading(false);
   };
   
   return (
