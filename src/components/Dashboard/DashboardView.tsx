@@ -50,11 +50,15 @@ export function DashboardView() {
     );
     const improvingWebsites = websitesList.filter(site => site.change >= 0).length;
     
+    // Find the top website (with the best/lowest average position)
+    const topWebsite = websitesList.sort((a, b) => a.avgPosition - b.avgPosition)[0]?.domain || 'N/A';
+    
     setOverallStats({
       totalWebsites: websitesList.length,
       totalKeywords: totalKeywords,
       avgPosition: avgPosition,
-      improvingWebsites: improvingWebsites
+      improvingWebsites: improvingWebsites,
+      topWebsite: topWebsite
     });
   };
   
