@@ -42,39 +42,54 @@ export type Database = {
       websites: {
         Row: {
           avg_position: number
+          contact_email: string | null
+          contact_name: string | null
           created_at: string | null
+          description: string | null
           domain: string
           id: string
           keyword_count: number
           position_change: number
+          reciprocal_link: string | null
+          title: string | null
           top_keyword: string | null
           top_keyword_position: number | null
           updated_at: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           avg_position: number
+          contact_email?: string | null
+          contact_name?: string | null
           created_at?: string | null
+          description?: string | null
           domain: string
           id?: string
           keyword_count: number
           position_change: number
+          reciprocal_link?: string | null
+          title?: string | null
           top_keyword?: string | null
           top_keyword_position?: number | null
           updated_at?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           avg_position?: number
+          contact_email?: string | null
+          contact_name?: string | null
           created_at?: string | null
+          description?: string | null
           domain?: string
           id?: string
           keyword_count?: number
           position_change?: number
+          reciprocal_link?: string | null
+          title?: string | null
           top_keyword?: string | null
           top_keyword_position?: number | null
           updated_at?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }

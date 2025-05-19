@@ -1,61 +1,25 @@
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-import { RankingSummary } from '@/lib/mockData';
-import { v4 as uuidv4 } from 'uuid';
-import { saveWebsite } from '@/services/websiteService';
 
 interface AddWebsiteFormProps {
-  onAddWebsite: (website: RankingSummary) => void;
+  onAddWebsite: (website: any) => void;
 }
 
 export function AddWebsiteForm({ onAddWebsite }: AddWebsiteFormProps) {
-  const { toast } = useToast();
+  const navigate = useNavigate();
   const [domain, setDomain] = useState('');
   const [keywords, setKeywords] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     
-    // Create a new website entry
-    const newWebsite: RankingSummary = {
-      websiteId: uuidv4(),
-      domain: domain,
-      avgPosition: Math.floor(Math.random() * 15) + 1, // Random position between 1-15
-      change: Math.floor(Math.random() * 5), // Random change between 0-4
-      keywordCount: keywords.split(',').filter(k => k.trim().length > 0).length,
-      topKeyword: keywords.split(',')[0]?.trim() || 'N/A', // Add first keyword as top keyword
-      topKeywordPosition: Math.floor(Math.random() * 10) + 1, // Random position for top keyword
-    };
-    
-    // Save to Supabase
-    const savedWebsite = await saveWebsite(newWebsite);
-    
-    if (savedWebsite) {
-      onAddWebsite(savedWebsite);
-      
-      toast({
-        title: "Website Added",
-        description: `${domain} has been added for tracking`,
-      });
-      
-      setDomain('');
-      setKeywords('');
-    } else {
-      toast({
-        title: "Error",
-        description: "Failed to add website. Please try again.",
-        variant: "destructive",
-      });
-    }
-    
-    setIsLoading(false);
+    // Redirect to the Add Website page with the form values as URL parameters
+    navigate(`/add-website?domain=${encodeURIComponent(domain)}&keywords=${encodeURIComponent(keywords)}`);
   };
   
   return (
@@ -95,10 +59,9 @@ export function AddWebsiteForm({ onAddWebsite }: AddWebsiteFormProps) {
         <CardFooter>
           <Button 
             type="submit" 
-            disabled={isLoading} 
             className="w-full bg-rank-teal hover:bg-rank-teal/90"
           >
-            {isLoading ? "Adding..." : "Add Website"}
+            Continue
           </Button>
         </CardFooter>
       </form>

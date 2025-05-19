@@ -10,6 +10,7 @@ import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/Auth/ProtectedRoute";
 import AllWebsites from "./pages/AllWebsites";
+import AddWebsite from "./pages/AddWebsite";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,11 @@ const App = () => (
                 <AllWebsites />
               </ProtectedRoute>
             } />
+            <Route path="/add-website" element={
+              <ProtectedRoute>
+                <AddWebsite />
+              </ProtectedRoute>
+            } />
             <Route 
               path="/rankings" 
               element={
@@ -41,14 +47,6 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <div>Keywords Page (Protected)</div>
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/add-website" 
-              element={
-                <ProtectedRoute>
-                  <div>Add Website Page (Protected)</div>
                 </ProtectedRoute>
               } 
             />
