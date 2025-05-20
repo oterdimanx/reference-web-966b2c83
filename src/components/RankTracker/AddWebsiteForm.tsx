@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface AddWebsiteFormProps {
   onAddWebsite: (website: any) => void;
@@ -14,12 +16,50 @@ export function AddWebsiteForm({ onAddWebsite }: AddWebsiteFormProps) {
   const navigate = useNavigate();
   const [domain, setDomain] = useState('');
   const [keywords, setKeywords] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const checkDuplicateDomain = async (domain: string) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        return false;
+      }
+      
+      const { data, error, count } = await supabase
+        .from('websites')
+        .select('*', { count: 'exact' })
+        .eq('domain', domain)
+        .eq('user_id', user.id);
+      
+      return count !== undefined && count > 0;
+    } catch (error) {
+      console.error('Error checking duplicate domain:', error);
+      return false;
+    }
+  };
+  
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     
-    // Redirect to the Add Website page with the form values as URL parameters
-    navigate(`/add-website?domain=${encodeURIComponent(domain)}&keywords=${encodeURIComponent(keywords)}`);
+    try {
+      // Check if domain already exists for this user
+      const isDuplicate = await checkDuplicateDomain(domain);
+      
+      if (isDuplicate) {
+        toast.error(`Website "${domain}" already exists in your account.`);
+        setIsSubmitting(false);
+        return;
+      }
+      
+      // Redirect to the Add Website page with the form values as URL parameters
+      navigate(`/add-website?domain=${encodeURIComponent(domain)}&keywords=${encodeURIComponent(keywords)}`);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      toast.error('An error occurred. Please try again.');
+      setIsSubmitting(false);
+    }
   };
   
   return (
@@ -60,8 +100,9 @@ export function AddWebsiteForm({ onAddWebsite }: AddWebsiteFormProps) {
           <Button 
             type="submit" 
             className="w-full bg-rank-teal hover:bg-rank-teal/90"
+            disabled={isSubmitting}
           >
-            Continue
+            {isSubmitting ? "Checking..." : "Continue"}
           </Button>
         </CardFooter>
       </form>

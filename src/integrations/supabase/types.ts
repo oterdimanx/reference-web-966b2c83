@@ -49,6 +49,8 @@ export type Database = {
           domain: string
           id: string
           keyword_count: number
+          phone_number: string | null
+          phone_prefix: string | null
           position_change: number
           reciprocal_link: string | null
           title: string | null
@@ -66,6 +68,8 @@ export type Database = {
           domain: string
           id?: string
           keyword_count: number
+          phone_number?: string | null
+          phone_prefix?: string | null
           position_change: number
           reciprocal_link?: string | null
           title?: string | null
@@ -83,6 +87,8 @@ export type Database = {
           domain?: string
           id?: string
           keyword_count?: number
+          phone_number?: string | null
+          phone_prefix?: string | null
           position_change?: number
           reciprocal_link?: string | null
           title?: string | null

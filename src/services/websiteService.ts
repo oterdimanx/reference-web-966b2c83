@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { RankingSummary } from '@/lib/mockData';
 
@@ -7,6 +8,8 @@ export interface DetailedWebsite extends RankingSummary {
   description?: string;
   contactName?: string;
   contactEmail?: string;
+  phonePrefix?: string;
+  phoneNumber?: string;
   reciprocalLink?: string | null;
 }
 
@@ -37,6 +40,8 @@ export const mapToDbDetailedWebsite = (website: DetailedWebsite) => {
     description: website.description,
     contact_name: website.contactName,
     contact_email: website.contactEmail,
+    phone_prefix: website.phonePrefix,
+    phone_number: website.phoneNumber,
     reciprocal_link: website.reciprocalLink
   };
 };
@@ -61,6 +66,8 @@ export const mapFromDbDetailedWebsite = (dbWebsite: any): DetailedWebsite => {
     description: dbWebsite.description,
     contactName: dbWebsite.contact_name,
     contactEmail: dbWebsite.contact_email,
+    phonePrefix: dbWebsite.phone_prefix,
+    phoneNumber: dbWebsite.phone_number,
     reciprocalLink: dbWebsite.reciprocal_link
   };
 };
