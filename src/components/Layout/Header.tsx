@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X, User, LogOut } from 'lucide-react';
+import { Menu, X, User, LogOut, Shield } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -14,7 +14,7 @@ import {
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { user, signOut } = useAuth();
+  const { user, signOut, isAdmin } = useAuth();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -57,6 +57,9 @@ export function Header() {
             <Link to="/keywords" className="text-gray-700 hover:text-rank-blue dark:text-gray-200 dark:hover:text-white font-medium">
               Keywords
             </Link>
+            <Link to="/about" className="text-gray-700 hover:text-rank-blue dark:text-gray-200 dark:hover:text-white font-medium">
+              About
+            </Link>
             
             {user ? (
               <div className="flex items-center gap-2">
@@ -81,6 +84,14 @@ export function Header() {
                       <User className="mr-2 h-4 w-4" />
                       <span>Profile</span>
                     </DropdownMenuItem>
+                    
+                    {isAdmin && (
+                      <DropdownMenuItem onClick={() => navigate('/admin')}>
+                        <Shield className="mr-2 h-4 w-4" />
+                        <span>Admin</span>
+                      </DropdownMenuItem>
+                    )}
+                    
                     <DropdownMenuItem onClick={handleSignOut}>
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Sign out</span>
@@ -120,6 +131,9 @@ export function Header() {
             <Link to="/keywords" className="block py-2 text-gray-700 hover:text-rank-blue dark:text-gray-200 dark:hover:text-white font-medium">
               Keywords
             </Link>
+            <Link to="/about" className="block py-2 text-gray-700 hover:text-rank-blue dark:text-gray-200 dark:hover:text-white font-medium">
+              About
+            </Link>
             
             {user ? (
               <>
@@ -138,6 +152,18 @@ export function Header() {
                   <User className="mr-2 h-4 w-4" />
                   <span>Profile</span>
                 </Button>
+                
+                {isAdmin && (
+                  <Button 
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => navigate('/admin')}
+                  >
+                    <Shield className="mr-2 h-4 w-4" />
+                    <span>Admin</span>
+                  </Button>
+                )}
+                
                 <Button 
                   variant="destructive"
                   className="w-full"
