@@ -3,6 +3,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 interface AuthContextType {
   session: Session | null;
@@ -132,6 +133,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+export function AdminRedirectProvider({ children }: { children: ReactNode }) {
+  const { user, isAdmin, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // If user is authenticated and is admin, redirect to admin dashboard
+    if (!loading && user && isAdmin) {
+      // Check if not already on an admin page
+      if (!window.location.pathname.startsWith('/admin')) {
+        setTimeout(() => {
+          navigate('/admin/dashboard-rw');
+        }, 100);
+      }
+    }
+  }, [user, isAdmin, loading, navigate]);
+
+  return <>{children}</>;
 }
 
 export const useAuth = () => {

@@ -1,188 +1,152 @@
 
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X, User, LogOut, Shield } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Menu, X } from 'lucide-react';
+import { useMobile } from '@/hooks/use-mobile';
 
 export function Header() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, signOut, isAdmin } = useAuth();
-  const navigate = useNavigate();
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
+  const isMobile = useMobile();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
   };
-
-  const handleAuthClick = () => {
-    navigate('/auth');
+  
+  // Get user initials for avatar
+  const getUserInitials = () => {
+    if (!user || !user.email) return '??';
+    return user.email.substring(0, 2).toUpperCase();
   };
-
-  const getInitials = () => {
-    if (!user?.email) return 'U';
-    return user.email.substring(0, 1).toUpperCase();
-  };
-
-  return (
-    <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center">
-            <Link to="/" className="flex items-center">
-              <div className="h-8 w-8 rounded gradient-bg flex items-center justify-center mr-2">
-                <span className="text-white font-bold text-sm">RW</span>
-              </div>
-              <span className="font-bold text-xl text-rank-blue dark:text-white">
-                Reference<span className="text-rank-teal">-Web</span>
-              </span>
-            </Link>
-          </div>
-
-          {/* Desktop navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
-            <Link to="/" className="text-gray-700 hover:text-rank-blue dark:text-gray-200 dark:hover:text-white font-medium">
-              Dashboard
-            </Link>
-            <Link to="/rankings" className="text-gray-700 hover:text-rank-blue dark:text-gray-200 dark:hover:text-white font-medium">
-              Rankings
-            </Link>
-            <Link to="/keywords" className="text-gray-700 hover:text-rank-blue dark:text-gray-200 dark:hover:text-white font-medium">
-              Keywords
-            </Link>
-            <Link to="/about" className="text-gray-700 hover:text-rank-blue dark:text-gray-200 dark:hover:text-white font-medium">
-              About
-            </Link>
-            
-            {user ? (
-              <div className="flex items-center gap-2">
-                <Button 
-                  variant="default" 
-                  size="sm" 
-                  className="bg-rank-teal hover:bg-rank-teal/90"
-                  onClick={() => navigate('/add-website')}
-                >
-                  Add Website
-                </Button>
-                
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Avatar className="h-8 w-8 cursor-pointer">
-                      <AvatarImage src={user.user_metadata?.avatar_url} alt={user.email || 'User'} />
-                      <AvatarFallback className="bg-rank-blue text-white">{getInitials()}</AvatarFallback>
-                    </Avatar>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => navigate('/profile')}>
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
-                    </DropdownMenuItem>
-                    
-                    {isAdmin && (
-                      <DropdownMenuItem onClick={() => navigate('/admin')}>
-                        <Shield className="mr-2 h-4 w-4" />
-                        <span>Admin</span>
-                      </DropdownMenuItem>
-                    )}
-                    
-                    <DropdownMenuItem onClick={handleSignOut}>
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Sign out</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            ) : (
-              <Button 
-                variant="default" 
-                size="sm" 
-                className="bg-rank-teal hover:bg-rank-teal/90"
-                onClick={handleAuthClick}
+  
+  const renderMobileMenu = () => {
+    if (!mobileMenuOpen) return null;
+    
+    return (
+      <div className="absolute top-16 left-0 right-0 bg-white shadow-lg z-50 p-4">
+        <div className="flex flex-col space-y-4">
+          <Link to="/" className="text-gray-600 hover:text-rank-teal" onClick={toggleMobileMenu}>
+            Home
+          </Link>
+          <Link to="/about" className="text-gray-600 hover:text-rank-teal" onClick={toggleMobileMenu}>
+            About
+          </Link>
+          {user ? (
+            <>
+              <Link to="/all-websites" className="text-gray-600 hover:text-rank-teal" onClick={toggleMobileMenu}>
+                All Websites
+              </Link>
+              <Link to="/add-website" className="text-gray-600 hover:text-rank-teal" onClick={toggleMobileMenu}>
+                Add Website
+              </Link>
+              <Link to="/profile" className="text-gray-600 hover:text-rank-teal" onClick={toggleMobileMenu}>
+                Profile
+              </Link>
+              {isAdmin && (
+                <Link to="/admin/dashboard-rw" className="text-gray-600 hover:text-rank-teal" onClick={toggleMobileMenu}>
+                  Admin
+                </Link>
+              )}
+              <button
+                onClick={() => {
+                  signOut();
+                  toggleMobileMenu();
+                }}
+                className="text-gray-600 hover:text-rank-teal text-left"
               >
-                Sign In
-              </Button>
-            )}
-          </nav>
-
-          {/* Mobile menu button */}
-          <div className="md:hidden">
-            <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-              {mobileMenuOpen ? <X /> : <Menu />}
-            </Button>
-          </div>
+                Sign Out
+              </button>
+            </>
+          ) : (
+            <Link to="/auth" className="text-gray-600 hover:text-rank-teal" onClick={toggleMobileMenu}>
+              Login / Sign Up
+            </Link>
+          )}
         </div>
+      </div>
+    );
+  };
+  
+  return (
+    <header className="bg-white border-b border-slate-200 relative">
+      <div className="container mx-auto flex justify-between items-center p-4">
+        <Link to="/" className="flex items-center space-x-2">
+          <span className="text-2xl font-bold bg-gradient-to-r from-rank-teal to-blue-600 text-transparent bg-clip-text">
+            ReferenceRank
+          </span>
+        </Link>
         
-        {/* Mobile navigation */}
-        {mobileMenuOpen && (
-          <nav className="md:hidden mt-4 pb-2 space-y-4 animate-fade-in">
-            <Link to="/" className="block py-2 text-gray-700 hover:text-rank-blue dark:text-gray-200 dark:hover:text-white font-medium">
-              Dashboard
-            </Link>
-            <Link to="/rankings" className="block py-2 text-gray-700 hover:text-rank-blue dark:text-gray-200 dark:hover:text-white font-medium">
-              Rankings
-            </Link>
-            <Link to="/keywords" className="block py-2 text-gray-700 hover:text-rank-blue dark:text-gray-200 dark:hover:text-white font-medium">
-              Keywords
-            </Link>
-            <Link to="/about" className="block py-2 text-gray-700 hover:text-rank-blue dark:text-gray-200 dark:hover:text-white font-medium">
-              About
-            </Link>
+        {isMobile ? (
+          <>
+            <button onClick={toggleMobileMenu} className="p-2">
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+            {renderMobileMenu()}
+          </>
+        ) : (
+          <div className="flex items-center space-x-6">
+            <nav className="flex items-center space-x-6">
+              <Link to="/" className="text-gray-600 hover:text-rank-teal">
+                Home
+              </Link>
+              <Link to="/about" className="text-gray-600 hover:text-rank-teal">
+                About
+              </Link>
+              {user && (
+                <>
+                  <Link to="/all-websites" className="text-gray-600 hover:text-rank-teal">
+                    All Websites
+                  </Link>
+                  <Link to="/add-website" className="text-gray-600 hover:text-rank-teal">
+                    Add Website
+                  </Link>
+                </>
+              )}
+            </nav>
             
             {user ? (
-              <>
-                <Button 
-                  variant="default" 
-                  className="w-full bg-rank-teal hover:bg-rank-teal/90 mb-2"
-                  onClick={() => navigate('/add-website')}
-                >
-                  Add Website
-                </Button>
-                <Button 
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => navigate('/profile')}
-                >
-                  <User className="mr-2 h-4 w-4" />
-                  <span>Profile</span>
-                </Button>
-                
-                {isAdmin && (
-                  <Button 
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => navigate('/admin')}
-                  >
-                    <Shield className="mr-2 h-4 w-4" />
-                    <span>Admin</span>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative rounded-full h-8 w-8 p-0">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.email || 'User'} />
+                      <AvatarFallback>{getUserInitials()}</AvatarFallback>
+                    </Avatar>
                   </Button>
-                )}
-                
-                <Button 
-                  variant="destructive"
-                  className="w-full"
-                  onClick={handleSignOut}
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Sign out</span>
-                </Button>
-              </>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile">Profile</Link>
+                  </DropdownMenuItem>
+                  {isAdmin && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin/dashboard-rw">Admin Dashboard</Link>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => signOut()}>
+                    Sign out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
-              <Button 
-                variant="default" 
-                className="w-full bg-rank-teal hover:bg-rank-teal/90"
-                onClick={handleAuthClick}
-              >
-                Sign In
+              <Button asChild className="bg-rank-teal hover:bg-rank-teal/90">
+                <Link to="/auth">Login</Link>
               </Button>
             )}
-          </nav>
+          </div>
         )}
       </div>
     </header>

@@ -11,6 +11,9 @@ export interface DetailedWebsite extends RankingSummary {
   phonePrefix?: string;
   phoneNumber?: string;
   reciprocalLink?: string | null;
+  pricingId?: string;
+  pricingTitle?: string;
+  pricingPrice?: number;
 }
 
 // Map RankingSummary to database structure and back
@@ -42,7 +45,8 @@ export const mapToDbDetailedWebsite = (website: DetailedWebsite) => {
     contact_email: website.contactEmail,
     phone_prefix: website.phonePrefix,
     phone_number: website.phoneNumber,
-    reciprocal_link: website.reciprocalLink
+    reciprocal_link: website.reciprocalLink,
+    pricing_id: website.pricingId
   };
 };
 
@@ -68,7 +72,8 @@ export const mapFromDbDetailedWebsite = (dbWebsite: any): DetailedWebsite => {
     contactEmail: dbWebsite.contact_email,
     phonePrefix: dbWebsite.phone_prefix,
     phoneNumber: dbWebsite.phone_number,
-    reciprocalLink: dbWebsite.reciprocal_link
+    reciprocalLink: dbWebsite.reciprocal_link,
+    pricingId: dbWebsite.pricing_id
   };
 };
 

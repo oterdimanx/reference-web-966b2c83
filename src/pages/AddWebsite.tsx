@@ -18,6 +18,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 
 // Common phone prefixes with French (+33) as default
 const phonePrefixes = [
@@ -29,6 +30,13 @@ const phonePrefixes = [
   { value: '+34', label: 'Spain (+34)' },
   { value: '+32', label: 'Belgium (+32)' },
 ];
+
+// Define pricing plan type
+interface PricingPlan {
+  id: string;
+  title: string;
+  price: number;
+}
 
 // Form validation schema
 const formSchema = z.object({
@@ -43,6 +51,7 @@ const formSchema = z.object({
     .regex(/^\d+$/, "Phone number must contain only digits"),
   reciprocal_link: z.string().optional(),
   keywords: z.string().min(1, "At least one keyword is required"),
+  pricing_id: z.string().min(1, "Please select a pricing plan")
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -56,6 +65,21 @@ const AddWebsite = () => {
   const urlParams = new URLSearchParams(window.location.search);
   const domainParam = urlParams.get('domain') || '';
   const keywordsParam = urlParams.get('keywords') || '';
+  
+  // Fetch pricing plans
+  const { data: pricingPlans, isLoading: pricingLoading } = useQuery({
+    queryKey: ['pricing-plans'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('pricing')
+        .select('id, title, price')
+        .eq('active', true)
+        .order('price', { ascending: true });
+        
+      if (error) throw error;
+      return data as PricingPlan[];
+    }
+  });
   
   // Check for duplicate domain
   const checkDuplicateDomain = async (domain: string) => {
@@ -90,7 +114,8 @@ const AddWebsite = () => {
       phone_prefix: '+33',
       phone_number: '',
       reciprocal_link: '',
-      keywords: keywordsParam
+      keywords: keywordsParam,
+      pricing_id: ''
     }
   });
   
@@ -120,6 +145,9 @@ const AddWebsite = () => {
         topKeywordPosition: Math.floor(Math.random() * 10) + 1,
       };
       
+      // Find selected pricing plan
+      const selectedPlan = pricingPlans?.find(plan => plan.id === data.pricing_id);
+      
       // Add the additional fields
       const detailedWebsiteData = {
         ...websiteData,
@@ -129,7 +157,10 @@ const AddWebsite = () => {
         contactEmail: data.contact_email,
         phonePrefix: data.phone_prefix,
         phoneNumber: data.phone_number,
-        reciprocalLink: data.reciprocal_link || null
+        reciprocalLink: data.reciprocal_link || null,
+        pricingId: data.pricing_id,
+        pricingTitle: selectedPlan?.title || 'Unknown',
+        pricingPrice: selectedPlan?.price || 0
       };
       
       const savedWebsite = await saveWebsiteDetailed(detailedWebsiteData);
@@ -340,6 +371,43 @@ const AddWebsite = () => {
                         </FormControl>
                         <FormDescription>
                           Enter keywords separated by commas
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="pricing_id"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Select a Plan</FormLabel>
+                        <Select 
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Choose a pricing plan" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {pricingLoading ? (
+                              <SelectItem value="loading" disabled>Loading plans...</SelectItem>
+                            ) : pricingPlans && pricingPlans.length > 0 ? (
+                              pricingPlans.map((plan) => (
+                                <SelectItem key={plan.id} value={plan.id}>
+                                  {plan.title} - ${plan.price.toFixed(2)}/month
+                                </SelectItem>
+                              ))
+                            ) : (
+                              <SelectItem value="none" disabled>No plans available</SelectItem>
+                            )}
+                          </SelectContent>
+                        </Select>
+                        <FormDescription>
+                          Choose the subscription plan for this website
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
