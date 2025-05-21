@@ -1,86 +1,124 @@
 
 import { useState } from 'react';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
+import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { useMutation } from '@tanstack/react-query';
+
+// Form schema
+const adminFormSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+});
+
+type AdminFormValues = z.infer<typeof adminFormSchema>;
 
 interface AddAdminFormProps {
   onAdminAdded: (email: string, userId: string) => void;
 }
 
 const AddAdminForm = ({ onAdminAdded }: AddAdminFormProps) => {
-  const [emailInput, setEmailInput] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleMakeAdmin = async () => {
-    if (!emailInput.trim()) {
-      toast.error('Please enter a valid email address');
-      return;
-    }
+  // Form setup
+  const form = useForm<AdminFormValues>({
+    resolver: zodResolver(adminFormSchema),
+    defaultValues: {
+      email: '',
+    },
+  });
 
-    setIsLoading(true);
-
-    try {
-      // First find the user by email
+  // Add admin mutation
+  const addAdminMutation = useMutation({
+    mutationFn: async (email: string) => {
+      // First check if user exists
       const { data: userData, error: userError } = await supabase.auth.admin.listUsers();
-      
+
       if (userError) {
         throw userError;
       }
 
-      const user = userData.users.find(u => u.email === emailInput.trim());
+      const user = userData.users.find(u => u.email === email);
       
       if (!user) {
-        toast.error('User not found. Please check the email address');
-        return;
+        throw new Error('User not found with this email address');
       }
 
-      // Now add the admin role
-      const { error } = await supabase
+      // Check if user already has admin role
+      const { data: existingRole, error: roleError } = await supabase
+        .from('user_roles')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('role', 'admin');
+
+      if (roleError) {
+        throw roleError;
+      }
+
+      if (existingRole && existingRole.length > 0) {
+        throw new Error('User already has admin role');
+      }
+
+      // Add admin role to user
+      const { error: insertError } = await supabase
         .from('user_roles')
         .insert({
           user_id: user.id,
-          role: 'admin'
-        })
-        .select();
+          role: 'admin',
+        });
 
-      if (error) {
-        if (error.code === '23505') { // Duplicate key error
-          toast.info('This user is already an admin');
-        } else {
-          throw error;
-        }
-      } else {
-        toast.success(`${emailInput} is now an admin`);
-        onAdminAdded(user.email || "", user.id);
-        setEmailInput('');
+      if (insertError) {
+        throw insertError;
       }
-    } catch (error) {
-      console.error('Error making user admin:', error);
-      toast.error('Failed to update user role');
-    } finally {
-      setIsLoading(false);
+
+      return { email, userId: user.id };
+    },
+    onSuccess: (data) => {
+      toast.success(`Admin role granted to ${data.email}`);
+      form.reset();
+      onAdminAdded(data.email, data.userId);
+    },
+    onError: (error) => {
+      toast.error(`Error adding admin: ${error.message}`);
     }
+  });
+
+  const onSubmit = async (values: AdminFormValues) => {
+    addAdminMutation.mutate(values.email);
   };
 
   return (
-    <div className="flex gap-2">
-      <Input 
-        placeholder="User email address" 
-        value={emailInput} 
-        onChange={(e) => setEmailInput(e.target.value)} 
-        type="email"
-        className="flex-grow"
-      />
-      <Button 
-        className="bg-rank-teal hover:bg-rank-teal/90"
-        onClick={handleMakeAdmin}
-        disabled={isLoading}
-      >
-        {isLoading ? 'Processing...' : 'Make Admin'}
-      </Button>
-    </div>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email Address</FormLabel>
+              <FormControl>
+                <Input placeholder="user@example.com" {...field} />
+              </FormControl>
+              <FormDescription>
+                Enter the email address of the user you want to grant admin privileges to
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <Button 
+          type="submit" 
+          disabled={addAdminMutation.isPending}
+        >
+          {addAdminMutation.isPending ? 'Adding Admin...' : 'Add Admin'}
+        </Button>
+      </form>
+    </Form>
   );
 };
 
