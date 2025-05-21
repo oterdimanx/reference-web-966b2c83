@@ -29,6 +29,19 @@ interface AddAdminResult {
   userId: string;
 }
 
+// Define the Supabase user type to match what comes from the API
+interface SupabaseUser {
+  id: string;
+  email?: string;
+  // Add other properties as needed, but these are the minimum we use
+}
+
+// Define the response type from listUsers to avoid the 'never' type error
+interface ListUsersResponse {
+  users: SupabaseUser[];
+  aud: string;
+}
+
 const AddAdminForm = ({ onAdminAdded }: AddAdminFormProps) => {
   const [error, setError] = useState<string | null>(null);
 
@@ -46,15 +59,18 @@ const AddAdminForm = ({ onAdminAdded }: AddAdminFormProps) => {
       setError(null);
       
       // First check if user exists
-      const { data: userData, error: userError } = await supabase.auth.admin.listUsers();
-
+      const { data, error: userError } = await supabase.auth.admin.listUsers();
+      
       if (userError) {
         throw userError;
       }
 
+      // Explicitly type the data as ListUsersResponse
+      const userData = data as unknown as ListUsersResponse;
+      
       const user = userData.users.find(u => u.email === email);
       
-      if (!user) {
+      if (!user || !user.email) {
         throw new Error('User not found with this email address');
       }
 
