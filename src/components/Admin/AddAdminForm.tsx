@@ -39,7 +39,7 @@ const AddAdminForm = ({ onAdminAdded }: AddAdminFormProps) => {
   });
 
   // Add admin mutation
-  const addAdminMutation = useMutation({
+  const addAdminMutation = useMutation<AddAdminResult, Error, string>({
     mutationFn: async (email: string): Promise<AddAdminResult> => {
       // First check if user exists
       const { data: userData, error: userError } = await supabase.auth.admin.listUsers();
