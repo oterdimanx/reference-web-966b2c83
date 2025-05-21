@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Header } from '@/components/Layout/Header';
 import { Footer } from '@/components/Layout/Footer';
@@ -96,7 +95,11 @@ const AdminPricing = () => {
     mutationFn: async (values: PricingFormValues) => {
       const { data, error } = await supabase
         .from('pricing')
-        .insert(values)
+        .insert({
+          title: values.title,
+          price: values.price,
+          active: values.active
+        })
         .select()
         .single();
         
@@ -119,7 +122,11 @@ const AdminPricing = () => {
     mutationFn: async ({ id, values }: { id: string, values: PricingFormValues }) => {
       const { data, error } = await supabase
         .from('pricing')
-        .update(values)
+        .update({
+          title: values.title,
+          price: values.price,
+          active: values.active
+        })
         .eq('id', id)
         .select()
         .single();

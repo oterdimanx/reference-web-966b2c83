@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Header } from '@/components/Layout/Header';
 import { Footer } from '@/components/Layout/Footer';
@@ -15,7 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 // Type for user with role
 interface UserWithRole {
   id: string;
-  email: string;
+  email: string | null;
   role: string;
 }
 
@@ -87,7 +86,7 @@ const AdminPage = () => {
           const userRole = roles?.find(role => role.user_id === authUser.id);
           return {
             id: authUser.id,
-            email: authUser.email || 'No email',
+            email: authUser.email || null,
             role: userRole ? userRole.role : 'user'
           };
         });
@@ -156,7 +155,7 @@ const AdminPage = () => {
           } else {
             newUsers.push({
               id: user.id,
-              email: user.email || 'No email',
+              email: user.email || null,
               role: 'admin'
             });
           }
