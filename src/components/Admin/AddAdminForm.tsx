@@ -21,6 +21,12 @@ interface AddAdminFormProps {
   onAdminAdded: (email: string, userId: string) => void;
 }
 
+// Define the expected response type from the mutation
+interface AddAdminResult {
+  email: string;
+  userId: string;
+}
+
 const AddAdminForm = ({ onAdminAdded }: AddAdminFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -34,7 +40,7 @@ const AddAdminForm = ({ onAdminAdded }: AddAdminFormProps) => {
 
   // Add admin mutation
   const addAdminMutation = useMutation({
-    mutationFn: async (email: string) => {
+    mutationFn: async (email: string): Promise<AddAdminResult> => {
       // First check if user exists
       const { data: userData, error: userError } = await supabase.auth.admin.listUsers();
 
