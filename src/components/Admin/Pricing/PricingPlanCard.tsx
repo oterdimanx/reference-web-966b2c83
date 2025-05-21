@@ -2,10 +2,11 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Pencil, Trash2 } from 'lucide-react';
-import { PricingPlan } from '@/hooks/use-pricing-plans';
+import { Pencil, Trash2, Loader2 } from 'lucide-react';
+import { PricingPlan, usePricingPlans } from '@/hooks/use-pricing-plans';
 import PricingPlanEditDialog from './PricingPlanEditDialog';
 import PricingPlanDeleteDialog from './PricingPlanDeleteDialog';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface PricingPlanCardProps {
   plan: PricingPlan;
@@ -14,6 +15,12 @@ interface PricingPlanCardProps {
 const PricingPlanCard = ({ plan }: PricingPlanCardProps) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const { user } = useAuth();
+  const { updatePricingMutation, deletePricingMutation } = usePricingPlans(user?.id, true);
+  
+  // Check if this specific plan is being processed
+  const isUpdating = updatePricingMutation.isPending && updatePricingMutation.variables?.id === plan.id;
+  const isDeleting = deletePricingMutation.isPending && deletePricingMutation.variables === plan.id;
 
   return (
     <>
@@ -26,16 +33,26 @@ const PricingPlanCard = ({ plan }: PricingPlanCardProps) => {
                 variant="ghost" 
                 size="icon"
                 onClick={() => setIsEditDialogOpen(true)}
+                disabled={isUpdating || isDeleting}
               >
-                <Pencil className="h-4 w-4" />
+                {isUpdating ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Pencil className="h-4 w-4" />
+                )}
               </Button>
               
               <Button 
                 variant="ghost" 
                 size="icon"
                 onClick={() => setIsDeleteDialogOpen(true)}
+                disabled={isUpdating || isDeleting}
               >
-                <Trash2 className="h-4 w-4" />
+                {isDeleting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Trash2 className="h-4 w-4" />
+                )}
               </Button>
             </div>
           </CardTitle>

@@ -1,4 +1,5 @@
 
+import { useState } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,6 +12,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { usePricingPlans } from '@/hooks/use-pricing-plans';
 import { useAuth } from '@/contexts/AuthContext';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle, Loader2 } from 'lucide-react';
 
 interface PricingPlanDeleteDialogProps {
   planId: string;
@@ -25,11 +28,17 @@ const PricingPlanDeleteDialog = ({
 }: PricingPlanDeleteDialogProps) => {
   const { user } = useAuth();
   const { deletePricingMutation } = usePricingPlans(user?.id, true);
+  const [error, setError] = useState<string | null>(null);
 
   const handleDelete = () => {
+    setError(null);
+    
     deletePricingMutation.mutate(planId, {
       onSuccess: () => {
         onOpenChange(false);
+      },
+      onError: (error) => {
+        setError(error.message);
       }
     });
   };
@@ -43,13 +52,29 @@ const PricingPlanDeleteDialog = ({
             This will permanently delete the pricing plan. This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
+        
+        {error && (
+          <Alert variant="destructive" className="mt-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={deletePricingMutation.isPending}>Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
             className="bg-red-600 hover:bg-red-700"
+            disabled={deletePricingMutation.isPending}
           >
-            {deletePricingMutation.isPending ? "Deleting..." : "Delete"}
+            {deletePricingMutation.isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Deleting...
+              </>
+            ) : (
+              "Delete"
+            )}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

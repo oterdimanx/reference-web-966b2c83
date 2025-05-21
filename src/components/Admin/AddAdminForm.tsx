@@ -9,6 +9,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useMutation } from '@tanstack/react-query';
+import { AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 // Form schema
 const adminFormSchema = z.object({
@@ -28,7 +30,7 @@ interface AddAdminResult {
 }
 
 const AddAdminForm = ({ onAdminAdded }: AddAdminFormProps) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Form setup
   const form = useForm<AdminFormValues>({
@@ -41,6 +43,8 @@ const AddAdminForm = ({ onAdminAdded }: AddAdminFormProps) => {
   // Add admin mutation
   const addAdminMutation = useMutation<AddAdminResult, Error, string>({
     mutationFn: async (email: string): Promise<AddAdminResult> => {
+      setError(null);
+      
       // First check if user exists
       const { data: userData, error: userError } = await supabase.auth.admin.listUsers();
 
@@ -87,8 +91,10 @@ const AddAdminForm = ({ onAdminAdded }: AddAdminFormProps) => {
       toast.success(`Admin role granted to ${data.email}`);
       form.reset();
       onAdminAdded(data.email, data.userId);
+      setError(null);
     },
     onError: (error) => {
+      setError(error.message);
       toast.error(`Error adding admin: ${error.message}`);
     }
   });
@@ -100,6 +106,13 @@ const AddAdminForm = ({ onAdminAdded }: AddAdminFormProps) => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        
         <FormField
           control={form.control}
           name="email"

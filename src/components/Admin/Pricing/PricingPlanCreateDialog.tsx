@@ -1,4 +1,5 @@
 
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { 
@@ -15,6 +16,8 @@ import { Switch } from '@/components/ui/switch';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { pricingFormSchema, PricingFormValues, usePricingPlans } from '@/hooks/use-pricing-plans';
 import { useAuth } from '@/contexts/AuthContext';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle, Loader2 } from 'lucide-react';
 
 interface PricingPlanCreateDialogProps {
   isOpen: boolean;
@@ -24,6 +27,7 @@ interface PricingPlanCreateDialogProps {
 const PricingPlanCreateDialog = ({ isOpen, onOpenChange }: PricingPlanCreateDialogProps) => {
   const { user } = useAuth();
   const { createPricingMutation } = usePricingPlans(user?.id, true);
+  const [error, setError] = useState<string | null>(null);
   
   const form = useForm<PricingFormValues>({
     resolver: zodResolver(pricingFormSchema),
@@ -35,16 +39,30 @@ const PricingPlanCreateDialog = ({ isOpen, onOpenChange }: PricingPlanCreateDial
   });
 
   const onSubmit = (values: PricingFormValues) => {
+    setError(null);
     createPricingMutation.mutate(values, {
       onSuccess: () => {
         onOpenChange(false);
         form.reset();
+      },
+      onError: (error) => {
+        setError(error.message);
       }
     });
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog 
+      open={isOpen} 
+      onOpenChange={(open) => {
+        if (!open) {
+          // Reset the form and error state when dialog is closed
+          form.reset();
+          setError(null);
+        }
+        onOpenChange(open);
+      }}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add New Pricing Plan</DialogTitle>
@@ -52,6 +70,13 @@ const PricingPlanCreateDialog = ({ isOpen, onOpenChange }: PricingPlanCreateDial
             Create a new pricing plan to offer to your customers.
           </DialogDescription>
         </DialogHeader>
+        
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
         
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -112,10 +137,22 @@ const PricingPlanCreateDialog = ({ isOpen, onOpenChange }: PricingPlanCreateDial
             
             <div className="flex justify-end gap-2">
               <DialogClose asChild>
-                <Button variant="outline" type="button">Cancel</Button>
+                <Button variant="outline" type="button" disabled={createPricingMutation.isPending}>
+                  Cancel
+                </Button>
               </DialogClose>
-              <Button type="submit" disabled={createPricingMutation.isPending}>
-                {createPricingMutation.isPending ? "Creating..." : "Create Plan"}
+              <Button 
+                type="submit" 
+                disabled={createPricingMutation.isPending}
+              >
+                {createPricingMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  "Create Plan"
+                )}
               </Button>
             </div>
           </form>

@@ -25,6 +25,12 @@ export const pricingFormSchema = z.object({
 
 export type PricingFormValues = z.infer<typeof pricingFormSchema>;
 
+// Define mutation return types
+interface UpdatePricingData {
+  id: string;
+  values: PricingFormValues;
+}
+
 export const usePricingPlans = (userId: string | undefined, isAdmin: boolean) => {
   const queryClient = useQueryClient();
   
@@ -36,19 +42,26 @@ export const usePricingPlans = (userId: string | undefined, isAdmin: boolean) =>
   } = useQuery({
     queryKey: ['pricing-plans', 'admin'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('pricing')
-        .select('*')
-        .order('price', { ascending: true });
-        
-      if (error) throw error;
-      return data as PricingPlan[];
+      try {
+        const { data, error } = await supabase
+          .from('pricing')
+          .select('*')
+          .order('price', { ascending: true });
+          
+        if (error) throw error;
+        return data as PricingPlan[];
+      } catch (error) {
+        console.error('Error fetching pricing plans:', error);
+        throw error;
+      }
     },
-    enabled: !!userId && isAdmin
+    enabled: !!userId && isAdmin,
+    retry: 2,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
   
   // Create pricing plan mutation
-  const createPricingMutation = useMutation({
+  const createPricingMutation = useMutation<PricingPlan, Error, PricingFormValues>({
     mutationFn: async (values: PricingFormValues) => {
       const { data, error } = await supabase
         .from('pricing')
@@ -61,7 +74,7 @@ export const usePricingPlans = (userId: string | undefined, isAdmin: boolean) =>
         .single();
         
       if (error) throw error;
-      return data;
+      return data as PricingPlan;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pricing-plans'] });
@@ -73,8 +86,8 @@ export const usePricingPlans = (userId: string | undefined, isAdmin: boolean) =>
   });
   
   // Update pricing plan mutation
-  const updatePricingMutation = useMutation({
-    mutationFn: async ({ id, values }: { id: string, values: PricingFormValues }) => {
+  const updatePricingMutation = useMutation<PricingPlan, Error, UpdatePricingData>({
+    mutationFn: async ({ id, values }: UpdatePricingData) => {
       const { data, error } = await supabase
         .from('pricing')
         .update({
@@ -87,7 +100,7 @@ export const usePricingPlans = (userId: string | undefined, isAdmin: boolean) =>
         .single();
         
       if (error) throw error;
-      return data;
+      return data as PricingPlan;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pricing-plans'] });
@@ -99,7 +112,7 @@ export const usePricingPlans = (userId: string | undefined, isAdmin: boolean) =>
   });
   
   // Delete pricing plan mutation
-  const deletePricingMutation = useMutation({
+  const deletePricingMutation = useMutation<void, Error, string>({
     mutationFn: async (id: string) => {
       const { error } = await supabase
         .from('pricing')
@@ -114,6 +127,8 @@ export const usePricingPlans = (userId: string | undefined, isAdmin: boolean) =>
     },
     onError: (error) => {
       toast.error(`Failed to delete pricing plan: ${error.message}`);
+      console.error('Error deleting pricing plan:', error);
+      throw error; // Re-throw to let components handle the error state
     }
   });
 
