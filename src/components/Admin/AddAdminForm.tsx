@@ -40,7 +40,7 @@ const AddAdminForm = ({ onAdminAdded }: AddAdminFormProps) => {
     },
   });
 
-  // Add admin mutation
+  // Add admin mutation - explicit typing for both input and output
   const addAdminMutation = useMutation<AddAdminResult, Error, string>({
     mutationFn: async (email: string): Promise<AddAdminResult> => {
       setError(null);
