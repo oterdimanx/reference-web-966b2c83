@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -17,7 +16,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 
 export function Header() {
   const { user, signOut, isAdmin } = useAuth();
-  const isMobile = useMobile();
+  const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const toggleMobileMenu = () => {
