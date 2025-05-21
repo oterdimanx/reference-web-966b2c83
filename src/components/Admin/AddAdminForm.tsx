@@ -40,7 +40,7 @@ const AddAdminForm = ({ onAdminAdded }: AddAdminFormProps) => {
     },
   });
 
-  // Add admin mutation - explicit typing for both input and output
+  // Add admin mutation with explicit type definitions to fix TypeScript errors
   const addAdminMutation = useMutation<AddAdminResult, Error, string>({
     mutationFn: async (email: string): Promise<AddAdminResult> => {
       setError(null);
@@ -85,7 +85,11 @@ const AddAdminForm = ({ onAdminAdded }: AddAdminFormProps) => {
         throw insertError;
       }
 
-      return { email, userId: user.id };
+      // Explicitly return the required structure to match AddAdminResult type
+      return {
+        email: email,
+        userId: user.id
+      };
     },
     onSuccess: (data) => {
       toast.success(`Admin role granted to ${data.email}`);
