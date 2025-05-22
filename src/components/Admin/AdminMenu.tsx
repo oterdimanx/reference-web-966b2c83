@@ -2,10 +2,12 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Home, DollarSign, Settings, ArrowLeftCircle } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const AdminMenu = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   
   // Determine if the current path is active
   const isActive = (path: string) => {
@@ -19,7 +21,7 @@ const AdminMenu = () => {
   
   return (
     <div className="bg-slate-100 p-4 rounded-lg mb-6">
-      <h2 className="text-lg font-semibold mb-3">Admin Navigation</h2>
+      <h2 className="text-lg font-semibold mb-3">{t('admin', 'navigationTitle')}</h2>
       <div className="flex flex-wrap gap-2">
         <Button
           variant={isActive('/admin/dashboard-rw') ? "default" : "outline"}
@@ -28,7 +30,7 @@ const AdminMenu = () => {
         >
           <Link to="/admin/dashboard-rw">
             <Home className="mr-2 h-4 w-4" />
-            Dashboard
+            {t('admin', 'dashboard')}
           </Link>
         </Button>
         
@@ -39,7 +41,7 @@ const AdminMenu = () => {
         >
           <Link to="/admin/pricing">
             <DollarSign className="mr-2 h-4 w-4" />
-            Pricing Plans
+            {t('admin', 'pricing')}
           </Link>
         </Button>
         
@@ -50,7 +52,7 @@ const AdminMenu = () => {
         >
           <Link to="/admin">
             <Settings className="mr-2 h-4 w-4" />
-            User Management
+            {t('admin', 'userManagement')}
           </Link>
         </Button>
         
@@ -61,7 +63,7 @@ const AdminMenu = () => {
           className="ml-auto"
         >
           <ArrowLeftCircle className="mr-2 h-4 w-4" />
-          Return to Front
+          {t('common', 'returnToFront')}
         </Button>
       </div>
     </div>
