@@ -16,6 +16,10 @@ export interface Translations {
     profile: string;
     admin: string;
     returnToFront: string;
+    // Footer links
+    privacyPolicy: string;
+    termsOfService: string;
+    copyright: string;
   };
   admin: {
     dashboard: string;
@@ -27,11 +31,38 @@ export interface Translations {
     pricingPlans: string;
     recentActivity: string;
     welcomeMessage: string;
+    translationManager: string;
+    commonTexts: string;
+    adminTexts: string;
+    homepageTexts: string;
+    saveTranslations: string;
   };
   homepage: {
     title: string;
     subtitle: string;
     getStarted: string;
+    // New homepage sections
+    featuresTitle: string;
+    rankingsSection: string;
+    keywordsSection: string;
+  };
+  pages: {
+    // Page titles
+    rankings: string;
+    keywords: string;
+    about: string;
+    profile: string;
+    addWebsite: string;
+    allWebsites: string;
+    // Section titles
+    rankingsTitle: string;
+    keywordsTitle: string;
+    monitorRankings: string;
+    optimizeKeywords: string;
+    whyTrackRankings: string;
+    whyKeywordResearch: string;
+    yourWebsiteRankings: string;
+    yourKeywords: string;
   };
 }
 
@@ -59,6 +90,10 @@ const enTranslations: Translations = {
     profile: 'Profile',
     admin: 'Admin Dashboard',
     returnToFront: 'Return to Front',
+    // Footer links
+    privacyPolicy: 'Privacy Policy',
+    termsOfService: 'Terms of Service',
+    copyright: '© {year} Reference-Web. All rights reserved.',
   },
   admin: {
     dashboard: 'Dashboard',
@@ -70,11 +105,38 @@ const enTranslations: Translations = {
     pricingPlans: 'Pricing Plans',
     recentActivity: 'Recent Activity',
     welcomeMessage: 'Welcome to the admin dashboard. Use the navigation above to manage different aspects of your application.',
+    translationManager: 'Translation Manager',
+    commonTexts: 'Common Texts',
+    adminTexts: 'Admin Texts',
+    homepageTexts: 'Homepage Texts',
+    saveTranslations: 'Save English Translations',
   },
   homepage: {
     title: 'Reference-Web',
     subtitle: 'Track and manage your website rankings',
     getStarted: 'Get Started',
+    // New homepage sections
+    featuresTitle: 'Our Features',
+    rankingsSection: 'Track Rankings',
+    keywordsSection: 'Keyword Research',
+  },
+  pages: {
+    // Page titles
+    rankings: 'Rankings',
+    keywords: 'Keywords',
+    about: 'About Us',
+    profile: 'User Profile',
+    addWebsite: 'Add Website',
+    allWebsites: 'All Websites',
+    // Section titles
+    rankingsTitle: 'Your Website Rankings',
+    keywordsTitle: 'Your Keywords',
+    monitorRankings: 'Monitor Your Website Rankings',
+    optimizeKeywords: 'Optimize Your Keyword Strategy',
+    whyTrackRankings: 'Why Track Your Rankings?',
+    whyKeywordResearch: 'Why Keyword Research Matters',
+    yourWebsiteRankings: 'Your Website Rankings',
+    yourKeywords: 'Your Keywords',
   },
 };
 
@@ -90,6 +152,10 @@ const frTranslations: Translations = {
     profile: 'Profil',
     admin: 'Tableau de bord admin',
     returnToFront: 'Retour au site',
+    // Footer links
+    privacyPolicy: 'Politique de confidentialité',
+    termsOfService: 'Conditions d\'utilisation',
+    copyright: '© {year} Reference-Web. Tous droits réservés.',
   },
   admin: {
     dashboard: 'Tableau de bord',
@@ -101,11 +167,38 @@ const frTranslations: Translations = {
     pricingPlans: 'Plans tarifaires',
     recentActivity: 'Activité récente',
     welcomeMessage: 'Bienvenue sur le tableau de bord administrateur. Utilisez la navigation ci-dessus pour gérer différents aspects de votre application.',
+    translationManager: 'Gestionnaire de traductions',
+    commonTexts: 'Textes communs',
+    adminTexts: 'Textes administrateur',
+    homepageTexts: 'Textes de la page d\'accueil',
+    saveTranslations: 'Sauvegarder les traductions françaises',
   },
   homepage: {
     title: 'Reference-Web',
     subtitle: 'Suivez et gérez les classements de votre site web',
     getStarted: 'Commencer',
+    // New homepage sections
+    featuresTitle: 'Nos fonctionnalités',
+    rankingsSection: 'Suivre les classements',
+    keywordsSection: 'Recherche de mots-clés',
+  },
+  pages: {
+    // Page titles
+    rankings: 'Classements',
+    keywords: 'Mots-clés',
+    about: 'À propos de nous',
+    profile: 'Profil utilisateur',
+    addWebsite: 'Ajouter un site web',
+    allWebsites: 'Tous les sites web',
+    // Section titles
+    rankingsTitle: 'Classements de votre site web',
+    keywordsTitle: 'Vos mots-clés',
+    monitorRankings: 'Surveillez les classements de votre site web',
+    optimizeKeywords: 'Optimisez votre stratégie de mots-clés',
+    whyTrackRankings: 'Pourquoi suivre vos classements ?',
+    whyKeywordResearch: 'Pourquoi la recherche de mots-clés est importante',
+    yourWebsiteRankings: 'Classements de votre site web',
+    yourKeywords: 'Vos mots-clés',
   },
 };
 

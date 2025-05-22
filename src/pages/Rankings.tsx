@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Header } from '@/components/Layout/Header';
 import { Footer } from '@/components/Layout/Footer';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +12,7 @@ import { Button } from '@/components/ui/button';
 
 const RankingsPage = () => {
   const { user, loading } = useAuth();
+  const { t } = useLanguage();
   const [demoRankings] = useState([
     { keyword: 'seo optimization', position: 3, change: 2 },
     { keyword: 'web design agency', position: 5, change: -1 },
@@ -49,7 +51,7 @@ const RankingsPage = () => {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">Rankings</h1>
+        <h1 className="text-3xl font-bold mb-6">{t('pages', 'rankings')}</h1>
 
         {loading ? (
           // Loading state
@@ -62,9 +64,9 @@ const RankingsPage = () => {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="text-xl">Your Website Rankings</CardTitle>
+                <CardTitle className="text-xl">{t('pages', 'yourWebsiteRankings')}</CardTitle>
                 <CardDescription>
-                  Track how your website keywords are performing in search engines
+                  {t('pages', 'rankingsTitle')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -122,7 +124,7 @@ const RankingsPage = () => {
             <Card>
               <CardContent className="pt-6">
                 <div className="text-center py-10">
-                  <h2 className="text-2xl font-semibold mb-4">Monitor Your Website Rankings</h2>
+                  <h2 className="text-2xl font-semibold mb-4">{t('pages', 'monitorRankings')}</h2>
                   <p className="mb-6 text-muted-foreground">
                     Track how your keywords perform in search results and improve your SEO strategy.
                     Sign in to access detailed ranking reports for your websites.
@@ -139,7 +141,7 @@ const RankingsPage = () => {
             
             <Card>
               <CardHeader>
-                <CardTitle className="text-xl">Why Track Your Rankings?</CardTitle>
+                <CardTitle className="text-xl">{t('pages', 'whyTrackRankings')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid md:grid-cols-3 gap-4 text-center">

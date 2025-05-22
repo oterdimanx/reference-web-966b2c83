@@ -3,16 +3,17 @@ import { useState } from 'react';
 import { Header } from '@/components/Layout/Header';
 import { Footer } from '@/components/Layout/Footer';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, XCircle, Info } from 'lucide-react';
 
 const KeywordsPage = () => {
   const { user, loading } = useAuth();
+  const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [demoKeywords] = useState([
     { keyword: 'seo optimization', volume: 'High', difficulty: 'Medium', ranking: 3 },
@@ -74,7 +75,7 @@ const KeywordsPage = () => {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">Keywords</h1>
+        <h1 className="text-3xl font-bold mb-6">{t('pages', 'keywords')}</h1>
 
         {loading ? (
           // Loading state
@@ -87,9 +88,9 @@ const KeywordsPage = () => {
           <div className="space-y-6">
             <Card className="mb-6">
               <CardHeader>
-                <CardTitle className="text-xl">Your Keywords</CardTitle>
+                <CardTitle className="text-xl">{t('pages', 'yourKeywords')}</CardTitle>
                 <CardDescription>
-                  Track and manage keywords for your websites
+                  {t('pages', 'keywordsTitle')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -152,7 +153,7 @@ const KeywordsPage = () => {
             <Card>
               <CardContent className="pt-6">
                 <div className="text-center py-10">
-                  <h2 className="text-2xl font-semibold mb-4">Optimize Your Keyword Strategy</h2>
+                  <h2 className="text-2xl font-semibold mb-4">{t('pages', 'optimizeKeywords')}</h2>
                   <p className="mb-6 text-muted-foreground">
                     Track keyword performance, discover new opportunities, and boost your search rankings.
                     Sign in to manage your keyword portfolio.
@@ -169,7 +170,7 @@ const KeywordsPage = () => {
             
             <Card>
               <CardHeader>
-                <CardTitle className="text-xl">Why Keyword Research Matters</CardTitle>
+                <CardTitle className="text-xl">{t('pages', 'whyKeywordResearch')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid md:grid-cols-3 gap-4">

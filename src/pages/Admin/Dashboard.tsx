@@ -25,7 +25,8 @@ const AdminDashboard = () => {
     setEditedTranslations({
       common: { ...translations.common },
       admin: { ...translations.admin },
-      homepage: { ...translations.homepage }
+      homepage: { ...translations.homepage },
+      pages: { ...translations.pages }
     });
   }, [language, translations]);
   
@@ -134,7 +135,7 @@ const AdminDashboard = () => {
         
         <Card>
           <CardHeader>
-            <CardTitle>Translation Manager</CardTitle>
+            <CardTitle>{t('admin', 'translationManager')}</CardTitle>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="en" onValueChange={(val) => setSelectedLanguage(val as Language)}>
@@ -145,7 +146,7 @@ const AdminDashboard = () => {
               
               <TabsContent value="en" className="space-y-6">
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Common Texts</h3>
+                  <h3 className="text-lg font-semibold">{t('admin', 'commonTexts')}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {Object.keys(editedTranslations.common || {}).map((key) => (
                       <div key={key} className="space-y-2">
@@ -160,7 +161,7 @@ const AdminDashboard = () => {
                 </div>
                 
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Admin Texts</h3>
+                  <h3 className="text-lg font-semibold">{t('admin', 'adminTexts')}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {Object.keys(editedTranslations.admin || {}).map((key) => (
                       <div key={key} className="space-y-2">
@@ -175,7 +176,7 @@ const AdminDashboard = () => {
                 </div>
                 
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Homepage Texts</h3>
+                  <h3 className="text-lg font-semibold">{t('admin', 'homepageTexts')}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {Object.keys(editedTranslations.homepage || {}).map((key) => (
                       <div key={key} className="space-y-2">
@@ -189,7 +190,22 @@ const AdminDashboard = () => {
                   </div>
                 </div>
                 
-                <Button onClick={saveTranslations} className="mt-4">Save English Translations</Button>
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Page Texts</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {Object.keys(editedTranslations.pages || {}).map((key) => (
+                      <div key={key} className="space-y-2">
+                        <label className="text-sm font-medium">{key}</label>
+                        <Input 
+                          value={editedTranslations.pages?.[key as keyof typeof editedTranslations.pages] || ''}
+                          onChange={(e) => handleTranslationChange('pages', key, e.target.value)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <Button onClick={saveTranslations} className="mt-4">{t('admin', 'saveTranslations')}</Button>
               </TabsContent>
               
               <TabsContent value="fr" className="space-y-6">
@@ -238,7 +254,22 @@ const AdminDashboard = () => {
                   </div>
                 </div>
                 
-                <Button onClick={saveTranslations} className="mt-4">Sauvegarder les traductions françaises</Button>
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Textes des pages</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {Object.keys(editedTranslations.pages || {}).map((key) => (
+                      <div key={key} className="space-y-2">
+                        <label className="text-sm font-medium">{key}</label>
+                        <Input 
+                          value={editedTranslations.pages?.[key as keyof typeof editedTranslations.pages] || ''}
+                          onChange={(e) => handleTranslationChange('pages', key, e.target.value)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <Button onClick={saveTranslations} className="mt-4">{t('admin', 'saveTranslations')}</Button>
               </TabsContent>
             </Tabs>
           </CardContent>

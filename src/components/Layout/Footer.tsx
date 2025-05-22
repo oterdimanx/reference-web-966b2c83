@@ -1,7 +1,11 @@
 
 import { Link } from 'react-router-dom';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export function Footer() {
+  const { t } = useLanguage();
+  const currentYear = new Date().getFullYear();
+  
   return (
     <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-6">
       <div className="container mx-auto px-4">
@@ -12,28 +16,28 @@ export function Footer() {
                 <span className="text-white font-bold text-xs">RW</span>
               </div>
               <span className="font-bold text-lg text-rank-blue dark:text-white">
-                Reference<span className="text-rank-teal">-Web</span>
+                {t('homepage', 'title')}
               </span>
             </div>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              Monitor and optimize your website rankings
+              {t('homepage', 'subtitle')}
             </p>
           </div>
           
           <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6">
             <Link to="/about" className="text-gray-600 hover:text-rank-blue dark:text-gray-300 dark:hover:text-white text-sm">
-              About
+              {t('common', 'about')}
             </Link>
             <Link to="/privacy" className="text-gray-600 hover:text-rank-blue dark:text-gray-300 dark:hover:text-white text-sm">
-              Privacy Policy
+              {t('common', 'privacyPolicy')}
             </Link>
             <Link to="/terms" className="text-gray-600 hover:text-rank-blue dark:text-gray-300 dark:hover:text-white text-sm">
-              Terms of Service
+              {t('common', 'termsOfService')}
             </Link>
           </div>
         </div>
         <div className="text-center text-xs text-gray-400 dark:text-gray-500 mt-6">
-          © {new Date().getFullYear()} Reference-Web. All rights reserved.
+          {t('common', 'copyright').replace('{year}', currentYear.toString())}
         </div>
       </div>
     </footer>
