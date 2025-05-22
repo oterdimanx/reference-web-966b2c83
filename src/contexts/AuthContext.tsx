@@ -138,18 +138,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function AdminRedirectProvider({ children }: { children: ReactNode }) {
   const { user, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
+  const [initialRedirectDone, setInitialRedirectDone] = useState(false);
 
   useEffect(() => {
-    // If user is authenticated and is admin, redirect to admin dashboard
-    if (!loading && user && isAdmin) {
+    // Only redirect on first login and authentication check
+    if (!loading && user && isAdmin && !initialRedirectDone) {
       // Check if not already on an admin page
       if (!window.location.pathname.startsWith('/admin')) {
-        setTimeout(() => {
-          navigate('/admin/dashboard-rw');
-        }, 100);
+        navigate('/admin/dashboard-rw');
       }
+      setInitialRedirectDone(true);
     }
-  }, [user, isAdmin, loading, navigate]);
+    
+    // Reset the flag when user logs out
+    if (!user) {
+      setInitialRedirectDone(false);
+    }
+  }, [user, isAdmin, loading, navigate, initialRedirectDone]);
 
   return <>{children}</>;
 }
