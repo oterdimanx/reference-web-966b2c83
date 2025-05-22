@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -82,7 +83,7 @@ export function Header() {
       <div className="container mx-auto flex justify-between items-center p-4">
         <Link to="/" className="flex items-center space-x-2">
           <span className="text-2xl font-bold bg-gradient-to-r from-rank-teal to-blue-600 text-transparent bg-clip-text">
-            ReferenceRank
+            Reference-Web
           </span>
         </Link>
         

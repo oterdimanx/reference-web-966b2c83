@@ -1,14 +1,20 @@
 
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Home, DollarSign, Settings, ArrowLeftCircle } from 'lucide-react';
 
 const AdminMenu = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   
   // Determine if the current path is active
   const isActive = (path: string) => {
     return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  };
+  
+  // Handle navigation to home page
+  const handleReturnToFront = () => {
+    navigate('/');
   };
   
   return (
@@ -51,13 +57,11 @@ const AdminMenu = () => {
         <Button
           variant="outline"
           size="sm"
-          asChild
+          onClick={handleReturnToFront}
           className="ml-auto"
         >
-          <Link to="/">
-            <ArrowLeftCircle className="mr-2 h-4 w-4" />
-            Return to Front
-          </Link>
+          <ArrowLeftCircle className="mr-2 h-4 w-4" />
+          Return to Front
         </Button>
       </div>
     </div>
