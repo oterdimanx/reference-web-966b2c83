@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -22,6 +23,7 @@ import Admin from "./pages/Admin";
 import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/Admin/Dashboard";
 import AdminPricing from "./pages/Admin/Pricing";
+import AdminAnalytics from "./pages/Admin/Analytics";
 import Sitemap from "./pages/Sitemap";
 import SitemapXml from "./pages/SitemapXml";
 
@@ -76,6 +78,11 @@ const App = () => (
                   <Route path="/admin/pricing" element={
                     <ProtectedRoute>
                       <AdminPricing />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/admin/analytics" element={
+                    <ProtectedRoute>
+                      <AdminAnalytics />
                     </ProtectedRoute>
                   } />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

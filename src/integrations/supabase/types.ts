@@ -9,6 +9,68 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      events: {
+        Row: {
+          click_x: number | null
+          click_y: number | null
+          client_timestamp: string
+          element_classes: string | null
+          element_id: string | null
+          element_tag: string | null
+          event_type: string
+          id: string
+          ip_address: string | null
+          received_at: string
+          screen_resolution: string | null
+          session_id: string
+          url: string
+          user_agent: string | null
+          website_id: string | null
+        }
+        Insert: {
+          click_x?: number | null
+          click_y?: number | null
+          client_timestamp: string
+          element_classes?: string | null
+          element_id?: string | null
+          element_tag?: string | null
+          event_type: string
+          id?: string
+          ip_address?: string | null
+          received_at?: string
+          screen_resolution?: string | null
+          session_id: string
+          url: string
+          user_agent?: string | null
+          website_id?: string | null
+        }
+        Update: {
+          click_x?: number | null
+          click_y?: number | null
+          client_timestamp?: string
+          element_classes?: string | null
+          element_id?: string | null
+          element_tag?: string | null
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          received_at?: string
+          screen_resolution?: string | null
+          session_id?: string
+          url?: string
+          user_agent?: string | null
+          website_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_website_id_fkey"
+            columns: ["website_id"]
+            isOneToOne: false
+            referencedRelation: "websites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pricing: {
         Row: {
           active: boolean
