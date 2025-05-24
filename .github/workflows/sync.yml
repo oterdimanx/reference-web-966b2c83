@@ -7,9 +7,14 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    # SECRET VALIDATION STEP HERE
+    - name: Validate PAT Secret
+      run: |
+        echo "PAT exists: ${#GH_PAT}"  # Should output "PAT exists: 40"
+        echo "First 5 chars: ${GH_PAT:0:5}"  # Partial verification
+
     - name: Configure Authenticated Remote
       run: |
-        # Use GitHub's recommended PAT format
         git remote add mirror "https://x-access-token:${{ secrets.GH_PAT }}@github.com/oterdimanx/reference-web.git"
         git config --global user.name "GitHub Actions"
         git config --global user.email "actions@github.com"
