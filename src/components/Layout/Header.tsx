@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageSwitch } from '@/components/Layout/LanguageSwitch';
+import { ThemeToggle } from '@/components/Layout/ThemeToggle';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,27 +38,27 @@ export function Header() {
     if (!mobileMenuOpen) return null;
     
     return (
-      <div className="absolute top-16 left-0 right-0 bg-white shadow-lg z-50 p-4">
+      <div className="absolute top-16 left-0 right-0 bg-white dark:bg-gray-800 shadow-lg z-50 p-4">
         <div className="flex flex-col space-y-4">
-          <Link to="/" className="text-gray-600 hover:text-rank-teal" onClick={toggleMobileMenu}>
+          <Link to="/" className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal" onClick={toggleMobileMenu}>
             {t('common', 'home')}
           </Link>
-          <Link to="/about" className="text-gray-600 hover:text-rank-teal" onClick={toggleMobileMenu}>
+          <Link to="/about" className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal" onClick={toggleMobileMenu}>
             {t('common', 'about')}
           </Link>
           {user ? (
             <>
-              <Link to="/all-websites" className="text-gray-600 hover:text-rank-teal" onClick={toggleMobileMenu}>
+              <Link to="/all-websites" className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal" onClick={toggleMobileMenu}>
                 {t('common', 'allWebsites')}
               </Link>
-              <Link to="/add-website" className="text-gray-600 hover:text-rank-teal" onClick={toggleMobileMenu}>
+              <Link to="/add-website" className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal" onClick={toggleMobileMenu}>
                 {t('common', 'addWebsite')}
               </Link>
-              <Link to="/profile" className="text-gray-600 hover:text-rank-teal" onClick={toggleMobileMenu}>
+              <Link to="/profile" className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal" onClick={toggleMobileMenu}>
                 {t('common', 'profile')}
               </Link>
               {isAdmin && (
-                <Link to="/admin/dashboard-rw" className="text-gray-600 hover:text-rank-teal" onClick={toggleMobileMenu}>
+                <Link to="/admin/dashboard-rw" className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal" onClick={toggleMobileMenu}>
                   {t('common', 'admin')}
                 </Link>
               )}
@@ -66,13 +67,13 @@ export function Header() {
                   signOut();
                   toggleMobileMenu();
                 }}
-                className="text-gray-600 hover:text-rank-teal text-left"
+                className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal text-left"
               >
                 {t('common', 'signOut')}
               </button>
             </>
           ) : (
-            <Link to="/auth" className="text-gray-600 hover:text-rank-teal" onClick={toggleMobileMenu}>
+            <Link to="/auth" className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal" onClick={toggleMobileMenu}>
               {t('common', 'login')}
             </Link>
           )}
@@ -82,7 +83,7 @@ export function Header() {
   };
   
   return (
-    <header className="bg-white border-b border-slate-200 relative">
+    <header className="bg-white dark:bg-gray-900 border-b border-slate-200 dark:border-gray-700 relative">
       <div className="container mx-auto flex justify-between items-center p-4">
         <Link to="/" className="flex items-center space-x-2">
           <span className="text-2xl font-bold bg-gradient-to-r from-rank-teal to-blue-600 text-transparent bg-clip-text">
@@ -93,6 +94,7 @@ export function Header() {
         {isMobile ? (
           <>
             <div className="flex items-center space-x-2">
+              <ThemeToggle />
               <LanguageSwitch />
               <button onClick={toggleMobileMenu} className="p-2">
                 {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -103,18 +105,18 @@ export function Header() {
         ) : (
           <div className="flex items-center space-x-6">
             <nav className="flex items-center space-x-6">
-              <Link to="/" className="text-gray-600 hover:text-rank-teal">
+              <Link to="/" className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal">
                 {t('common', 'home')}
               </Link>
-              <Link to="/about" className="text-gray-600 hover:text-rank-teal">
+              <Link to="/about" className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal">
                 {t('common', 'about')}
               </Link>
               {user && (
                 <>
-                  <Link to="/all-websites" className="text-gray-600 hover:text-rank-teal">
+                  <Link to="/all-websites" className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal">
                     {t('common', 'allWebsites')}
                   </Link>
-                  <Link to="/add-website" className="text-gray-600 hover:text-rank-teal">
+                  <Link to="/add-website" className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal">
                     {t('common', 'addWebsite')}
                   </Link>
                 </>
@@ -122,6 +124,7 @@ export function Header() {
             </nav>
             
             <div className="flex items-center space-x-4">
+              <ThemeToggle />
               <LanguageSwitch />
               
               {user ? (
