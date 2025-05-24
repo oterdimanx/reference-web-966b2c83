@@ -1,4 +1,4 @@
-name: Guaranteed Sync
+name: Sync Repositories
 on: [push]
 
 jobs:
@@ -6,33 +6,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
 
-    - name: Nuclear Authentication
+    - name: Add Authenticated Remote
       run: |
-        # 1. PAT in URL
         git remote add mirror "https://${{ secrets.GH_PAT }}@github.com/oterdimanx/reference-web.git"
-        
-        # 2. .netrc fallback
-        echo "machine github.com" > ~/.netrc
-        echo "login x" >> ~/.netrc
-        echo "password ${{ secrets.GH_PAT }}" >> ~/.netrc
-        chmod 600 ~/.netrc
-        
-        # 3. Header authentication
-        git config --global http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n x:${{ secrets.GH_PAT }} | base64)"
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
 
-    - name: Bruteforce Verification
-      run: |
-        # Test raw HTTP access
-        curl -sH "Authorization: token ${{ secrets.GH_PAT }}" \
-          https://api.github.com/repos/oterdimanx/reference-web | jq .id
-        
-        # Test Git protocol
-        git -c http.extraHeader="Authorization: Bearer ${{ secrets.GH_PAT }}" \
-          ls-remote https://github.com/oterdimanx/reference-web
+    - name: Verify Remote Access
+      run: git ls-remote mirror
 
-    - name: Obliterate Push
-      run: |
-        git push --force mirror HEAD:main
+    - name: Push Changes
+      run: git push mirror HEAD:main
