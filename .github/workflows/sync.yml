@@ -1,0 +1,19 @@
+name: Sync Repositories
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Mirror to other repo
+      run: |
+        git remote add mirror https://github.com/oterdimanx/reference-web.git
+        git push --mirror mirror
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT }}
