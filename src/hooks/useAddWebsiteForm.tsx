@@ -148,7 +148,10 @@ export function useAddWebsiteForm() {
       
       if (savedWebsite) {
         toast.success("Website added successfully!");
-        navigate('/');
+        // Navigate to home instead of staying on success page
+        setTimeout(() => {
+          navigate('/');
+        }, 1500);
       } else {
         toast.error("Failed to add website. Please try again.");
       }

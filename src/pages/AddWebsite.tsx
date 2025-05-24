@@ -23,9 +23,10 @@ interface PricingPlan {
 const AddWebsite = () => {
   const { t } = useLanguage();
   const { form, isSubmitting, selectedImage, setSelectedImage, onSubmit } = useAddWebsiteForm();
-  const [currentStep, setCurrentStep] = useState<'payment' | 'form'>('payment');
+  const [currentStep, setCurrentStep] = useState<'form' | 'payment' | 'success'>('form');
   const [isPaymentComplete, setIsPaymentComplete] = useState(false);
-  const [selectedPlanPrice, setSelectedPlanPrice] = useState<number>(29.99); // Default price
+  const [validatedFormData, setValidatedFormData] = useState<any>(null);
+  const [selectedPlanPrice, setSelectedPlanPrice] = useState<number>(29.99);
   
   // Fetch pricing plans
   const { data: pricingPlans, isLoading: pricingLoading } = useQuery({
@@ -42,20 +43,35 @@ const AddWebsite = () => {
     }
   });
   
+  const handleFormSubmit = (data: any) => {
+    // Store form data and proceed to payment
+    setValidatedFormData(data);
+    
+    // Find selected plan price
+    const selectedPlan = pricingPlans?.find(plan => plan.id === data.pricing_id);
+    if (selectedPlan) {
+      setSelectedPlanPrice(selectedPlan.price);
+    }
+    
+    setCurrentStep('payment');
+  };
+
   const handlePaymentSuccess = () => {
     setIsPaymentComplete(true);
+    
+    // Now actually submit the data to database
+    if (validatedFormData) {
+      onSubmit(validatedFormData, pricingPlans);
+    }
+    
     setTimeout(() => {
-      setCurrentStep('form');
-    }, 2000); // Show success message for 2 seconds, then proceed to form
+      setCurrentStep('success');
+    }, 2000);
   };
 
   const handlePaymentCancel = () => {
-    // Redirect back to home page or show cancellation message
-    window.history.back();
-  };
-  
-  const handleSubmit = (data: any) => {
-    onSubmit(data, pricingPlans);
+    // Go back to form
+    setCurrentStep('form');
   };
   
   if (currentStep === 'payment') {
@@ -64,12 +80,56 @@ const AddWebsite = () => {
         <Header />
         <main className="flex-grow py-8">
           <div className="container max-w-2xl mx-auto px-4">
+            <div className="mb-6">
+              <Button 
+                variant="outline" 
+                onClick={() => setCurrentStep('form')}
+                className="mb-4"
+              >
+                ← Retour au formulaire
+              </Button>
+              <h1 className="text-3xl font-bold">Finaliser votre commande</h1>
+              <p className="text-gray-600 mt-2">
+                Formulaire validé ! Procédez maintenant au paiement pour ajouter votre site web.
+              </p>
+            </div>
+            
             <PaymentStep
               amount={selectedPlanPrice}
               onPaymentSuccess={handlePaymentSuccess}
               onPaymentCancel={handlePaymentCancel}
               isPaymentComplete={isPaymentComplete}
             />
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (currentStep === 'success') {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Header />
+        <main className="flex-grow py-8">
+          <div className="container max-w-2xl mx-auto px-4">
+            <Card className="text-center">
+              <CardContent className="pt-6">
+                <div className="space-y-4">
+                  <div className="text-6xl">🎉</div>
+                  <h1 className="text-3xl font-bold text-green-700">Site web ajouté avec succès !</h1>
+                  <p className="text-gray-600">
+                    Votre site web a été ajouté et le paiement a été traité avec succès.
+                  </p>
+                  <Button 
+                    onClick={() => window.location.href = '/'}
+                    className="bg-rank-teal hover:bg-rank-teal/90"
+                  >
+                    Retour au tableau de bord
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </main>
         <Footer />
@@ -83,11 +143,10 @@ const AddWebsite = () => {
       <main className="flex-grow py-8">
         <div className="container max-w-3xl mx-auto px-4">
           <div className="mb-6">
-            <div className="flex items-center gap-2 text-sm text-green-600 mb-4">
-              <span className="inline-block w-2 h-2 bg-green-500 rounded-full"></span>
-              Paiement confirmé
-            </div>
             <h1 className="text-3xl font-bold">{t('addWebsiteForm', 'pageTitle')}</h1>
+            <p className="text-gray-600 mt-2">
+              Remplissez les informations de votre site web. Le paiement sera demandé après validation du formulaire.
+            </p>
           </div>
           
           <Card>
@@ -99,7 +158,7 @@ const AddWebsite = () => {
             </CardHeader>
             <CardContent>
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+                <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
                   <WebsiteBasicInfo form={form} onImageSelect={setSelectedImage} />
                   <ContactInfo form={form} />
                   <AdditionalSettings 
@@ -108,12 +167,19 @@ const AddWebsite = () => {
                     pricingLoading={pricingLoading} 
                   />
                   
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <h4 className="font-semibold text-blue-800 mb-2">Étape suivante : Paiement</h4>
+                    <p className="text-sm text-blue-700">
+                      Après validation de ce formulaire, vous serez dirigé vers la page de paiement sécurisé.
+                    </p>
+                  </div>
+                  
                   <Button 
                     type="submit" 
                     className="w-full bg-rank-teal hover:bg-rank-teal/90"
                     disabled={isSubmitting}
                   >
-                    {isSubmitting ? t('addWebsiteForm', 'addingWebsite') : t('addWebsiteForm', 'addWebsiteButton')}
+                    {isSubmitting ? "Validation..." : "Valider et procéder au paiement"}
                   </Button>
                 </form>
               </Form>

@@ -53,7 +53,7 @@ export function AddWebsiteForm({ onAddWebsite }: AddWebsiteFormProps) {
         return;
       }
       
-      // Redirect to the Add Website page with payment flow
+      // Redirect to the Add Website page with form-first flow
       navigate(`/add-website?domain=${encodeURIComponent(domain)}&keywords=${encodeURIComponent(keywords)}`);
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -67,7 +67,7 @@ export function AddWebsiteForm({ onAddWebsite }: AddWebsiteFormProps) {
       <CardHeader>
         <CardTitle>Add Website</CardTitle>
         <CardDescription>
-          Enter a website URL and keywords you want to track. Payment required to proceed.
+          Enter a website URL and keywords you want to track. Complete the form first, then payment.
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
@@ -97,7 +97,7 @@ export function AddWebsiteForm({ onAddWebsite }: AddWebsiteFormProps) {
           </div>
           <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-sm text-blue-800">
-              💳 Payment required: €29.99 for website tracking service
+              💳 Payment: €29.99 (after form validation)
             </p>
           </div>
         </CardContent>
@@ -107,7 +107,7 @@ export function AddWebsiteForm({ onAddWebsite }: AddWebsiteFormProps) {
             className="w-full bg-rank-teal hover:bg-rank-teal/90"
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Processing..." : "Continue to Payment"}
+            {isSubmitting ? "Processing..." : "Continue to Form"}
           </Button>
         </CardFooter>
       </form>
