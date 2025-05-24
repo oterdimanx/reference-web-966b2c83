@@ -1,7 +1,7 @@
 
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Home, DollarSign, Settings, ArrowLeftCircle } from 'lucide-react';
+import { Home, DollarSign, Settings, ArrowLeftCircle, BarChart3 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const AdminMenu = () => {
@@ -31,6 +31,17 @@ const AdminMenu = () => {
           <Link to="/admin/dashboard-rw">
             <Home className="mr-2 h-4 w-4" />
             {t('admin', 'dashboard')}
+          </Link>
+        </Button>
+        
+        <Button
+          variant={isActive('/admin/analytics') ? "default" : "outline"}
+          size="sm"
+          asChild
+        >
+          <Link to="/admin/analytics">
+            <BarChart3 className="mr-2 h-4 w-4" />
+            Analytics
           </Link>
         </Button>
         
