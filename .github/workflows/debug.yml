@@ -1,0 +1,12 @@
+name: Push Debugger
+on: [push]
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check incoming commit
+      run: |
+        echo "Last commit author: ${{ github.actor }}"
+        echo "Commit SHA: ${{ github.sha }}"
+        echo "Event payload: ${{ toJson(github.event) }}"
