@@ -99,7 +99,7 @@ export function useAddWebsiteForm() {
         .eq('user_id', user.id)
         .eq('pricing_id', pricingPlan.id)
         .eq('is_active', true)
-        .single();
+        .maybeSingle();
         
       if (existingSub) {
         console.log('User already has active subscription for this plan');

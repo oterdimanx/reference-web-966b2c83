@@ -23,21 +23,22 @@ export const useUserSubscription = () => {
     queryFn: async () => {
       if (!user?.id) return null;
       
-      // Get user's current subscription
+      // Get user's current subscription with pricing details
       const { data: subData, error: subError } = await supabase
         .from('user_subscriptions')
         .select(`
           *,
-          pricing:pricing_id (
+          pricing (
             title,
             price
           )
         `)
         .eq('user_id', user.id)
         .eq('is_active', true)
-        .single();
+        .maybeSingle();
         
-      if (subError && subError.code !== 'PGRST116') {
+      if (subError) {
+        console.error('Error fetching subscription:', subError);
         throw subError;
       }
       
@@ -48,10 +49,11 @@ export const useUserSubscription = () => {
         .eq('user_id', user.id);
         
       if (countError) {
+        console.error('Error counting websites:', countError);
         throw countError;
       }
       
-      if (!subData) {
+      if (!subData || !subData.pricing) {
         return {
           hasSubscription: false,
           websitesUsed: websiteCount || 0,
