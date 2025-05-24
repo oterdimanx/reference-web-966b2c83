@@ -10,10 +10,10 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-
-    - name: Mirror to other repo
+    
+    - name: Safe Sync
       run: |
-        git remote add mirror https://github.com/oterdimanx/reference-web.git
-        git push --mirror mirror
+        git fetch origin
+        git push --force-with-lease mirror main:main
       env:
         GH_TOKEN: ${{ secrets.GH_PAT }}
