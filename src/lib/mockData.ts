@@ -19,6 +19,9 @@ export interface RankingData {
 export interface RankingSummary {
   websiteId: string;
   domain: string;
+  title?: string;
+  description?: string;
+  imagePath?: string;
   avgPosition: number;
   topKeyword: string;
   topKeywordPosition: number;
@@ -115,6 +118,9 @@ export const getRankingSummaries = (): RankingSummary[] => {
       return {
         websiteId: website.id,
         domain: website.domain,
+        title: undefined,
+        description: undefined,
+        imagePath: undefined,
         avgPosition: 0,
         topKeyword: 'N/A',
         topKeywordPosition: 0,
@@ -165,6 +171,9 @@ export const getRankingSummaries = (): RankingSummary[] => {
     return {
       websiteId: website.id,
       domain: website.domain,
+      title: undefined,
+      description: undefined,
+      imagePath: undefined,
       avgPosition,
       topKeyword: bestKeyword,
       topKeywordPosition: bestPosition,
