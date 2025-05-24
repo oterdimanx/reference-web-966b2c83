@@ -14,6 +14,7 @@ import ProtectedRoute from "./components/Auth/ProtectedRoute";
 import AllWebsites from "./pages/AllWebsites";
 import AddWebsite from "./pages/AddWebsite";
 import About from "./pages/About";
+import Pricing from "./pages/Pricing";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Rankings from "./pages/Rankings";
@@ -39,6 +40,7 @@ const App = () => (
                   <Route path="/" element={<Index />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/about" element={<About />} />
+                  <Route path="/pricing" element={<Pricing />} />
                   <Route path="/privacy" element={<Privacy />} />
                   <Route path="/terms" element={<Terms />} />
                   <Route path="/rankings" element={<Rankings />} />
