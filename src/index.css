@@ -84,6 +84,11 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  .dark h1,
+  .dark h2 {
+    @apply text-yellow-500;
+  }
 }
 
 .gradient-bg {
