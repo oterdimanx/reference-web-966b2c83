@@ -143,8 +143,13 @@ export function AdminRedirectProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Only redirect on first login and authentication check
     if (!loading && user && isAdmin && !initialRedirectDone) {
-      // Check if not already on an admin page
-      if (!window.location.pathname.startsWith('/admin')) {
+      // Check if not already on an admin page or other protected pages
+      const currentPath = window.location.pathname;
+      const protectedPaths = ['/admin', '/keywords', '/rankings', '/all-websites', '/add-website', '/profile'];
+      const isOnProtectedPath = protectedPaths.some(path => currentPath.startsWith(path));
+      
+      // Only redirect to admin if on the home page
+      if (currentPath === '/' && !isOnProtectedPath) {
         navigate('/admin/dashboard-rw');
       }
       setInitialRedirectDone(true);

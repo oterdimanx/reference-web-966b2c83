@@ -12,6 +12,8 @@ import {
 } from '@/lib/mockData';
 import { Check, Globe, Search, TrendingUp, Award } from 'lucide-react';
 import { getUserWebsites } from '@/services/websiteService';
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 export function DashboardView() {
   const [selectedWebsiteId, setSelectedWebsiteId] = useState<string>('1');
@@ -111,7 +113,17 @@ export function DashboardView() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6 animate-fade-in" style={{ animationDelay: '200ms' }}>
             {/* Website ranking chart */}
-            <RankingChart data={websiteRankingData} />
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-100 dark:border-gray-700">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="font-semibold text-lg">Keyword Rankings</h3>
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/keywords">
+                    Manage Keywords
+                  </Link>
+                </Button>
+              </div>
+              <RankingChart data={websiteRankingData} />
+            </div>
             
             {/* Website list */}
             <WebsiteList
