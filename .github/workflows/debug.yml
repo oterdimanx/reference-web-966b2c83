@@ -1,14 +1,10 @@
-name: Debug Sync
-on: [push]
-
-jobs:
-  debug:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
+- name: Test Access
+  run: |
+    # Test read access
+    curl -H "Authorization: token ${{ secrets.GH_PAT }}" \
+         https://api.github.com/repos/oterdimanx/reference-web-966b2c83
     
-    - name: Show Remotes
-      run: |
-        git remote add test https://${{ secrets.GH_PAT }}@github.com/oterdimanx/reference-web.git
-        git ls-remote test
-        git remote remove test
+    # Test write access
+    curl -X POST -H "Authorization: token ${{ secrets.GH_PAT }}" \
+         https://api.github.com/repos/oterdimanx/reference-web-966b2c83/issues \
+         -d '{"title":"Test"}'
