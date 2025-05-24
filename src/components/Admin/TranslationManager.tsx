@@ -18,7 +18,10 @@ export function TranslationManager() {
       common: { ...translations.common },
       admin: { ...translations.admin },
       homepage: { ...translations.homepage },
-      pages: { ...translations.pages }
+      pages: { ...translations.pages },
+      aboutPage: { ...translations.aboutPage },
+      allWebsitesPage: { ...translations.allWebsitesPage },
+      addWebsiteForm: { ...translations.addWebsiteForm }
     });
   }, [language, translations]);
   
@@ -94,6 +97,27 @@ export function TranslationManager() {
               onTranslationChange={handleTranslationChange}
             />
             
+            <TranslationSection
+              title="About Page"
+              sectionKey="aboutPage"
+              translations={editedTranslations}
+              onTranslationChange={handleTranslationChange}
+            />
+            
+            <TranslationSection
+              title="All Websites Page"
+              sectionKey="allWebsitesPage"
+              translations={editedTranslations}
+              onTranslationChange={handleTranslationChange}
+            />
+            
+            <TranslationSection
+              title="Add Website Form"
+              sectionKey="addWebsiteForm"
+              translations={editedTranslations}
+              onTranslationChange={handleTranslationChange}
+            />
+            
             <Button onClick={saveTranslations} className="mt-4">{t('admin', 'saveTranslations')}</Button>
           </TabsContent>
           
@@ -122,6 +146,27 @@ export function TranslationManager() {
             <TranslationSection
               title="Textes des pages"
               sectionKey="pages"
+              translations={editedTranslations}
+              onTranslationChange={handleTranslationChange}
+            />
+            
+            <TranslationSection
+              title="Page À propos"
+              sectionKey="aboutPage"
+              translations={editedTranslations}
+              onTranslationChange={handleTranslationChange}
+            />
+            
+            <TranslationSection
+              title="Page Tous les sites web"
+              sectionKey="allWebsitesPage"
+              translations={editedTranslations}
+              onTranslationChange={handleTranslationChange}
+            />
+            
+            <TranslationSection
+              title="Formulaire d'ajout de site web"
+              sectionKey="addWebsiteForm"
               translations={editedTranslations}
               onTranslationChange={handleTranslationChange}
             />

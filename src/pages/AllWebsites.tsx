@@ -9,12 +9,14 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { getUserWebsites } from '@/services/websiteService';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const AllWebsites = () => {
   const [selectedWebsiteId, setSelectedWebsiteId] = useState<string | undefined>(undefined);
   const [websites, setWebsites] = useState<RankingSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   // Fetch websites from Supabase
   useEffect(() => {
@@ -38,24 +40,24 @@ const AllWebsites = () => {
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold">All Tracked Websites</h1>
+          <h1 className="text-3xl font-bold">{t('allWebsitesPage', 'title')}</h1>
           <Button 
             variant="outline" 
             onClick={() => navigate('/')}
             className="flex items-center gap-2"
           >
             <ArrowLeft size={16} />
-            Back to Dashboard
+            {t('allWebsitesPage', 'backToDashboard')}
           </Button>
         </div>
         
         <Card>
           <CardHeader>
-            <CardTitle>Complete Website Rankings</CardTitle>
+            <CardTitle>{t('allWebsitesPage', 'completeWebsiteRankings')}</CardTitle>
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <div className="py-8 text-center text-gray-500">Loading websites...</div>
+              <div className="py-8 text-center text-gray-500">{t('allWebsitesPage', 'loadingWebsites')}</div>
             ) : (
               <WebsiteList 
                 websites={websites}

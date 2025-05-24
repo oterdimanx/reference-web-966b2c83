@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RankingSummary } from '@/lib/mockData';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface WebsiteListProps {
   websites: RankingSummary[];
@@ -15,6 +16,7 @@ export function WebsiteList({ websites, onSelectWebsite, selectedWebsiteId }: We
   const [sortBy, setSortBy] = useState<'domain' | 'position' | 'change'>('position');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const sortedWebsites = [...websites].sort((a, b) => {
     if (sortBy === 'domain') {
@@ -56,7 +58,7 @@ export function WebsiteList({ websites, onSelectWebsite, selectedWebsiteId }: We
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Tracked Websites</CardTitle>
+        <CardTitle>{t('allWebsitesPage', 'trackedWebsites')}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
@@ -68,7 +70,7 @@ export function WebsiteList({ websites, onSelectWebsite, selectedWebsiteId }: We
                     onClick={() => toggleSort('domain')}
                     className="font-medium text-gray-500 dark:text-gray-400 flex items-center hover:text-gray-700 dark:hover:text-gray-300"
                   >
-                    Website {getSortIndicator('domain')}
+                    {t('allWebsitesPage', 'website')} {getSortIndicator('domain')}
                   </button>
                 </th>
                 <th className="px-4 py-3 text-left">
@@ -76,7 +78,7 @@ export function WebsiteList({ websites, onSelectWebsite, selectedWebsiteId }: We
                     onClick={() => toggleSort('position')}
                     className="font-medium text-gray-500 dark:text-gray-400 flex items-center hover:text-gray-700 dark:hover:text-gray-300"
                   >
-                    Avg Position {getSortIndicator('position')}
+                    {t('allWebsitesPage', 'avgPosition')} {getSortIndicator('position')}
                   </button>
                 </th>
                 <th className="px-4 py-3 text-left">
@@ -84,12 +86,12 @@ export function WebsiteList({ websites, onSelectWebsite, selectedWebsiteId }: We
                     onClick={() => toggleSort('change')}
                     className="font-medium text-gray-500 dark:text-gray-400 flex items-center hover:text-gray-700 dark:hover:text-gray-300"
                   >
-                    Change {getSortIndicator('change')}
+                    {t('allWebsitesPage', 'change')} {getSortIndicator('change')}
                   </button>
                 </th>
                 <th className="px-4 py-3 text-left">
                   <span className="font-medium text-gray-500 dark:text-gray-400">
-                    Keywords
+                    {t('allWebsitesPage', 'keywords')}
                   </span>
                 </th>
               </tr>
@@ -143,7 +145,7 @@ export function WebsiteList({ websites, onSelectWebsite, selectedWebsiteId }: We
               ) : (
                 <tr>
                   <td colSpan={4} className="px-4 py-6 text-center text-gray-500 dark:text-gray-400">
-                    No websites found. Add a website to start tracking.
+                    {t('allWebsitesPage', 'noWebsitesFound')}
                   </td>
                 </tr>
               )}
@@ -152,7 +154,7 @@ export function WebsiteList({ websites, onSelectWebsite, selectedWebsiteId }: We
         </div>
         
         <div className="mt-4 flex justify-end">
-          <Button variant="outline" size="sm" onClick={handleViewAll}>View All</Button>
+          <Button variant="outline" size="sm" onClick={handleViewAll}>{t('allWebsitesPage', 'viewAll')}</Button>
         </div>
       </CardContent>
     </Card>

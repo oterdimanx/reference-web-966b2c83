@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 // Define available languages
@@ -63,6 +62,76 @@ export interface Translations {
     whyKeywordResearch: string;
     yourWebsiteRankings: string;
     yourKeywords: string;
+  };
+  aboutPage: {
+    title: string;
+    intro: string;
+    missionTitle: string;
+    missionText: string;
+    teamTitle: string;
+    teamText: string;
+    technologyTitle: string;
+    technologyText: string;
+    contactTitle: string;
+    contactText: string;
+  };
+  allWebsitesPage: {
+    title: string;
+    backToDashboard: string;
+    completeWebsiteRankings: string;
+    loadingWebsites: string;
+    website: string;
+    avgPosition: string;
+    change: string;
+    keywords: string;
+    noWebsitesFound: string;
+    viewAll: string;
+    trackedWebsites: string;
+  };
+  addWebsiteForm: {
+    pageTitle: string;
+    websiteDetails: string;
+    websiteDetailsDescription: string;
+    websiteTitle: string;
+    websiteTitlePlaceholder: string;
+    websiteTitleDescription: string;
+    websiteUrl: string;
+    websiteUrlPlaceholder: string;
+    websiteUrlDescription: string;
+    description: string;
+    descriptionPlaceholder: string;
+    contactName: string;
+    contactNamePlaceholder: string;
+    contactEmail: string;
+    contactEmailPlaceholder: string;
+    countryCode: string;
+    selectCountryCode: string;
+    phoneNumber: string;
+    phoneNumberPlaceholder: string;
+    phoneNumberDescription: string;
+    reciprocalLink: string;
+    reciprocalLinkPlaceholder: string;
+    reciprocalLinkDescription: string;
+    keywords: string;
+    keywordsPlaceholder: string;
+    keywordsDescription: string;
+    selectPlan: string;
+    choosePricingPlan: string;
+    selectPlanDescription: string;
+    loadingPlans: string;
+    noPlansAvailable: string;
+    addingWebsite: string;
+    addWebsiteButton: string;
+    // Form validation messages
+    titleRequired: string;
+    domainRequired: string;
+    descriptionRequired: string;
+    contactNameRequired: string;
+    invalidEmail: string;
+    phoneRequired: string;
+    phoneDigitsOnly: string;
+    keywordsRequired: string;
+    planRequired: string;
   };
 }
 
@@ -138,6 +207,76 @@ const enTranslations: Translations = {
     yourWebsiteRankings: 'Your Website Rankings',
     yourKeywords: 'Your Keywords',
   },
+  aboutPage: {
+    title: 'About Reference-Web',
+    intro: 'Reference-Web is a powerful SEO ranking and website monitoring platform designed to help businesses and individuals track their online presence and improve their search engine rankings.',
+    missionTitle: 'Our Mission',
+    missionText: 'Our mission is to provide accessible and actionable insights into website performance, helping our users make data-driven decisions to improve their online visibility.',
+    teamTitle: 'The Team',
+    teamText: 'Founded by a team of SEO experts and web developers, Reference-Web combines technical expertise with user-friendly design to deliver a seamless experience.',
+    technologyTitle: 'Our Technology',
+    technologyText: 'We use cutting-edge technology to gather and analyze data from search engines, providing accurate and up-to-date information about your website\'s performance.',
+    contactTitle: 'Contact Us',
+    contactText: 'Have questions or feedback? We\'d love to hear from you! Contact our support team at support@reference-web.com.',
+  },
+  allWebsitesPage: {
+    title: 'All Tracked Websites',
+    backToDashboard: 'Back to Dashboard',
+    completeWebsiteRankings: 'Complete Website Rankings',
+    loadingWebsites: 'Loading websites...',
+    website: 'Website',
+    avgPosition: 'Avg Position',
+    change: 'Change',
+    keywords: 'Keywords',
+    noWebsitesFound: 'No websites found. Add a website to start tracking.',
+    viewAll: 'View All',
+    trackedWebsites: 'Tracked Websites',
+  },
+  addWebsiteForm: {
+    pageTitle: 'Add Website',
+    websiteDetails: 'Website Details',
+    websiteDetailsDescription: 'Enter information about the website you want to track',
+    websiteTitle: 'Website Title',
+    websiteTitlePlaceholder: 'My Awesome Website',
+    websiteTitleDescription: 'The name or title of your website',
+    websiteUrl: 'Website URL',
+    websiteUrlPlaceholder: 'example.com',
+    websiteUrlDescription: 'Enter the domain without http:// or https://',
+    description: 'Description',
+    descriptionPlaceholder: 'Brief description of your website',
+    contactName: 'Contact Name',
+    contactNamePlaceholder: 'John Doe',
+    contactEmail: 'Contact Email',
+    contactEmailPlaceholder: 'email@example.com',
+    countryCode: 'Country Code',
+    selectCountryCode: 'Select country code',
+    phoneNumber: 'Phone Number',
+    phoneNumberPlaceholder: '612345678',
+    phoneNumberDescription: 'Enter only numbers without spaces or special characters',
+    reciprocalLink: 'Reciprocal Link (Optional)',
+    reciprocalLinkPlaceholder: 'https://example.com/partners/referencerank',
+    reciprocalLinkDescription: 'Link back to our service from your website (optional)',
+    keywords: 'Keywords',
+    keywordsPlaceholder: 'seo, marketing, web design',
+    keywordsDescription: 'Enter keywords separated by commas',
+    selectPlan: 'Select a Plan',
+    choosePricingPlan: 'Choose a pricing plan',
+    selectPlanDescription: 'Choose the subscription plan for this website',
+    loadingPlans: 'Loading plans...',
+    noPlansAvailable: 'No plans available',
+    addingWebsite: 'Adding Website...',
+    addWebsiteButton: 'Add Website',
+    // Form validation messages
+    titleRequired: 'Title is required',
+    domainRequired: 'Domain is required',
+    descriptionRequired: 'Description is required',
+    contactNameRequired: 'Contact name is required',
+    invalidEmail: 'Invalid email address',
+    phoneRequired: 'Phone number is required',
+    phoneDigitsOnly: 'Phone number must contain only digits',
+    keywordsRequired: 'At least one keyword is required',
+    planRequired: 'Please select a pricing plan',
+  },
 };
 
 // French translations
@@ -199,6 +338,76 @@ const frTranslations: Translations = {
     whyKeywordResearch: 'Pourquoi la recherche de mots-clés est importante',
     yourWebsiteRankings: 'Classements de votre site web',
     yourKeywords: 'Vos mots-clés',
+  },
+  aboutPage: {
+    title: 'À propos de Reference-Web',
+    intro: 'Reference-Web est une plateforme puissante de classement SEO et de surveillance de sites web conçue pour aider les entreprises et les particuliers à suivre leur présence en ligne et à améliorer leurs classements dans les moteurs de recherche.',
+    missionTitle: 'Notre Mission',
+    missionText: 'Notre mission est de fournir des informations accessibles et exploitables sur les performances des sites web, aidant nos utilisateurs à prendre des décisions basées sur les données pour améliorer leur visibilité en ligne.',
+    teamTitle: 'L\'Équipe',
+    teamText: 'Fondée par une équipe d\'experts SEO et de développeurs web, Reference-Web combine l\'expertise technique avec un design convivial pour offrir une expérience fluide.',
+    technologyTitle: 'Notre Technologie',
+    technologyText: 'Nous utilisons une technologie de pointe pour collecter et analyser les données des moteurs de recherche, fournissant des informations précises et à jour sur les performances de votre site web.',
+    contactTitle: 'Contactez-nous',
+    contactText: 'Vous avez des questions ou des commentaires ? Nous aimerions avoir de vos nouvelles ! Contactez notre équipe de support à support@reference-web.com.',
+  },
+  allWebsitesPage: {
+    title: 'Tous les sites web suivis',
+    backToDashboard: 'Retour au tableau de bord',
+    completeWebsiteRankings: 'Classements complets des sites web',
+    loadingWebsites: 'Chargement des sites web...',
+    website: 'Site web',
+    avgPosition: 'Position moyenne',
+    change: 'Changement',
+    keywords: 'Mots-clés',
+    noWebsitesFound: 'Aucun site web trouvé. Ajoutez un site web pour commencer le suivi.',
+    viewAll: 'Voir tout',
+    trackedWebsites: 'Sites web suivis',
+  },
+  addWebsiteForm: {
+    pageTitle: 'Ajouter un site web',
+    websiteDetails: 'Détails du site web',
+    websiteDetailsDescription: 'Entrez les informations sur le site web que vous voulez suivre',
+    websiteTitle: 'Titre du site web',
+    websiteTitlePlaceholder: 'Mon site web génial',
+    websiteTitleDescription: 'Le nom ou titre de votre site web',
+    websiteUrl: 'URL du site web',
+    websiteUrlPlaceholder: 'exemple.com',
+    websiteUrlDescription: 'Entrez le domaine sans http:// ou https://',
+    description: 'Description',
+    descriptionPlaceholder: 'Brève description de votre site web',
+    contactName: 'Nom du contact',
+    contactNamePlaceholder: 'Jean Dupont',
+    contactEmail: 'Email du contact',
+    contactEmailPlaceholder: 'email@exemple.com',
+    countryCode: 'Indicatif pays',
+    selectCountryCode: 'Sélectionner l\'indicatif pays',
+    phoneNumber: 'Numéro de téléphone',
+    phoneNumberPlaceholder: '612345678',
+    phoneNumberDescription: 'Entrez uniquement des chiffres sans espaces ou caractères spéciaux',
+    reciprocalLink: 'Lien réciproque (Optionnel)',
+    reciprocalLinkPlaceholder: 'https://exemple.com/partenaires/referencerank',
+    reciprocalLinkDescription: 'Lien de retour vers notre service depuis votre site web (optionnel)',
+    keywords: 'Mots-clés',
+    keywordsPlaceholder: 'seo, marketing, conception web',
+    keywordsDescription: 'Entrez les mots-clés séparés par des virgules',
+    selectPlan: 'Sélectionner un plan',
+    choosePricingPlan: 'Choisir un plan tarifaire',
+    selectPlanDescription: 'Choisissez le plan d\'abonnement pour ce site web',
+    loadingPlans: 'Chargement des plans...',
+    noPlansAvailable: 'Aucun plan disponible',
+    addingWebsite: 'Ajout du site web...',
+    addWebsiteButton: 'Ajouter le site web',
+    // Form validation messages
+    titleRequired: 'Le titre est requis',
+    domainRequired: 'Le domaine est requis',
+    descriptionRequired: 'La description est requise',
+    contactNameRequired: 'Le nom du contact est requis',
+    invalidEmail: 'Adresse email invalide',
+    phoneRequired: 'Le numéro de téléphone est requis',
+    phoneDigitsOnly: 'Le numéro de téléphone ne doit contenir que des chiffres',
+    keywordsRequired: 'Au moins un mot-clé est requis',
+    planRequired: 'Veuillez sélectionner un plan tarifaire',
   },
 };
 

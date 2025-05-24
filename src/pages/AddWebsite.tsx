@@ -19,6 +19,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // Common phone prefixes with French (+33) as default
 const phonePrefixes = [
@@ -38,33 +39,34 @@ interface PricingPlan {
   price: number;
 }
 
-// Form validation schema
-const formSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  domain: z.string().min(1, "Domain is required"),
-  description: z.string().min(1, "Description is required"),
-  contact_name: z.string().min(1, "Contact name is required"),
-  contact_email: z.string().email("Invalid email address"),
-  phone_prefix: z.string().default('+33'),
-  phone_number: z.string()
-    .min(1, "Phone number is required")
-    .regex(/^\d+$/, "Phone number must contain only digits"),
-  reciprocal_link: z.string().optional(),
-  keywords: z.string().min(1, "At least one keyword is required"),
-  pricing_id: z.string().min(1, "Please select a pricing plan")
-});
-
-type FormValues = z.infer<typeof formSchema>;
-
 const AddWebsite = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Get URL parameters if coming from homepage form
   const urlParams = new URLSearchParams(window.location.search);
   const domainParam = urlParams.get('domain') || '';
   const keywordsParam = urlParams.get('keywords') || '';
+  
+  // Form validation schema with translated messages
+  const formSchema = z.object({
+    title: z.string().min(1, t('addWebsiteForm', 'titleRequired')),
+    domain: z.string().min(1, t('addWebsiteForm', 'domainRequired')),
+    description: z.string().min(1, t('addWebsiteForm', 'descriptionRequired')),
+    contact_name: z.string().min(1, t('addWebsiteForm', 'contactNameRequired')),
+    contact_email: z.string().email(t('addWebsiteForm', 'invalidEmail')),
+    phone_prefix: z.string().default('+33'),
+    phone_number: z.string()
+      .min(1, t('addWebsiteForm', 'phoneRequired'))
+      .regex(/^\d+$/, t('addWebsiteForm', 'phoneDigitsOnly')),
+    reciprocal_link: z.string().optional(),
+    keywords: z.string().min(1, t('addWebsiteForm', 'keywordsRequired')),
+    pricing_id: z.string().min(1, t('addWebsiteForm', 'planRequired'))
+  });
+
+  type FormValues = z.infer<typeof formSchema>;
   
   // Fetch pricing plans
   const { data: pricingPlans, isLoading: pricingLoading } = useQuery({
@@ -184,13 +186,13 @@ const AddWebsite = () => {
       <Header />
       <main className="flex-grow py-8">
         <div className="container max-w-3xl mx-auto px-4">
-          <h1 className="text-3xl font-bold mb-6">Add Website</h1>
+          <h1 className="text-3xl font-bold mb-6">{t('addWebsiteForm', 'pageTitle')}</h1>
           
           <Card>
             <CardHeader>
-              <CardTitle>Website Details</CardTitle>
+              <CardTitle>{t('addWebsiteForm', 'websiteDetails')}</CardTitle>
               <CardDescription>
-                Enter information about the website you want to track
+                {t('addWebsiteForm', 'websiteDetailsDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -201,12 +203,12 @@ const AddWebsite = () => {
                     name="title"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Website Title</FormLabel>
+                        <FormLabel>{t('addWebsiteForm', 'websiteTitle')}</FormLabel>
                         <FormControl>
-                          <Input placeholder="My Awesome Website" required {...field} />
+                          <Input placeholder={t('addWebsiteForm', 'websiteTitlePlaceholder')} required {...field} />
                         </FormControl>
                         <FormDescription>
-                          The name or title of your website
+                          {t('addWebsiteForm', 'websiteTitleDescription')}
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -218,12 +220,12 @@ const AddWebsite = () => {
                     name="domain"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Website URL</FormLabel>
+                        <FormLabel>{t('addWebsiteForm', 'websiteUrl')}</FormLabel>
                         <FormControl>
-                          <Input placeholder="example.com" required {...field} />
+                          <Input placeholder={t('addWebsiteForm', 'websiteUrlPlaceholder')} required {...field} />
                         </FormControl>
                         <FormDescription>
-                          Enter the domain without http:// or https://
+                          {t('addWebsiteForm', 'websiteUrlDescription')}
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -235,10 +237,10 @@ const AddWebsite = () => {
                     name="description"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Description</FormLabel>
+                        <FormLabel>{t('addWebsiteForm', 'description')}</FormLabel>
                         <FormControl>
                           <Textarea 
-                            placeholder="Brief description of your website" 
+                            placeholder={t('addWebsiteForm', 'descriptionPlaceholder')} 
                             className="resize-none min-h-[100px]"
                             required
                             {...field} 
@@ -255,9 +257,9 @@ const AddWebsite = () => {
                       name="contact_name"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Contact Name</FormLabel>
+                          <FormLabel>{t('addWebsiteForm', 'contactName')}</FormLabel>
                           <FormControl>
-                            <Input placeholder="John Doe" required {...field} />
+                            <Input placeholder={t('addWebsiteForm', 'contactNamePlaceholder')} required {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -269,11 +271,11 @@ const AddWebsite = () => {
                       name="contact_email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Contact Email</FormLabel>
+                          <FormLabel>{t('addWebsiteForm', 'contactEmail')}</FormLabel>
                           <FormControl>
                             <Input 
                               type="email" 
-                              placeholder="email@example.com" 
+                              placeholder={t('addWebsiteForm', 'contactEmailPlaceholder')} 
                               required 
                               {...field} 
                             />
@@ -290,14 +292,14 @@ const AddWebsite = () => {
                       name="phone_prefix"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Country Code</FormLabel>
+                          <FormLabel>{t('addWebsiteForm', 'countryCode')}</FormLabel>
                           <Select 
                             onValueChange={field.onChange} 
                             defaultValue={field.value}
                           >
                             <FormControl>
                               <SelectTrigger>
-                                <SelectValue placeholder="Select country code" />
+                                <SelectValue placeholder={t('addWebsiteForm', 'selectCountryCode')} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
@@ -318,17 +320,17 @@ const AddWebsite = () => {
                       name="phone_number"
                       render={({ field }) => (
                         <FormItem className="md:col-span-2">
-                          <FormLabel>Phone Number</FormLabel>
+                          <FormLabel>{t('addWebsiteForm', 'phoneNumber')}</FormLabel>
                           <FormControl>
                             <Input 
                               type="tel" 
-                              placeholder="612345678" 
+                              placeholder={t('addWebsiteForm', 'phoneNumberPlaceholder')} 
                               required 
                               {...field} 
                             />
                           </FormControl>
                           <FormDescription>
-                            Enter only numbers without spaces or special characters
+                            {t('addWebsiteForm', 'phoneNumberDescription')}
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
@@ -341,15 +343,15 @@ const AddWebsite = () => {
                     name="reciprocal_link"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Reciprocal Link (Optional)</FormLabel>
+                        <FormLabel>{t('addWebsiteForm', 'reciprocalLink')}</FormLabel>
                         <FormControl>
                           <Input 
-                            placeholder="https://example.com/partners/referencerank" 
+                            placeholder={t('addWebsiteForm', 'reciprocalLinkPlaceholder')} 
                             {...field} 
                           />
                         </FormControl>
                         <FormDescription>
-                          Link back to our service from your website (optional)
+                          {t('addWebsiteForm', 'reciprocalLinkDescription')}
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -361,16 +363,16 @@ const AddWebsite = () => {
                     name="keywords"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Keywords</FormLabel>
+                        <FormLabel>{t('addWebsiteForm', 'keywords')}</FormLabel>
                         <FormControl>
                           <Input 
-                            placeholder="seo, marketing, web design" 
+                            placeholder={t('addWebsiteForm', 'keywordsPlaceholder')} 
                             required 
                             {...field} 
                           />
                         </FormControl>
                         <FormDescription>
-                          Enter keywords separated by commas
+                          {t('addWebsiteForm', 'keywordsDescription')}
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -382,19 +384,19 @@ const AddWebsite = () => {
                     name="pricing_id"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Select a Plan</FormLabel>
+                        <FormLabel>{t('addWebsiteForm', 'selectPlan')}</FormLabel>
                         <Select 
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Choose a pricing plan" />
+                              <SelectValue placeholder={t('addWebsiteForm', 'choosePricingPlan')} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
                             {pricingLoading ? (
-                              <SelectItem value="loading" disabled>Loading plans...</SelectItem>
+                              <SelectItem value="loading" disabled>{t('addWebsiteForm', 'loadingPlans')}</SelectItem>
                             ) : pricingPlans && pricingPlans.length > 0 ? (
                               pricingPlans.map((plan) => (
                                 <SelectItem key={plan.id} value={plan.id}>
@@ -402,12 +404,12 @@ const AddWebsite = () => {
                                 </SelectItem>
                               ))
                             ) : (
-                              <SelectItem value="none" disabled>No plans available</SelectItem>
+                              <SelectItem value="none" disabled>{t('addWebsiteForm', 'noPlansAvailable')}</SelectItem>
                             )}
                           </SelectContent>
                         </Select>
                         <FormDescription>
-                          Choose the subscription plan for this website
+                          {t('addWebsiteForm', 'selectPlanDescription')}
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -419,7 +421,7 @@ const AddWebsite = () => {
                     className="w-full bg-rank-teal hover:bg-rank-teal/90"
                     disabled={isSubmitting}
                   >
-                    {isSubmitting ? "Adding Website..." : "Add Website"}
+                    {isSubmitting ? t('addWebsiteForm', 'addingWebsite') : t('addWebsiteForm', 'addWebsiteButton')}
                   </Button>
                 </form>
               </Form>
