@@ -28,19 +28,10 @@ const SitemapXml = () => {
       const staticUrls = getStaticUrls();
       const xml = generateSitemap(staticUrls);
       
-      // Set content type and serve XML
-      const blob = new Blob([xml], { type: 'application/xml' });
-      const url = URL.createObjectURL(blob);
-      
       // Replace current page content with XML
       document.open();
       document.write(xml);
       document.close();
-      
-      // Set proper content type header
-      if (document.contentType) {
-        document.contentType = 'application/xml';
-      }
     }
   }, [websites, isLoading]);
 
