@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface AddWebsiteFormProps {
   onAddWebsite: (website: any) => void;
@@ -14,6 +15,7 @@ interface AddWebsiteFormProps {
 
 export function AddWebsiteForm({ onAddWebsite }: AddWebsiteFormProps) {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [domain, setDomain] = useState('');
   const [keywords, setKeywords] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -65,39 +67,39 @@ export function AddWebsiteForm({ onAddWebsite }: AddWebsiteFormProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Add Website</CardTitle>
+        <CardTitle>{t('homepage', 'addWebsiteTitle')}</CardTitle>
         <CardDescription>
-          Enter a website URL and keywords you want to track. Complete the form first, then payment.
+          {t('homepage', 'addWebsiteDescription')}
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="domain">Website URL</Label>
+            <Label htmlFor="domain">{t('homepage', 'websiteUrlLabel')}</Label>
             <Input
               id="domain"
-              placeholder="example.com"
+              placeholder={t('homepage', 'websiteUrlPlaceholder')}
               value={domain}
               onChange={(e) => setDomain(e.target.value)}
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="keywords">Keywords (comma separated)</Label>
+            <Label htmlFor="keywords">{t('homepage', 'keywordsLabel')}</Label>
             <Input
               id="keywords"
-              placeholder="seo, marketing, website design"
+              placeholder={t('homepage', 'keywordsPlaceholder')}
               value={keywords}
               onChange={(e) => setKeywords(e.target.value)}
               required
             />
             <p className="text-xs text-muted-foreground">
-              Enter up to 10 keywords you want to track for this website
+              {t('homepage', 'keywordsHelp')}
             </p>
           </div>
           <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-sm text-blue-800">
-              💳 Payment: €29.99 (after form validation)
+              {t('homepage', 'paymentInfo')}
             </p>
           </div>
         </CardContent>
@@ -107,7 +109,7 @@ export function AddWebsiteForm({ onAddWebsite }: AddWebsiteFormProps) {
             className="w-full bg-rank-teal hover:bg-rank-teal/90"
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Processing..." : "Continue to Form"}
+            {isSubmitting ? "Processing..." : t('homepage', 'continueToFormButton')}
           </Button>
         </CardFooter>
       </form>

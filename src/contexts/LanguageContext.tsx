@@ -44,6 +44,16 @@ export interface Translations {
     featuresTitle: string;
     rankingsSection: string;
     keywordsSection: string;
+    // Add Website section
+    addWebsiteTitle: string;
+    addWebsiteDescription: string;
+    websiteUrlLabel: string;
+    websiteUrlPlaceholder: string;
+    keywordsLabel: string;
+    keywordsPlaceholder: string;
+    keywordsHelp: string;
+    paymentInfo: string;
+    continueToFormButton: string;
   };
   pages: {
     // Page titles
@@ -188,6 +198,16 @@ const enTranslations: Translations = {
     featuresTitle: 'Our Features',
     rankingsSection: 'Track Rankings',
     keywordsSection: 'Keyword Research',
+    // Add Website section
+    addWebsiteTitle: 'Add Website',
+    addWebsiteDescription: 'Enter a website URL and keywords you want to track. Complete the form first, then payment.',
+    websiteUrlLabel: 'Website URL',
+    websiteUrlPlaceholder: 'example.com',
+    keywordsLabel: 'Keywords (comma separated)',
+    keywordsPlaceholder: 'seo, marketing, website design',
+    keywordsHelp: 'Enter up to 10 keywords you want to track for this website',
+    paymentInfo: '💳 Payment: Starting at 1€ (after form validation)',
+    continueToFormButton: 'Continue to Form',
   },
   pages: {
     // Page titles
@@ -320,6 +340,16 @@ const frTranslations: Translations = {
     featuresTitle: 'Nos fonctionnalités',
     rankingsSection: 'Suivre les classements',
     keywordsSection: 'Recherche de mots-clés',
+    // Add Website section
+    addWebsiteTitle: 'Ajouter un site web',
+    addWebsiteDescription: 'Entrez une URL de site web et les mots-clés que vous voulez suivre. Complétez le formulaire d\'abord, puis le paiement.',
+    websiteUrlLabel: 'URL du site web',
+    websiteUrlPlaceholder: 'exemple.com',
+    keywordsLabel: 'Mots-clés (séparés par des virgules)',
+    keywordsPlaceholder: 'seo, marketing, conception web',
+    keywordsHelp: 'Entrez jusqu\'à 10 mots-clés que vous voulez suivre pour ce site web',
+    paymentInfo: '💳 Paiement : À partir de 1€ (après validation du formulaire)',
+    continueToFormButton: 'Continuer vers le formulaire',
   },
   pages: {
     // Page titles
