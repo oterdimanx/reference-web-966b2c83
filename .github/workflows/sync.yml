@@ -1,4 +1,4 @@
-name: Safe Repository Sync
+name: Sync to Private Repo
 on: [push]
 
 jobs:
@@ -8,19 +8,15 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        fetch-depth: 0  # Get full history
+        fetch-depth: 0  # Required for full history
 
-    - name: Configure Mirror Remote
+    - name: Configure Mirror
       run: |
-        # Remove existing remote if present
-        git remote remove mirror || true
-        
-        # Add remote with authentication
-        git remote add mirror https://${{ secrets.GH_PAT }}@github.com/oterdimanx/reference-web.git
-        
-        # Verify remote
-        git remote -v
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+        git remote add mirror "https://${{ secrets.GH_PAT }}@github.com/oterdimanx/reference-web.git"
+        git remote -v  # Verify remote configuration
 
     - name: Push to Mirror
       run: |
-        git push mirror HEAD:main
+        git push --force-with-lease mirror HEAD:main
