@@ -101,6 +101,7 @@ export type Database = {
           phone_number: string | null
           phone_prefix: string | null
           position_change: number
+          pricing_id: string | null
           reciprocal_link: string | null
           title: string | null
           top_keyword: string | null
@@ -121,6 +122,7 @@ export type Database = {
           phone_number?: string | null
           phone_prefix?: string | null
           position_change: number
+          pricing_id?: string | null
           reciprocal_link?: string | null
           title?: string | null
           top_keyword?: string | null
@@ -141,6 +143,7 @@ export type Database = {
           phone_number?: string | null
           phone_prefix?: string | null
           position_change?: number
+          pricing_id?: string | null
           reciprocal_link?: string | null
           title?: string | null
           top_keyword?: string | null
@@ -148,7 +151,15 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "websites_pricing_id_fkey"
+            columns: ["pricing_id"]
+            isOneToOne: false
+            referencedRelation: "pricing"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
