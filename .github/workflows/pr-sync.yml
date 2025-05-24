@@ -1,0 +1,37 @@
+name: Create Sync PR
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Daily
+
+jobs:
+  check-diff:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v4
+      with:
+        repository: oterdimanx/reference-web-966b2c83
+
+    - name: Checkout target
+      uses: actions/checkout@v4
+      with:
+        repository: oterdimanx/reference-web
+        path: target-repo
+
+    - name: Compare repos
+      run: |
+        diff_output=$(diff -qr . target-repo || true)
+        if [ -n "$diff_output" ]; then
+          echo "DIFF_FOUND=true" >> $GITHUB_ENV
+        fi
+
+    - name: Create PR
+      if: env.DIFF_FOUND == 'true'
+      uses: peter-evans/create-pull-request@v5
+      with:
+        token: ${{ secrets.GH_PAT }}
+        title: "Sync from source repository"
+        body: "Automatic sync from nameofmyrepo-1234"
+        base: main
+        branch: "sync-$(date +%s)"
