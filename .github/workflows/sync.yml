@@ -1,8 +1,5 @@
-name: Sync Repositories
-
-on:
-  push:
-    branches: [ main ]
+name: Safe Repository Sync
+on: [push]
 
 jobs:
   sync:
@@ -10,10 +7,20 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    
-    - name: Safe Sync
+      with:
+        fetch-depth: 0  # Get full history
+
+    - name: Configure Mirror Remote
       run: |
-        git fetch origin
-        git push --force-with-lease mirror main:main
-      env:
-        GH_TOKEN: ${{ secrets.GH_PAT }}
+        # Remove existing remote if present
+        git remote remove mirror || true
+        
+        # Add remote with authentication
+        git remote add mirror https://${{ secrets.GH_PAT }}@github.com/oterdimanx/reference-web.git
+        
+        # Verify remote
+        git remote -v
+
+    - name: Push to Mirror
+      run: |
+        git push mirror HEAD:main
