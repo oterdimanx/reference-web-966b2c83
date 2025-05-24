@@ -32,6 +32,6 @@ jobs:
       with:
         token: ${{ secrets.GH_PAT }}
         title: "Sync from source repository"
-        body: "Automatic sync from nameofmyrepo-1234"
+        body: "Automatic sync from reference-web-966b2c83"
         base: main
         branch: "sync-$(date +%s)"
