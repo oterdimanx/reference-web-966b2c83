@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Upload, X, Image } from 'lucide-react';
+import { Upload, X, Image as ImageIcon } from 'lucide-react';
 
 interface ImageUploadProps {
   onImageSelect: (file: File | null) => void;
@@ -23,7 +23,7 @@ export function ImageUpload({
 
   const validateImageDimensions = (file: File): Promise<boolean> => {
     return new Promise((resolve) => {
-      const img = new Image();
+      const img = new window.Image();
       img.onload = () => {
         const isValid = img.width <= maxSize.width && img.height <= maxSize.height;
         if (!isValid) {
@@ -101,7 +101,7 @@ export function ImageUpload({
           </div>
         ) : (
           <div className="w-16 h-16 border-2 border-dashed border-gray-300 rounded flex items-center justify-center">
-            <Image size={24} className="text-gray-400" />
+            <ImageIcon size={24} className="text-gray-400" />
           </div>
         )}
         
