@@ -5,14 +5,18 @@ import { Footer } from '@/components/Layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form } from '@/components/ui/form';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAddWebsiteForm } from '@/hooks/useAddWebsiteForm';
+import { useUserSubscription } from '@/hooks/useUserSubscription';
 import { WebsiteBasicInfo } from '@/components/AddWebsite/WebsiteBasicInfo';
 import { ContactInfo } from '@/components/AddWebsite/ContactInfo';
 import { AdditionalSettings } from '@/components/AddWebsite/AdditionalSettings';
 import { PaymentStep } from '@/components/Payment/PaymentStep';
+import { AlertCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface PricingPlan {
   id: string;
@@ -23,6 +27,7 @@ interface PricingPlan {
 const AddWebsite = () => {
   const { t } = useLanguage();
   const { form, isSubmitting, selectedImage, setSelectedImage, onSubmit } = useAddWebsiteForm();
+  const { subscription, isLoading: subscriptionLoading, canAddWebsite, websitesUsed, websitesAllowed } = useUserSubscription();
   const [currentStep, setCurrentStep] = useState<'form' | 'payment' | 'success'>('form');
   const [isPaymentComplete, setIsPaymentComplete] = useState(false);
   const [validatedFormData, setValidatedFormData] = useState<any>(null);
@@ -42,6 +47,47 @@ const AddWebsite = () => {
       return data as PricingPlan[];
     }
   });
+  
+  // Show loading state while checking subscription
+  if (subscriptionLoading) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Header />
+        <main className="flex-grow py-8">
+          <div className="container max-w-2xl mx-auto px-4">
+            <div className="text-center">Loading...</div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+  
+  // Show subscription limit reached message
+  if (!canAddWebsite && subscription?.hasSubscription) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Header />
+        <main className="flex-grow py-8">
+          <div className="container max-w-2xl mx-auto px-4">
+            <Alert className="border-orange-200 bg-orange-50">
+              <AlertCircle className="h-4 w-4 text-orange-600" />
+              <AlertDescription className="text-orange-800">
+                <strong>Website limit reached!</strong>
+                <br />
+                You have used {websitesUsed} out of {websitesAllowed} websites allowed with your current plan.
+                <br />
+                <Link to="/pricing" className="underline font-medium">
+                  Upgrade your plan to add more websites
+                </Link>
+              </AlertDescription>
+            </Alert>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
   
   const handleFormSubmit = (data: any) => {
     // Store form data and proceed to payment
@@ -147,6 +193,16 @@ const AddWebsite = () => {
             <p className="text-gray-600 mt-2">
               Remplissez les informations de votre site web. Le paiement sera demandé après validation du formulaire.
             </p>
+            
+            {subscription?.hasSubscription && (
+              <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  <strong>Current plan:</strong> {subscription.subscription?.pricing_title} 
+                  <br />
+                  <strong>Websites:</strong> {websitesUsed} / {websitesAllowed} used
+                </p>
+              </div>
+            )}
           </div>
           
           <Card>

@@ -86,6 +86,46 @@ export function useAddWebsiteForm() {
     }
   };
   
+  const saveUserSubscription = async (pricingPlan: PricingPlan) => {
+    try {
+      if (!user?.id) {
+        throw new Error('No authenticated user');
+      }
+      
+      // Check if user already has an active subscription for this plan
+      const { data: existingSub } = await supabase
+        .from('user_subscriptions')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('pricing_id', pricingPlan.id)
+        .eq('is_active', true)
+        .single();
+        
+      if (existingSub) {
+        console.log('User already has active subscription for this plan');
+        return;
+      }
+      
+      // Create new subscription
+      const { error } = await supabase
+        .from('user_subscriptions')
+        .insert({
+          user_id: user.id,
+          pricing_id: pricingPlan.id,
+          is_active: true
+        });
+        
+      if (error) {
+        throw error;
+      }
+      
+      console.log('User subscription saved successfully');
+    } catch (error) {
+      console.error('Error saving user subscription:', error);
+      throw error;
+    }
+  };
+  
   const onSubmit = async (data: FormValues, pricingPlans?: PricingPlan[]) => {
     setIsSubmitting(true);
     
@@ -127,6 +167,13 @@ export function useAddWebsiteForm() {
       
       // Find selected pricing plan
       const selectedPlan = pricingPlans?.find(plan => plan.id === data.pricing_id);
+      
+      if (!selectedPlan) {
+        throw new Error('Selected pricing plan not found');
+      }
+      
+      // Save user subscription first
+      await saveUserSubscription(selectedPlan);
       
       // Add the additional fields including image path
       const detailedWebsiteData = {

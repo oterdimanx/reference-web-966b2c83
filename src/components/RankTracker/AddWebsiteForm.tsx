@@ -1,13 +1,16 @@
 
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useUserSubscription } from '@/hooks/useUserSubscription';
+import { AlertCircle } from 'lucide-react';
 
 interface AddWebsiteFormProps {
   onAddWebsite: (website: any) => void;
@@ -16,6 +19,7 @@ interface AddWebsiteFormProps {
 export function AddWebsiteForm({ onAddWebsite }: AddWebsiteFormProps) {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { canAddWebsite, websitesUsed, websitesAllowed, subscription, isLoading } = useUserSubscription();
   const [domain, setDomain] = useState('');
   const [keywords, setKeywords] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,6 +50,13 @@ export function AddWebsiteForm({ onAddWebsite }: AddWebsiteFormProps) {
     setIsSubmitting(true);
     
     try {
+      // Check if user can add more websites
+      if (!canAddWebsite && subscription?.hasSubscription) {
+        toast.error(`You have reached your website limit (${websitesUsed}/${websitesAllowed}). Please upgrade your plan.`);
+        setIsSubmitting(false);
+        return;
+      }
+      
       // Check if domain already exists for this user
       const isDuplicate = await checkDuplicateDomain(domain);
       
@@ -64,6 +75,9 @@ export function AddWebsiteForm({ onAddWebsite }: AddWebsiteFormProps) {
     }
   };
   
+  // Show subscription status if user has one
+  const showSubscriptionAlert = subscription?.hasSubscription && !canAddWebsite;
+  
   return (
     <Card>
       <CardHeader>
@@ -72,8 +86,36 @@ export function AddWebsiteForm({ onAddWebsite }: AddWebsiteFormProps) {
           {t('homepage', 'addWebsiteDescription')}
         </CardDescription>
       </CardHeader>
+      
+      {showSubscriptionAlert && (
+        <CardContent className="pt-0">
+          <Alert className="border-orange-200 bg-orange-50">
+            <AlertCircle className="h-4 w-4 text-orange-600" />
+            <AlertDescription className="text-orange-800">
+              <strong>Website limit reached!</strong>
+              <br />
+              You have used {websitesUsed} out of {websitesAllowed} websites allowed.
+              <br />
+              <Link to="/pricing" className="underline font-medium">
+                Upgrade your plan to add more websites
+              </Link>
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      )}
+      
       <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4">
+        <CardContent className={showSubscriptionAlert ? "pt-4 space-y-4" : "space-y-4"}>
+          {subscription?.hasSubscription && canAddWebsite && (
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-800">
+                <strong>Current plan:</strong> {subscription.subscription?.pricing_title}
+                <br />
+                <strong>Websites:</strong> {websitesUsed} / {websitesAllowed} used
+              </p>
+            </div>
+          )}
+          
           <div className="space-y-2">
             <Label htmlFor="domain">{t('homepage', 'websiteUrlLabel')}</Label>
             <Input
@@ -82,6 +124,7 @@ export function AddWebsiteForm({ onAddWebsite }: AddWebsiteFormProps) {
               value={domain}
               onChange={(e) => setDomain(e.target.value)}
               required
+              disabled={showSubscriptionAlert}
             />
           </div>
           <div className="space-y-2">
@@ -92,6 +135,7 @@ export function AddWebsiteForm({ onAddWebsite }: AddWebsiteFormProps) {
               value={keywords}
               onChange={(e) => setKeywords(e.target.value)}
               required
+              disabled={showSubscriptionAlert}
             />
             <p className="text-xs text-muted-foreground">
               {t('homepage', 'keywordsHelp')}
@@ -104,13 +148,19 @@ export function AddWebsiteForm({ onAddWebsite }: AddWebsiteFormProps) {
           </div>
         </CardContent>
         <CardFooter>
-          <Button 
-            type="submit" 
-            className="w-full bg-rank-teal hover:bg-rank-teal/90"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Processing..." : t('homepage', 'continueToFormButton')}
-          </Button>
+          {showSubscriptionAlert ? (
+            <Button asChild className="w-full bg-rank-teal hover:bg-rank-teal/90">
+              <Link to="/pricing">Upgrade Plan</Link>
+            </Button>
+          ) : (
+            <Button 
+              type="submit" 
+              className="w-full bg-rank-teal hover:bg-rank-teal/90"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Processing..." : t('homepage', 'continueToFormButton')}
+            </Button>
+          )}
         </CardFooter>
       </form>
     </Card>
