@@ -58,7 +58,7 @@ export function EventAnalytics() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('events')
-        .select('event_type, created_at::date as date')
+        .select('event_type, received_at')
         .gte('received_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
 
       if (error) {
