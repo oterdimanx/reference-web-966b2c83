@@ -96,6 +96,7 @@ export type Database = {
           description: string | null
           domain: string
           id: string
+          image_path: string | null
           keyword_count: number
           phone_number: string | null
           phone_prefix: string | null
@@ -115,6 +116,7 @@ export type Database = {
           description?: string | null
           domain: string
           id?: string
+          image_path?: string | null
           keyword_count: number
           phone_number?: string | null
           phone_prefix?: string | null
@@ -134,6 +136,7 @@ export type Database = {
           description?: string | null
           domain?: string
           id?: string
+          image_path?: string | null
           keyword_count?: number
           phone_number?: string | null
           phone_prefix?: string | null

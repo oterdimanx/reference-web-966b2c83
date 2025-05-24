@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -10,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ImageUpload } from '@/components/ui/image-upload';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { saveWebsiteDetailed } from '@/services/websiteService';
@@ -20,6 +20,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { saveImageToPublic } from '@/utils/imageUtils';
 
 // Common phone prefixes with French (+33) as default
 const phonePrefixes = [
@@ -44,6 +45,7 @@ const AddWebsite = () => {
   const { user } = useAuth();
   const { t } = useLanguage();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
   
   // Get URL parameters if coming from homepage form
   const urlParams = new URLSearchParams(window.location.search);
@@ -133,6 +135,19 @@ const AddWebsite = () => {
         setIsSubmitting(false);
         return;
       }
+
+      // Handle image upload if selected
+      let imagePath: string | null = null;
+      if (selectedImage) {
+        try {
+          imagePath = await saveImageToPublic(selectedImage, data.domain);
+        } catch (error) {
+          console.error('Error uploading image:', error);
+          toast.error('Failed to upload image');
+          setIsSubmitting(false);
+          return;
+        }
+      }
       
       // Create a website entry with the form data
       const keywordsArray = data.keywords.split(',').filter(k => k.trim().length > 0);
@@ -150,7 +165,7 @@ const AddWebsite = () => {
       // Find selected pricing plan
       const selectedPlan = pricingPlans?.find(plan => plan.id === data.pricing_id);
       
-      // Add the additional fields
+      // Add the additional fields including image path
       const detailedWebsiteData = {
         ...websiteData,
         title: data.title,
@@ -162,7 +177,8 @@ const AddWebsite = () => {
         reciprocalLink: data.reciprocal_link || null,
         pricingId: data.pricing_id,
         pricingTitle: selectedPlan?.title || 'Unknown',
-        pricingPrice: selectedPlan?.price || 0
+        pricingPrice: selectedPlan?.price || 0,
+        imagePath: imagePath
       };
       
       const savedWebsite = await saveWebsiteDetailed(detailedWebsiteData);
@@ -230,6 +246,11 @@ const AddWebsite = () => {
                         <FormMessage />
                       </FormItem>
                     )}
+                  />
+
+                  <ImageUpload
+                    onImageSelect={setSelectedImage}
+                    maxSize={{ width: 200, height: 200 }}
                   />
                   
                   <FormField
