@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Header } from '@/components/Layout/Header';
 import { Footer } from '@/components/Layout/Footer';
@@ -26,7 +25,6 @@ interface PricingPlan {
 
 const AddWebsite = () => {
   const { t } = useLanguage();
-  const { form, isSubmitting, selectedImage, setSelectedImage, onSubmit } = useAddWebsiteForm();
   const { subscription, isLoading: subscriptionLoading, canAddWebsite, websitesUsed, websitesAllowed } = useUserSubscription();
   const [currentStep, setCurrentStep] = useState<'form' | 'payment' | 'success'>('form');
   const [isPaymentComplete, setIsPaymentComplete] = useState(false);
@@ -47,6 +45,8 @@ const AddWebsite = () => {
       return data as PricingPlan[];
     }
   });
+  
+  const { form, isSubmitting, selectedImage, setSelectedImage, onSubmit } = useAddWebsiteForm(pricingPlans);
   
   // Show loading state while checking subscription
   if (subscriptionLoading) {

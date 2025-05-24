@@ -2,23 +2,44 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useWebsiteSubmission } from './useWebsiteSubmission';
 import { createFormSchema, FormValues, PricingPlan } from '@/types/addWebsiteForm';
 
-export function useAddWebsiteForm() {
+export function useAddWebsiteForm(pricingPlans?: PricingPlan[]) {
   const { user } = useAuth();
   const { t } = useLanguage();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const { submitWebsite } = useWebsiteSubmission();
   
-  // Get URL parameters if coming from homepage form
+  // Get URL parameters if coming from homepage form or pricing page
   const urlParams = new URLSearchParams(window.location.search);
   const domainParam = urlParams.get('domain') || '';
   const keywordsParam = urlParams.get('keywords') || '';
+  const planParam = urlParams.get('plan') || '';
+  
+  // Determine default pricing plan
+  const getDefaultPricingId = () => {
+    if (planParam && pricingPlans) {
+      // If coming from pricing page with specific plan
+      const selectedPlan = pricingPlans.find(plan => plan.id === planParam);
+      if (selectedPlan) {
+        return planParam;
+      }
+    }
+    
+    // Default to cheapest plan
+    if (pricingPlans && pricingPlans.length > 0) {
+      const cheapestPlan = pricingPlans.reduce((min, plan) => 
+        plan.price < min.price ? plan : min
+      );
+      return cheapestPlan.id;
+    }
+    
+    return '';
+  };
   
   // Form validation schema with translated messages
   const formSchema = createFormSchema(t);
@@ -35,7 +56,17 @@ export function useAddWebsiteForm() {
       phone_number: '',
       reciprocal_link: '',
       keywords: keywordsParam,
-      pricing_id: ''
+      pricing_id: getDefaultPricingId()
+    }
+  });
+  
+  // Update form when pricing plans are loaded
+  useState(() => {
+    if (pricingPlans && pricingPlans.length > 0) {
+      const defaultPricingId = getDefaultPricingId();
+      if (defaultPricingId && !form.getValues('pricing_id')) {
+        form.setValue('pricing_id', defaultPricingId);
+      }
     }
   });
   
@@ -47,7 +78,7 @@ export function useAddWebsiteForm() {
     } catch (error) {
       console.error('Error submitting form:', error);
       if (error instanceof Error && error.message !== 'Duplicate domain') {
-        toast.error("An error occurred while adding the website.");
+        // Error handling is done in submitWebsite hook
       }
     } finally {
       setIsSubmitting(false);

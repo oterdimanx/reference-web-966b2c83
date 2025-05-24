@@ -112,7 +112,7 @@ const Pricing = () => {
                             : 'bg-gray-600 hover:bg-gray-700'
                         }`}
                       >
-                        <Link to="/add-website">Get Started</Link>
+                        <Link to={`/add-website?plan=${plan.id}`}>Get Started</Link>
                       </Button>
                     ) : (
                       <Button 
