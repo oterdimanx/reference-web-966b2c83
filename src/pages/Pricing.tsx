@@ -1,4 +1,3 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { Header } from '@/components/Layout/Header';
 import { Footer } from '@/components/Layout/Footer';
@@ -105,64 +104,65 @@ const Pricing = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {pricingPlans?.map((plan, index) => (
-                <Card 
-                  key={plan.id} 
-                  className={`chrome-card-subtle card-hover relative ${
-                    plan.price === 1 ? 'ring-2 ring-rank-teal pulse-glow-subtle' : ''
-                  }`}
-                  style={{ animationDelay: `${index * 200}ms` }}
-                >
+                <div key={plan.id} className="relative">
                   {plan.price === 1 && (
-                    <Badge className="metallic-badge absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
+                    <Badge className="metallic-badge absolute -top-3 left-1/2 transform -translate-x-1/2 z-50">
                       {t('pricingPage', 'mostPopular')}
                     </Badge>
                   )}
                   
-                  <CardHeader className="text-center">
-                    <CardTitle className="text-2xl gradient-text">{getPlanTitle(plan)}</CardTitle>
-                    <CardDescription>
-                      <span className="text-4xl font-bold text-rank-teal gradient-text">€{plan.price}</span>
-                      <span className="text-gray-500 ml-2">{getPaymentFrequency(plan)}</span>
-                    </CardDescription>
-                  </CardHeader>
-                  
-                  <CardContent>
-                    <ul className="space-y-3">
-                      {getFeatures(plan).map((feature, index) => (
-                        <li key={index} className="flex items-center">
-                          <Check className="h-5 w-5 text-rank-teal mr-3" />
-                          <span>{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                  
-                  <CardFooter>
-                    {user ? (
-                      <Button 
-                        asChild 
-                        className={`w-full chrome-button-subtle ${
-                          plan.price === 1 
-                            ? 'chrome-accent-subtle text-white' 
-                            : 'chrome-button-subtle'
-                        }`}
-                      >
-                        <Link to={`/add-website?plan=${plan.id}`}>{t('pricingPage', 'getStarted')}</Link>
-                      </Button>
-                    ) : (
-                      <Button 
-                        asChild 
-                        className={`w-full chrome-button-subtle ${
-                          plan.price === 1 
-                            ? 'chrome-accent-subtle text-white' 
-                            : 'chrome-button-subtle'
-                        }`}
-                      >
-                        <Link to="/auth">{t('pricingPage', 'signUpTo')} {t('pricingPage', 'getStarted')}</Link>
-                      </Button>
-                    )}
-                  </CardFooter>
-                </Card>
+                  <Card 
+                    className={`chrome-card-subtle card-hover h-full ${
+                      plan.price === 1 ? 'ring-2 ring-rank-teal pulse-glow-subtle' : ''
+                    }`}
+                    style={{ animationDelay: `${index * 200}ms` }}
+                  >
+                    <CardHeader className="text-center">
+                      <CardTitle className="text-2xl gradient-text">{getPlanTitle(plan)}</CardTitle>
+                      <CardDescription>
+                        <span className="text-4xl font-bold text-rank-teal gradient-text">€{plan.price}</span>
+                        <span className="text-gray-500 ml-2">{getPaymentFrequency(plan)}</span>
+                      </CardDescription>
+                    </CardHeader>
+                    
+                    <CardContent>
+                      <ul className="space-y-3">
+                        {getFeatures(plan).map((feature, index) => (
+                          <li key={index} className="flex items-center">
+                            <Check className="h-5 w-5 text-rank-teal mr-3" />
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                    
+                    <CardFooter>
+                      {user ? (
+                        <Button 
+                          asChild 
+                          className={`w-full chrome-button-subtle ${
+                            plan.price === 1 
+                              ? 'chrome-accent-subtle text-white' 
+                              : 'chrome-button-subtle'
+                          }`}
+                        >
+                          <Link to={`/add-website?plan=${plan.id}`}>{t('pricingPage', 'getStarted')}</Link>
+                        </Button>
+                      ) : (
+                        <Button 
+                          asChild 
+                          className={`w-full chrome-button-subtle ${
+                            plan.price === 1 
+                              ? 'chrome-accent-subtle text-white' 
+                              : 'chrome-button-subtle'
+                          }`}
+                        >
+                          <Link to="/auth">{t('pricingPage', 'signUpTo')} {t('pricingPage', 'getStarted')}</Link>
+                        </Button>
+                      )}
+                    </CardFooter>
+                  </Card>
+                </div>
               ))}
             </div>
           )}
