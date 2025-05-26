@@ -14,6 +14,11 @@ const AdminMenu = () => {
     return location.pathname === path || location.pathname.startsWith(`${path}/`);
   };
   
+  // Special check for exact admin route (user management)
+  const isExactAdmin = () => {
+    return location.pathname === '/admin';
+  };
+  
   // Handle navigation to home page
   const handleReturnToFront = () => {
     navigate('/');
@@ -57,7 +62,7 @@ const AdminMenu = () => {
         </Button>
         
         <Button
-          variant={isActive('/admin') ? "default" : "outline"}
+          variant={isExactAdmin() ? "default" : "outline"}
           size="sm"
           asChild
         >
