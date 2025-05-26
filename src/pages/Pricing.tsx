@@ -75,9 +75,9 @@ const Pricing = () => {
     // €1 plan shows "one-time", basic plan shows "/3 months", premium shows "/year"
     if (plan.price === 1) {
       return t('pricingPage', 'oneTime');
-    } else if (plan.price < 50) { // Assuming basic plans are under €50
+    } else if (plan.price < 10) { // Basic plans are under €10
       return language === 'fr' ? '/3 mois' : '/3 months';
-    } else { // Premium plans
+    } else { // Premium plans are €10 and above
       return language === 'fr' ? '/an' : '/year';
     }
   };
