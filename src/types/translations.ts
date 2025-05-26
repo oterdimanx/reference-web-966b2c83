@@ -1,4 +1,3 @@
-
 // Define available languages
 export type Language = 'en' | 'fr';
 
@@ -153,6 +152,13 @@ export interface Translations {
     noPricingPlans: string;
     contactSupport: string;
     getStarted: string;
+    oneTime: string;
+    signUpTo: string;
+    mostPopular: string;
+    startDescription: string;
+    addFirstWebsite: string;
+    signUpStart: string;
+    learnMore: string;
   };
   legalPages: {
     privacyTitle: string;
