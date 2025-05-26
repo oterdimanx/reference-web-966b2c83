@@ -1,3 +1,4 @@
+
 import { useQuery } from '@tanstack/react-query';
 import { Header } from '@/components/Layout/Header';
 import { Footer } from '@/components/Layout/Footer';
@@ -102,21 +103,21 @@ const Pricing = () => {
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
               {pricingPlans?.map((plan, index) => (
-                <div key={plan.id} className="relative mt-6">
-                  {plan.price === 1 && (
-                    <Badge className="metallic-badge absolute -top-3 left-1/2 transform -translate-x-1/2 z-[100]">
-                      {t('pricingPage', 'mostPopular')}
-                    </Badge>
-                  )}
-                  
+                <div key={plan.id} className="relative">
                   <Card 
                     className={`chrome-card-subtle card-hover h-full ${
                       plan.price === 1 ? 'ring-2 ring-rank-teal pulse-glow-subtle' : ''
                     }`}
                     style={{ animationDelay: `${index * 200}ms` }}
                   >
+                    {plan.price === 1 && (
+                      <Badge className="metallic-badge absolute -top-3 left-1/2 transform -translate-x-1/2 z-[200]">
+                        {t('pricingPage', 'mostPopular')}
+                      </Badge>
+                    )}
+                    
                     <CardHeader className="text-center">
                       <CardTitle className="text-2xl gradient-text">{getPlanTitle(plan)}</CardTitle>
                       <CardDescription>
