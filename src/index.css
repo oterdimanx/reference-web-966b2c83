@@ -44,12 +44,17 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    /* Metallic Chrome Variables */
-    --chrome-light: linear-gradient(145deg, #f0f8ff, #e6e6fa, #f5f5f5);
-    --chrome-dark: linear-gradient(145deg, #2c2c2c, #1a1a1a, #0d0d0d);
+    /* Light Theme Chrome Variables */
+    --chrome-light: linear-gradient(145deg, #f8fafc, #e2e8f0);
+    --chrome-light-subtle: linear-gradient(145deg, #ffffff, #f1f5f9);
     --chrome-primary: linear-gradient(145deg, #c0c0c0, #a8a8a8, #909090);
     --chrome-accent: linear-gradient(145deg, #0d9488, #14b8a6, #2dd4bf);
     --metallic-shine: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.8) 50%, transparent 70%);
+    
+    /* System Theme Chrome Variables (slightly warmer) */
+    --chrome-system: linear-gradient(145deg, #fafbfc, #e8ebef);
+    --chrome-system-subtle: linear-gradient(145deg, #ffffff, #f4f6f8);
+    --chrome-dark: linear-gradient(145deg, #2c2c2c, #1a1a1a, #0d0d0d);
   }
 
   .dark {
@@ -88,12 +93,20 @@
     @apply border-border;
   }
 
+  /* Light theme (manual light setting) */
   body {
     @apply bg-background text-foreground;
     background: var(--chrome-light);
     background-attachment: fixed;
   }
 
+  /* System theme (follows OS preference but with warmer tones) */
+  .system body {
+    background: var(--chrome-system);
+    background-attachment: fixed;
+  }
+
+  /* Dark theme */
   .dark body {
     background: var(--chrome-dark);
   }
@@ -105,7 +118,7 @@
   }
 }
 
-/* Metallic Chrome Effects */
+/* Original Chrome Effects */
 .chrome-card {
   background: linear-gradient(145deg, #f8fafc, #e2e8f0);
   box-shadow: 
@@ -124,6 +137,36 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
     inset 0 -1px 0 rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Subtle Chrome Effects for Pricing Page */
+.chrome-card-subtle {
+  background: linear-gradient(145deg, #ffffff, #f8fafc);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.system .chrome-card-subtle {
+  background: linear-gradient(145deg, #ffffff, #fafbfc);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.dark .chrome-card-subtle {
+  background: linear-gradient(145deg, #1e293b, #0f172a);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .chrome-card::before {
@@ -154,6 +197,53 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
+}
+
+/* Subtle Chrome Button */
+.chrome-button-subtle {
+  background: linear-gradient(145deg, #f1f5f9, #e2e8f0);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.chrome-button-subtle:hover {
+  background: linear-gradient(145deg, #f8fafc, #f1f5f9);
+  transform: translateY(-1px);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06);
+}
+
+.system .chrome-button-subtle {
+  background: linear-gradient(145deg, #f4f6f8, #e8ebef);
+}
+
+.system .chrome-button-subtle:hover {
+  background: linear-gradient(145deg, #fafbfc, #f4f6f8);
+}
+
+.dark .chrome-button-subtle {
+  background: linear-gradient(145deg, #374151, #1f2937);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .chrome-button-subtle:hover {
+  background: linear-gradient(145deg, #4b5563, #374151);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
 }
 
 .chrome-button:hover {
@@ -197,6 +287,25 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.3),
     inset 0 -1px 0 rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Subtle Chrome Accent */
+.chrome-accent-subtle {
+  background: linear-gradient(145deg, #0d9488, #14b8a6);
+  box-shadow: 
+    0 2px 8px rgba(13, 148, 136, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.chrome-accent-subtle:hover {
+  background: linear-gradient(145deg, #14b8a6, #2dd4bf);
+  transform: translateY(-1px);
+  box-shadow: 
+    0 4px 12px rgba(13, 148, 136, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.15);
 }
 
 .chrome-accent:hover {
@@ -268,8 +377,22 @@
   }
 }
 
+/* Subtle Pulse Glow */
+@keyframes pulse-glow-subtle {
+  0%, 100% { 
+    box-shadow: 0 0 10px rgba(13, 148, 136, 0.2);
+  }
+  50% { 
+    box-shadow: 0 0 20px rgba(13, 148, 136, 0.4);
+  }
+}
+
 .pulse-glow {
   animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.pulse-glow-subtle {
+  animation: pulse-glow-subtle 2s ease-in-out infinite;
 }
 
 /* Gradient Text Animation */
@@ -298,6 +421,8 @@
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  position: relative;
 }
 
 /* Chrome Input Fields */

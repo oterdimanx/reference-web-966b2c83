@@ -1,3 +1,4 @@
+
 import { useQuery } from '@tanstack/react-query';
 import { Header } from '@/components/Layout/Header';
 import { Footer } from '@/components/Layout/Footer';
@@ -106,13 +107,13 @@ const Pricing = () => {
               {pricingPlans?.map((plan, index) => (
                 <Card 
                   key={plan.id} 
-                  className={`chrome-card card-hover relative ${
-                    plan.price === 1 ? 'ring-2 ring-rank-teal pulse-glow' : ''
+                  className={`chrome-card-subtle card-hover relative ${
+                    plan.price === 1 ? 'ring-2 ring-rank-teal pulse-glow-subtle' : ''
                   }`}
                   style={{ animationDelay: `${index * 200}ms` }}
                 >
                   {plan.price === 1 && (
-                    <Badge className="metallic-badge absolute -top-3 left-1/2 transform -translate-x-1/2">
+                    <Badge className="metallic-badge absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
                       {t('pricingPage', 'mostPopular')}
                     </Badge>
                   )}
@@ -140,10 +141,10 @@ const Pricing = () => {
                     {user ? (
                       <Button 
                         asChild 
-                        className={`w-full chrome-button ${
+                        className={`w-full chrome-button-subtle ${
                           plan.price === 1 
-                            ? 'chrome-accent text-white' 
-                            : 'chrome-button'
+                            ? 'chrome-accent-subtle text-white' 
+                            : 'chrome-button-subtle'
                         }`}
                       >
                         <Link to={`/add-website?plan=${plan.id}`}>{t('pricingPage', 'getStarted')}</Link>
@@ -151,10 +152,10 @@ const Pricing = () => {
                     ) : (
                       <Button 
                         asChild 
-                        className={`w-full chrome-button ${
+                        className={`w-full chrome-button-subtle ${
                           plan.price === 1 
-                            ? 'chrome-accent text-white' 
-                            : 'chrome-button'
+                            ? 'chrome-accent-subtle text-white' 
+                            : 'chrome-button-subtle'
                         }`}
                       >
                         <Link to="/auth">{t('pricingPage', 'signUpTo')} {t('pricingPage', 'getStarted')}</Link>
@@ -167,7 +168,7 @@ const Pricing = () => {
           )}
           
           <div className="mt-16 text-center">
-            <div className="chrome-card rounded-lg p-8 border-blue-200 dark:border-blue-800">
+            <div className="chrome-card-subtle rounded-lg p-8 border-blue-200 dark:border-blue-800">
               <h3 className="text-2xl font-semibold mb-4 text-blue-800 dark:text-blue-200 gradient-text">
                 {t('pricingPage', 'startMessage')} {t('pricingPage', 'startAmount')}
               </h3>
@@ -175,12 +176,12 @@ const Pricing = () => {
                 {t('pricingPage', 'startDescription')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button asChild className="chrome-accent text-white">
+                <Button asChild className="chrome-accent-subtle text-white">
                   <Link to={user ? "/add-website" : "/auth"}>
                     {user ? t('pricingPage', 'addFirstWebsite') : t('pricingPage', 'signUpStart')}
                   </Link>
                 </Button>
-                <Button variant="outline" asChild className="chrome-button">
+                <Button variant="outline" asChild className="chrome-button-subtle">
                   <Link to="/about">{t('pricingPage', 'learnMore')}</Link>
                 </Button>
               </div>
