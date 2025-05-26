@@ -72,8 +72,14 @@ const Pricing = () => {
   };
 
   const getPaymentFrequency = (plan: PricingPlan) => {
-    // €1 plan shows "one-time", others show "/month"
-    return plan.price === 1 ? t('pricingPage', 'oneTime') : t('pricingPage', 'monthly');
+    // €1 plan shows "one-time", basic plan shows "/3 months", premium shows "/year"
+    if (plan.price === 1) {
+      return t('pricingPage', 'oneTime');
+    } else if (plan.price < 50) { // Assuming basic plans are under €50
+      return language === 'fr' ? '/3 mois' : '/3 months';
+    } else { // Premium plans
+      return language === 'fr' ? '/an' : '/year';
+    }
   };
 
   return (
