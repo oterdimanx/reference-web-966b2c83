@@ -142,6 +142,18 @@ export interface Translations {
     keywordsRequired: string;
     planRequired: string;
   };
+  pricingPage: {
+    title: string;
+    subtitle: string;
+    startMessage: string;
+    startAmount: string;
+    choosePlan: string;
+    monthly: string;
+    loadingPlans: string;
+    noPricingPlans: string;
+    contactSupport: string;
+    getStarted: string;
+  };
   legalPages: {
     privacyTitle: string;
     privacyLastUpdated: string;

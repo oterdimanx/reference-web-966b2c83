@@ -140,6 +140,18 @@ export const enTranslations: Translations = {
     keywordsRequired: 'At least one keyword is required',
     planRequired: 'Please select a pricing plan',
   },
+  pricingPage: {
+    title: 'Choose Your Plan',
+    subtitle: 'Select the perfect plan for your website tracking needs',
+    startMessage: 'Start with Just',
+    startAmount: '€1!',
+    choosePlan: 'Choose Your Plan',
+    monthly: '/month',
+    loadingPlans: 'Loading pricing plans...',
+    noPricingPlans: 'No pricing plans available at the moment.',
+    contactSupport: 'Please contact support for more information.',
+    getStarted: 'Get Started',
+  },
   legalPages: {
     privacyTitle: 'Privacy Policy',
     privacyLastUpdated: 'Last updated: May 20, 2025',

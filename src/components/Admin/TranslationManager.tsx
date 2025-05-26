@@ -7,7 +7,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { toast } from 'sonner';
 import { useLanguage, Language, Translations } from '@/contexts/LanguageContext';
 import { TranslationSection } from './TranslationSection';
-import { ChevronDown, ChevronRight, Globe, Settings, Home, FileText, Scale, Lightbulb, Info } from 'lucide-react';
+import { ChevronDown, ChevronRight, Globe, Settings, Home, FileText, Scale, Lightbulb, Info, Euro } from 'lucide-react';
 
 export function TranslationManager() {
   const { t, language, translations, updateTranslation } = useLanguage();
@@ -32,6 +32,7 @@ export function TranslationManager() {
       aboutPage: { ...translations.aboutPage },
       allWebsitesPage: { ...translations.allWebsitesPage },
       addWebsiteForm: { ...translations.addWebsiteForm },
+      pricingPage: { ...translations.pricingPage },
       legalPages: { ...translations.legalPages },
       quickTips: { ...translations.quickTips }
     });
@@ -181,6 +182,14 @@ export function TranslationManager() {
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-purple-600"
               />
+              
+              <TranslationSection
+                title="Pricing Page"
+                sectionKey="pricingPage"
+                translations={editedTranslations}
+                onTranslationChange={handleTranslationChange}
+                iconColor="text-purple-600"
+              />
             </SectionGroup>
 
             <SectionGroup title="Legal Pages" icon={Scale} colorClass="bg-gray-700" groupKey="legal">
@@ -261,6 +270,14 @@ export function TranslationManager() {
               <TranslationSection
                 title="Formulaire d'ajout de site web"
                 sectionKey="addWebsiteForm"
+                translations={editedTranslations}
+                onTranslationChange={handleTranslationChange}
+                iconColor="text-purple-600"
+              />
+              
+              <TranslationSection
+                title="Page de tarification"
+                sectionKey="pricingPage"
                 translations={editedTranslations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-purple-600"

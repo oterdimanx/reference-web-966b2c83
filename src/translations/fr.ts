@@ -140,6 +140,18 @@ export const frTranslations: Translations = {
     keywordsRequired: 'Au moins un mot-clé est requis',
     planRequired: 'Veuillez sélectionner un plan tarifaire',
   },
+  pricingPage: {
+    title: 'Choisissez votre plan',
+    subtitle: 'Sélectionnez le plan parfait pour vos besoins de suivi de site web',
+    startMessage: 'Commencez à seulement',
+    startAmount: '1€ !',
+    choosePlan: 'Choisissez votre plan',
+    monthly: '/mois',
+    loadingPlans: 'Chargement des plans tarifaires...',
+    noPricingPlans: 'Aucun plan tarifaire disponible pour le moment.',
+    contactSupport: 'Veuillez contacter le support pour plus d\'informations.',
+    getStarted: 'Commencer',
+  },
   legalPages: {
     privacyTitle: 'Politique de confidentialité',
     privacyLastUpdated: 'Dernière mise à jour : 20 mai 2025',
