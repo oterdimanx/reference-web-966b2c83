@@ -71,6 +71,11 @@ const Pricing = () => {
     return language === 'fr' && plan.title_fr ? plan.title_fr : plan.title;
   };
 
+  const getPaymentFrequency = (plan: PricingPlan) => {
+    // €1 plan shows "one-time", others show "/month"
+    return plan.price === 1 ? t('pricingPage', 'oneTime') : t('pricingPage', 'monthly');
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -104,7 +109,7 @@ const Pricing = () => {
                     <CardTitle className="text-2xl">{getPlanTitle(plan)}</CardTitle>
                     <CardDescription>
                       <span className="text-4xl font-bold text-rank-teal">€{plan.price}</span>
-                      <span className="text-gray-500 ml-2">{t('pricingPage', 'oneTime')}</span>
+                      <span className="text-gray-500 ml-2">{getPaymentFrequency(plan)}</span>
                     </CardDescription>
                   </CardHeader>
                   
