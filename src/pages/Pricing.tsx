@@ -1,4 +1,3 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { Header } from '@/components/Layout/Header';
 import { Footer } from '@/components/Layout/Footer';
@@ -87,7 +86,7 @@ const Pricing = () => {
                 >
                   {plan.price === 1 && (
                     <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-rank-teal">
-                      Most Popular
+                      {t('pricingPage', 'mostPopular')}
                     </Badge>
                   )}
                   
@@ -95,7 +94,7 @@ const Pricing = () => {
                     <CardTitle className="text-2xl">{getPlanTitle(plan)}</CardTitle>
                     <CardDescription>
                       <span className="text-4xl font-bold text-rank-teal">€{plan.price}</span>
-                      <span className="text-gray-500 ml-2">one-time</span>
+                      <span className="text-gray-500 ml-2">{t('pricingPage', 'oneTime')}</span>
                     </CardDescription>
                   </CardHeader>
                   
@@ -131,7 +130,7 @@ const Pricing = () => {
                             : 'bg-gray-600 hover:bg-gray-700'
                         }`}
                       >
-                        <Link to="/auth">Sign Up to {t('pricingPage', 'getStarted')}</Link>
+                        <Link to="/auth">{t('pricingPage', 'signUpTo')} {t('pricingPage', 'getStarted')}</Link>
                       </Button>
                     )}
                   </CardFooter>
@@ -146,17 +145,16 @@ const Pricing = () => {
                 {t('pricingPage', 'startMessage')} {t('pricingPage', 'startAmount')}
               </h3>
               <p className="text-blue-700 dark:text-blue-300 mb-6">
-                Try our service with the starter plan - perfect for testing our platform 
-                with one website. Upgrade anytime as your business grows.
+                {t('pricingPage', 'startDescription')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button asChild className="bg-rank-teal hover:bg-rank-teal/90">
                   <Link to={user ? "/add-website" : "/auth"}>
-                    {user ? "Add Your First Website" : `Sign Up & Start Tracking`}
+                    {user ? t('pricingPage', 'addFirstWebsite') : t('pricingPage', 'signUpStart')}
                   </Link>
                 </Button>
                 <Button variant="outline" asChild>
-                  <Link to="/about">Learn More About Our Service</Link>
+                  <Link to="/about">{t('pricingPage', 'learnMore')}</Link>
                 </Button>
               </div>
             </div>

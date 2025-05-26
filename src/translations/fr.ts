@@ -1,4 +1,3 @@
-
 import { Translations } from '../types/translations';
 
 export const frTranslations: Translations = {
@@ -151,6 +150,13 @@ export const frTranslations: Translations = {
     noPricingPlans: 'Aucun plan tarifaire disponible pour le moment.',
     contactSupport: 'Veuillez contacter le support pour plus d\'informations.',
     getStarted: 'Commencer',
+    oneTime: 'paiement unique',
+    signUpTo: 'Inscrivez-vous pour',
+    mostPopular: 'Le plus populaire',
+    startDescription: 'Essayez notre service avec le plan de démarrage - parfait pour tester notre plateforme avec un site web. Passez à un plan supérieur à tout moment selon l\'évolution de votre entreprise.',
+    addFirstWebsite: 'Ajoutez votre premier site web',
+    signUpStart: 'Inscrivez-vous et commencez le suivi',
+    learnMore: 'En savoir plus sur notre service',
   },
   legalPages: {
     privacyTitle: 'Politique de confidentialité',

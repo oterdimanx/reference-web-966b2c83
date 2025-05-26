@@ -1,4 +1,3 @@
-
 import { Translations } from '../types/translations';
 
 export const enTranslations: Translations = {
@@ -151,6 +150,13 @@ export const enTranslations: Translations = {
     noPricingPlans: 'No pricing plans available at the moment.',
     contactSupport: 'Please contact support for more information.',
     getStarted: 'Get Started',
+    oneTime: 'one-time',
+    signUpTo: 'Sign Up to',
+    mostPopular: 'Most Popular',
+    startDescription: 'Try our service with the starter plan - perfect for testing our platform with one website. Upgrade anytime as your business grows.',
+    addFirstWebsite: 'Add Your First Website',
+    signUpStart: 'Sign Up & Start Tracking',
+    learnMore: 'Learn More About Our Service',
   },
   legalPages: {
     privacyTitle: 'Privacy Policy',
