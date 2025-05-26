@@ -41,7 +41,9 @@ export function useUserPreferences() {
       }
 
       if (data) {
-        setPreferences(data);
+        setPreferences({
+          theme_preference: data.theme_preference as ThemePreference
+        });
       } else {
         // Create default preferences if none exist
         await createDefaultPreferences();
@@ -73,7 +75,9 @@ export function useUserPreferences() {
         return;
       }
 
-      setPreferences(data);
+      setPreferences({
+        theme_preference: data.theme_preference as ThemePreference
+      });
     } catch (error) {
       console.error('Error creating default preferences:', error);
     }
