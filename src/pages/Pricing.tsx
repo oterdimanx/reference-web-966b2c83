@@ -1,4 +1,3 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { Header } from '@/components/Layout/Header';
 import { Footer } from '@/components/Layout/Footer';
@@ -88,7 +87,7 @@ const Pricing = () => {
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold mb-4">
+            <h1 className="text-4xl font-bold mb-4 gradient-text">
               {t('pricingPage', 'title')} <span className="text-rank-teal">{t('pricingPage', 'choosePlan')}</span>
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
@@ -97,24 +96,31 @@ const Pricing = () => {
           </div>
 
           {isLoading ? (
-            <div className="text-center">{t('pricingPage', 'loadingPlans')}</div>
+            <div className="text-center chrome-card p-8 rounded-lg">
+              <div className="floating">
+                {t('pricingPage', 'loadingPlans')}
+              </div>
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {pricingPlans?.map((plan) => (
+              {pricingPlans?.map((plan, index) => (
                 <Card 
                   key={plan.id} 
-                  className={`relative ${plan.price === 1 ? 'border-rank-teal border-2 shadow-lg' : ''}`}
+                  className={`chrome-card card-hover relative ${
+                    plan.price === 1 ? 'ring-2 ring-rank-teal pulse-glow' : ''
+                  }`}
+                  style={{ animationDelay: `${index * 200}ms` }}
                 >
                   {plan.price === 1 && (
-                    <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-rank-teal">
+                    <Badge className="metallic-badge absolute -top-3 left-1/2 transform -translate-x-1/2">
                       {t('pricingPage', 'mostPopular')}
                     </Badge>
                   )}
                   
                   <CardHeader className="text-center">
-                    <CardTitle className="text-2xl">{getPlanTitle(plan)}</CardTitle>
+                    <CardTitle className="text-2xl gradient-text">{getPlanTitle(plan)}</CardTitle>
                     <CardDescription>
-                      <span className="text-4xl font-bold text-rank-teal">€{plan.price}</span>
+                      <span className="text-4xl font-bold text-rank-teal gradient-text">€{plan.price}</span>
                       <span className="text-gray-500 ml-2">{getPaymentFrequency(plan)}</span>
                     </CardDescription>
                   </CardHeader>
@@ -134,10 +140,10 @@ const Pricing = () => {
                     {user ? (
                       <Button 
                         asChild 
-                        className={`w-full ${
+                        className={`w-full chrome-button ${
                           plan.price === 1 
-                            ? 'bg-rank-teal hover:bg-rank-teal/90' 
-                            : 'bg-gray-600 hover:bg-gray-700'
+                            ? 'chrome-accent text-white' 
+                            : 'chrome-button'
                         }`}
                       >
                         <Link to={`/add-website?plan=${plan.id}`}>{t('pricingPage', 'getStarted')}</Link>
@@ -145,10 +151,10 @@ const Pricing = () => {
                     ) : (
                       <Button 
                         asChild 
-                        className={`w-full ${
+                        className={`w-full chrome-button ${
                           plan.price === 1 
-                            ? 'bg-rank-teal hover:bg-rank-teal/90' 
-                            : 'bg-gray-600 hover:bg-gray-700'
+                            ? 'chrome-accent text-white' 
+                            : 'chrome-button'
                         }`}
                       >
                         <Link to="/auth">{t('pricingPage', 'signUpTo')} {t('pricingPage', 'getStarted')}</Link>
@@ -161,20 +167,20 @@ const Pricing = () => {
           )}
           
           <div className="mt-16 text-center">
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-8">
-              <h3 className="text-2xl font-semibold mb-4 text-blue-800 dark:text-blue-200">
+            <div className="chrome-card rounded-lg p-8 border-blue-200 dark:border-blue-800">
+              <h3 className="text-2xl font-semibold mb-4 text-blue-800 dark:text-blue-200 gradient-text">
                 {t('pricingPage', 'startMessage')} {t('pricingPage', 'startAmount')}
               </h3>
               <p className="text-blue-700 dark:text-blue-300 mb-6">
                 {t('pricingPage', 'startDescription')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button asChild className="bg-rank-teal hover:bg-rank-teal/90">
+                <Button asChild className="chrome-accent text-white">
                   <Link to={user ? "/add-website" : "/auth"}>
                     {user ? t('pricingPage', 'addFirstWebsite') : t('pricingPage', 'signUpStart')}
                   </Link>
                 </Button>
-                <Button variant="outline" asChild>
+                <Button variant="outline" asChild className="chrome-button">
                   <Link to="/about">{t('pricingPage', 'learnMore')}</Link>
                 </Button>
               </div>
