@@ -23,4 +23,4 @@ jobs:
       run: git ls-remote mirror
 
     - name: Push Changes
-      run: git push --force-with-lease mirror HEAD:main
+      run: git push origin master
