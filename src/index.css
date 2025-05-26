@@ -44,7 +44,7 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    /* Light Theme Chrome Variables - Subtle blue/teal accents */
+    /* Light Theme Chrome Variables */
     --chrome-light: linear-gradient(145deg, #f0f9ff, #e0f2fe, #bae6fd);
     --chrome-light-subtle: linear-gradient(145deg, #f8fafc, #f1f5f9, #e2e8f0);
     --chrome-primary: linear-gradient(145deg, #0ea5e9, #0284c7, #0369a1);
@@ -93,7 +93,7 @@
     @apply border-border;
   }
 
-  /* Light theme (manual light setting) - Subtle blue/cyan theme */
+  /* Light theme (manual light setting) */
   body {
     @apply bg-background text-foreground;
     background: var(--chrome-light);
@@ -118,7 +118,7 @@
   }
 }
 
-/* Chrome Effects - Light theme with blue/cyan accents */
+/* Chrome Effects - Light theme */
 .chrome-card {
   background: linear-gradient(145deg, #f0f9ff, #e0f2fe);
   box-shadow: 
@@ -196,7 +196,7 @@
   100% { left: -100%; }
 }
 
-/* Chrome Button - Light theme with blue accents */
+/* Chrome Button - Light theme */
 .chrome-button {
   background: linear-gradient(145deg, #0ea5e9, #0284c7);
   box-shadow: 
@@ -308,7 +308,7 @@
     inset 0 -1px 0 rgba(0, 0, 0, 0.3);
 }
 
-/* Chrome Accent - Light theme with cyan */
+/* Chrome Accent - Light theme */
 .chrome-accent {
   background: linear-gradient(145deg, #06b6d4, #0891b2, #0e7490);
   box-shadow: 
@@ -382,7 +382,7 @@
     inset 0 -1px 0 rgba(0, 0, 0, 0.2);
 }
 
-/* Metallic Header - Light theme with blue accents */
+/* Metallic Header - Light theme */
 .metallic-header {
   background: linear-gradient(145deg, #f0f9ff, #e0f2fe);
   backdrop-filter: blur(20px);
@@ -449,7 +449,7 @@
   animation: float 3s ease-in-out infinite;
 }
 
-/* Pulse Glow Effect - Light theme with blue glow */
+/* Pulse Glow Effect - Light theme */
 @keyframes pulse-glow {
   0%, 100% { 
     box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
@@ -495,7 +495,7 @@
   animation: pulse-glow-subtle 2s ease-in-out infinite;
 }
 
-/* Gradient Text Animation - Light theme with blue gradients */
+/* Gradient Text Animation - Light theme */
 @keyframes gradient-shift {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -520,7 +520,7 @@
   animation: gradient-shift 3s ease infinite;
 }
 
-/* Metallic Badge - Light theme with blue accents */
+/* Metallic Badge - Light theme */
 .metallic-badge {
   background: linear-gradient(145deg, #0ea5e9, #0284c7, #0369a1);
   box-shadow: 
@@ -546,7 +546,7 @@
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-/* Chrome Input Fields - Light theme with blue accents */
+/* Chrome Input Fields - Light theme */
 .chrome-input {
   background: linear-gradient(145deg, #f0f9ff, #e0f2fe);
   border: 2px solid rgba(6, 182, 212, 0.2);
