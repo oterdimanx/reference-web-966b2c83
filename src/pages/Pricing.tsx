@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 
 interface PricingPlan {
@@ -19,6 +20,7 @@ interface PricingPlan {
 
 const Pricing = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   
   const { data: pricingPlans, isLoading } = useQuery({
     queryKey: ['pricing-plans-public'],
@@ -61,15 +63,15 @@ const Pricing = () => {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold mb-4">
-              Choose Your <span className="text-rank-teal">Ranking Plan</span>
+              {t('pricingPage', 'title')} <span className="text-rank-teal">{t('pricingPage', 'choosePlan')}</span>
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
-              Start tracking your website's search rankings today
+              {t('pricingPage', 'subtitle')}
             </p>
           </div>
 
           {isLoading ? (
-            <div className="text-center">Loading pricing plans...</div>
+            <div className="text-center">{t('pricingPage', 'loadingPlans')}</div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {pricingPlans?.map((plan) => (
@@ -112,7 +114,7 @@ const Pricing = () => {
                             : 'bg-gray-600 hover:bg-gray-700'
                         }`}
                       >
-                        <Link to={`/add-website?plan=${plan.id}`}>Get Started</Link>
+                        <Link to={`/add-website?plan=${plan.id}`}>{t('pricingPage', 'getStarted')}</Link>
                       </Button>
                     ) : (
                       <Button 
@@ -123,7 +125,7 @@ const Pricing = () => {
                             : 'bg-gray-600 hover:bg-gray-700'
                         }`}
                       >
-                        <Link to="/auth">Sign Up to Get Started</Link>
+                        <Link to="/auth">Sign Up to {t('pricingPage', 'getStarted')}</Link>
                       </Button>
                     )}
                   </CardFooter>
@@ -135,7 +137,7 @@ const Pricing = () => {
           <div className="mt-16 text-center">
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-8">
               <h3 className="text-2xl font-semibold mb-4 text-blue-800 dark:text-blue-200">
-                Start with Just €1!
+                {t('pricingPage', 'startMessage')} {t('pricingPage', 'startAmount')}
               </h3>
               <p className="text-blue-700 dark:text-blue-300 mb-6">
                 Try our service with the starter plan - perfect for testing our platform 
@@ -144,7 +146,7 @@ const Pricing = () => {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button asChild className="bg-rank-teal hover:bg-rank-teal/90">
                   <Link to={user ? "/add-website" : "/auth"}>
-                    {user ? "Add Your First Website" : "Sign Up & Start Tracking"}
+                    {user ? "Add Your First Website" : `Sign Up & Start Tracking`}
                   </Link>
                 </Button>
                 <Button variant="outline" asChild>
