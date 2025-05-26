@@ -8,6 +8,9 @@ import { z } from 'zod';
 export interface PricingPlan {
   id: string;
   title: string;
+  title_fr: string | null;
+  description_fr: string | null;
+  description_en: string | null;
   price: number;
   active: boolean;
   created_at: string;

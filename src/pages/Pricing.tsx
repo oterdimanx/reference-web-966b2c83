@@ -1,3 +1,4 @@
+
 import { useQuery } from '@tanstack/react-query';
 import { Header } from '@/components/Layout/Header';
 import { Footer } from '@/components/Layout/Footer';
@@ -15,6 +16,7 @@ interface PricingPlan {
   title: string;
   title_fr: string | null;
   description_fr: string | null;
+  description_en: string | null;
   price: number;
   active: boolean;
 }
@@ -38,6 +40,15 @@ const Pricing = () => {
   });
   
   const getFeatures = (plan: PricingPlan) => {
+    // Get the appropriate description based on language
+    const description = language === 'fr' && plan.description_fr ? plan.description_fr : plan.description_en;
+    
+    // If we have a description from the database, use it
+    if (description) {
+      return description.split('|');
+    }
+    
+    // Fallback to the original logic if no description in database
     if (plan.price === 1) {
       return [
         'Add 1 website to track',
@@ -47,7 +58,6 @@ const Pricing = () => {
       ];
     }
     
-    // Default features for other plans
     return [
       `Add up to ${plan.price === 1 ? '1' : plan.price < 10 ? '5' : 'unlimited'} websites`,
       'Advanced keyword tracking',
