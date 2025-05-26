@@ -14,13 +14,15 @@ import { Link } from 'react-router-dom';
 interface PricingPlan {
   id: string;
   title: string;
+  title_fr: string | null;
+  description_fr: string | null;
   price: number;
   active: boolean;
 }
 
 const Pricing = () => {
   const { user } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   
   const { data: pricingPlans, isLoading } = useQuery({
     queryKey: ['pricing-plans-public'],
@@ -56,6 +58,10 @@ const Pricing = () => {
     ];
   };
 
+  const getPlanTitle = (plan: PricingPlan) => {
+    return language === 'fr' && plan.title_fr ? plan.title_fr : plan.title;
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -86,7 +92,7 @@ const Pricing = () => {
                   )}
                   
                   <CardHeader className="text-center">
-                    <CardTitle className="text-2xl">{plan.title}</CardTitle>
+                    <CardTitle className="text-2xl">{getPlanTitle(plan)}</CardTitle>
                     <CardDescription>
                       <span className="text-4xl font-bold text-rank-teal">€{plan.price}</span>
                       <span className="text-gray-500 ml-2">one-time</span>
