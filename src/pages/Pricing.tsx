@@ -104,9 +104,9 @@ const Pricing = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {pricingPlans?.map((plan, index) => (
-                <div key={plan.id} className="relative">
+                <div key={plan.id} className="relative mt-6">
                   {plan.price === 1 && (
-                    <Badge className="metallic-badge absolute -top-3 left-1/2 transform -translate-x-1/2 z-50">
+                    <Badge className="metallic-badge absolute -top-3 left-1/2 transform -translate-x-1/2 z-[100]">
                       {t('pricingPage', 'mostPopular')}
                     </Badge>
                   )}
