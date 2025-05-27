@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Header } from '@/components/Layout/Header';
 import { Footer } from '@/components/Layout/Footer';
@@ -12,11 +12,11 @@ const Index = () => {
   const [showAnimation, setShowAnimation] = useState(false);
 
   // Set showAnimation after loading check is complete
-  useState(() => {
+  useEffect(() => {
     if (!isLoading && isFirstVisit) {
       setShowAnimation(true);
     }
-  });
+  }, [isLoading, isFirstVisit]);
 
   const handleAnimationComplete = () => {
     setShowAnimation(false);
