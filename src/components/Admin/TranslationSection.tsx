@@ -63,7 +63,8 @@ export function TranslationSection({
     }
   };
 
-  const handleBlur = (key: string, value: string) => {
+  const handleBlur = (key: string, event: React.FocusEvent<HTMLInputElement>) => {
+    const value = event.target.value;
     saveTranslation(key, value);
   };
 
@@ -90,8 +91,8 @@ export function TranslationSection({
             <Input 
               value={getInputValue(key)}
               onChange={(e) => handleInputChange(key, e.target.value)}
-              onBlur={(e) => handleBlur(key, e.target.value)}
-              onKeyDown={(e) => handleKeyPress(key, e.target.value, e)}
+              onBlur={(e) => handleBlur(key, e)}
+              onKeyDown={(e) => handleKeyPress(key, (e.target as HTMLInputElement).value, e)}
               className="bg-white dark:bg-slate-800"
               disabled={savingKeys.has(key)}
             />
