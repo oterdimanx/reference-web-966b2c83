@@ -65,7 +65,7 @@ const Auth = () => {
     <div className="flex justify-center items-center min-h-screen bg-gray-50 dark:bg-gray-900 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl font-bold">WebRankBeacon</CardTitle>
+          <CardTitle className="text-2xl font-bold">Reference-Web</CardTitle>
           <CardDescription>
             Enter your credentials below to access your account
           </CardDescription>
