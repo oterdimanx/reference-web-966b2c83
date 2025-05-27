@@ -42,7 +42,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     migrateLocalStorageToDatabase();
   }, [migrateLocalStorageToDatabase]);
 
-  // Get current translations
+  // Get current translations for the selected language
   const translations = buildTranslations(language);
 
   // Translation function

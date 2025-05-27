@@ -143,17 +143,21 @@ export function useCustomTranslations() {
     setMigrationComplete(true);
   };
 
-  // Build final translations object
+  // Build final translations object with proper defaults
   const buildTranslations = (language: Language): Translations => {
+    // Start with base translations (this ensures we always have the defaults)
     const baseTranslations = language === 'en' ? enTranslations : frTranslations;
-    const result = JSON.parse(JSON.stringify(baseTranslations)); // Deep clone
+    
+    // Deep clone to avoid mutating the original
+    const result: Translations = JSON.parse(JSON.stringify(baseTranslations));
 
-    // Apply custom translations from database
+    // Apply custom translations from database, only overriding where they exist
     customTranslations
       .filter(t => t.language === language)
       .forEach(translation => {
-        if (result[translation.section_key]) {
-          (result[translation.section_key] as any)[translation.translation_key] = translation.value;
+        const section = result[translation.section_key];
+        if (section && typeof section === 'object') {
+          (section as any)[translation.translation_key] = translation.value;
         }
       });
 

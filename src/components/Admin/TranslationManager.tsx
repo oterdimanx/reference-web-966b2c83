@@ -2,16 +2,20 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { toast } from 'sonner';
 import { useLanguage, Language } from '@/contexts/LanguageContext';
+import { useCustomTranslations } from '@/hooks/useCustomTranslations';
 import { TranslationSection } from './TranslationSection';
 import { ChevronDown, ChevronRight, Globe, FileText, Scale, Lightbulb } from 'lucide-react';
 
 export function TranslationManager() {
-  const { t, translations, updateTranslation, isSaving, isLoading } = useLanguage();
+  const { t, updateTranslation, isSaving, isLoading } = useLanguage();
+  const { buildTranslations } = useCustomTranslations();
   const [selectedLanguage, setSelectedLanguage] = useState<Language>('en');
+  
+  // Get translations for the currently selected language in the admin panel
+  const currentTranslations = buildTranslations(selectedLanguage);
   
   // Collapsible states for each section group
   const [openSections, setOpenSections] = useState({
@@ -23,13 +27,13 @@ export function TranslationManager() {
   
   // Handle translation text change
   const handleTranslationChange = async (
-    section: keyof typeof translations, 
+    section: keyof typeof currentTranslations, 
     key: string, 
     value: string
   ) => {
     try {
       await updateTranslation(section, key, value, selectedLanguage);
-      toast.success(`Translation updated successfully`);
+      toast.success(`${selectedLanguage.toUpperCase()} translation updated successfully`);
     } catch (error) {
       console.error('Error saving translation:', error);
       toast.error('Failed to save translation');
@@ -95,12 +99,15 @@ export function TranslationManager() {
     <Card className="mb-8">
       <CardHeader>
         <CardTitle>{t('admin', 'translationManager')}</CardTitle>
+        <p className="text-sm text-muted-foreground">
+          Currently editing: <strong>{selectedLanguage === 'en' ? 'English' : 'French'}</strong> translations
+        </p>
       </CardHeader>
       <CardContent>
         <Tabs value={selectedLanguage} onValueChange={(value) => setSelectedLanguage(value as Language)}>
           <TabsList className="mb-4">
-            <TabsTrigger value="en">English</TabsTrigger>
-            <TabsTrigger value="fr">Français</TabsTrigger>
+            <TabsTrigger value="en">Edit English</TabsTrigger>
+            <TabsTrigger value="fr">Edit French</TabsTrigger>
           </TabsList>
           
           <TabsContent value="en" className="space-y-6">
@@ -108,7 +115,7 @@ export function TranslationManager() {
               <TranslationSection
                 title="Common Texts"
                 sectionKey="common"
-                translations={translations}
+                translations={currentTranslations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-blue-600"
                 language={selectedLanguage}
@@ -117,7 +124,7 @@ export function TranslationManager() {
               <TranslationSection
                 title="Admin Texts"
                 sectionKey="admin"
-                translations={translations}
+                translations={currentTranslations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-blue-600"
                 language={selectedLanguage}
@@ -126,7 +133,7 @@ export function TranslationManager() {
               <TranslationSection
                 title="Homepage Texts"
                 sectionKey="homepage"
-                translations={translations}
+                translations={currentTranslations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-blue-600"
                 language={selectedLanguage}
@@ -137,7 +144,7 @@ export function TranslationManager() {
               <TranslationSection
                 title="General Page Texts"
                 sectionKey="pages"
-                translations={translations}
+                translations={currentTranslations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-purple-600"
                 language={selectedLanguage}
@@ -146,7 +153,7 @@ export function TranslationManager() {
               <TranslationSection
                 title="Directory Page"
                 sectionKey="directoryPage"
-                translations={translations}
+                translations={currentTranslations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-purple-600"
                 language={selectedLanguage}
@@ -155,7 +162,7 @@ export function TranslationManager() {
               <TranslationSection
                 title="About Page"
                 sectionKey="aboutPage"
-                translations={translations}
+                translations={currentTranslations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-purple-600"
                 language={selectedLanguage}
@@ -164,7 +171,7 @@ export function TranslationManager() {
               <TranslationSection
                 title="All Websites Page"
                 sectionKey="allWebsitesPage"
-                translations={translations}
+                translations={currentTranslations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-purple-600"
                 language={selectedLanguage}
@@ -173,7 +180,7 @@ export function TranslationManager() {
               <TranslationSection
                 title="Add Website Form"
                 sectionKey="addWebsiteForm"
-                translations={translations}
+                translations={currentTranslations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-purple-600"
                 language={selectedLanguage}
@@ -182,7 +189,7 @@ export function TranslationManager() {
               <TranslationSection
                 title="Pricing Page"
                 sectionKey="pricingPage"
-                translations={translations}
+                translations={currentTranslations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-purple-600"
                 language={selectedLanguage}
@@ -193,7 +200,7 @@ export function TranslationManager() {
               <TranslationSection
                 title="Privacy Policy & Terms of Service"
                 sectionKey="legalPages"
-                translations={translations}
+                translations={currentTranslations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-gray-700"
                 language={selectedLanguage}
@@ -204,7 +211,7 @@ export function TranslationManager() {
               <TranslationSection
                 title="Quick Tips"
                 sectionKey="quickTips"
-                translations={translations}
+                translations={currentTranslations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-amber-500"
                 language={selectedLanguage}
@@ -217,7 +224,7 @@ export function TranslationManager() {
               <TranslationSection
                 title="Textes communs"
                 sectionKey="common"
-                translations={translations}
+                translations={currentTranslations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-blue-600"
                 language={selectedLanguage}
@@ -226,7 +233,7 @@ export function TranslationManager() {
               <TranslationSection
                 title="Textes administrateur"
                 sectionKey="admin"
-                translations={translations}
+                translations={currentTranslations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-blue-600"
                 language={selectedLanguage}
@@ -235,7 +242,7 @@ export function TranslationManager() {
               <TranslationSection
                 title="Textes de la page d'accueil"
                 sectionKey="homepage"
-                translations={translations}
+                translations={currentTranslations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-blue-600"
                 language={selectedLanguage}
@@ -246,7 +253,7 @@ export function TranslationManager() {
               <TranslationSection
                 title="Textes des pages généraux"
                 sectionKey="pages"
-                translations={translations}
+                translations={currentTranslations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-purple-600"
                 language={selectedLanguage}
@@ -255,7 +262,7 @@ export function TranslationManager() {
               <TranslationSection
                 title="Page Répertoire"
                 sectionKey="directoryPage"
-                translations={translations}
+                translations={currentTranslations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-purple-600"
                 language={selectedLanguage}
@@ -264,7 +271,7 @@ export function TranslationManager() {
               <TranslationSection
                 title="Page À propos"
                 sectionKey="aboutPage"
-                translations={translations}
+                translations={currentTranslations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-purple-600"
                 language={selectedLanguage}
@@ -273,7 +280,7 @@ export function TranslationManager() {
               <TranslationSection
                 title="Page Tous les sites web"
                 sectionKey="allWebsitesPage"
-                translations={translations}
+                translations={currentTranslations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-purple-600"
                 language={selectedLanguage}
@@ -282,7 +289,7 @@ export function TranslationManager() {
               <TranslationSection
                 title="Formulaire d'ajout de site web"
                 sectionKey="addWebsiteForm"
-                translations={translations}
+                translations={currentTranslations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-purple-600"
                 language={selectedLanguage}
@@ -291,7 +298,7 @@ export function TranslationManager() {
               <TranslationSection
                 title="Page de tarification"
                 sectionKey="pricingPage"
-                translations={translations}
+                translations={currentTranslations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-purple-600"
                 language={selectedLanguage}
@@ -302,7 +309,7 @@ export function TranslationManager() {
               <TranslationSection
                 title="Politique de confidentialité & Conditions d'utilisation"
                 sectionKey="legalPages"
-                translations={translations}
+                translations={currentTranslations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-gray-700"
                 language={selectedLanguage}
@@ -313,7 +320,7 @@ export function TranslationManager() {
               <TranslationSection
                 title="Conseils rapides"
                 sectionKey="quickTips"
-                translations={translations}
+                translations={currentTranslations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-amber-500"
                 language={selectedLanguage}

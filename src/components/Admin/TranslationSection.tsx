@@ -22,16 +22,21 @@ export function TranslationSection({
   language
 }: TranslationSectionProps) {
   const [editingValues, setEditingValues] = useState<{[key: string]: string}>({});
+  const [savingKeys, setSavingKeys] = useState<Set<string>>(new Set());
   const sectionTranslations = translations[sectionKey] || {};
   
   const handleInputChange = (key: string, value: string) => {
+    const editingKey = `${sectionKey}-${key}`;
     setEditingValues(prev => ({
       ...prev,
-      [`${sectionKey}-${key}`]: value
+      [editingKey]: value
     }));
   };
 
-  const handleInputBlur = async (key: string, value: string) => {
+  const saveTranslation = async (key: string, value: string) => {
+    if (savingKeys.has(key)) return; // Prevent double saves
+    
+    setSavingKeys(prev => new Set(prev).add(key));
     try {
       await onTranslationChange(sectionKey, key, value);
       // Clear the editing value after successful save
@@ -42,7 +47,24 @@ export function TranslationSection({
       });
     } catch (error) {
       console.error('Failed to save translation:', error);
+    } finally {
+      setSavingKeys(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(key);
+        return newSet;
+      });
     }
+  };
+
+  const handleKeyPress = (key: string, value: string, event: React.KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === 'Tab') {
+      event.preventDefault();
+      saveTranslation(key, value);
+    }
+  };
+
+  const handleBlur = (key: string, value: string) => {
+    saveTranslation(key, value);
   };
 
   const getInputValue = (key: string) => {
@@ -57,7 +79,7 @@ export function TranslationSection({
     <div className="space-y-4 border-t pt-4 first:border-t-0 first:pt-0">
       <h3 className="text-lg font-semibold flex items-center">
         <File className={`mr-2 ${iconColor}`} size={18} />
-        {title}
+        {title} - {language === 'en' ? 'English' : 'Français'}
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {Object.keys(sectionTranslations).map((key) => (
@@ -68,9 +90,14 @@ export function TranslationSection({
             <Input 
               value={getInputValue(key)}
               onChange={(e) => handleInputChange(key, e.target.value)}
-              onBlur={(e) => handleInputBlur(key, e.target.value)}
+              onBlur={(e) => handleBlur(key, e.target.value)}
+              onKeyDown={(e) => handleKeyPress(key, e.target.value, e)}
               className="bg-white dark:bg-slate-800"
+              disabled={savingKeys.has(key)}
             />
+            {savingKeys.has(key) && (
+              <div className="text-xs text-blue-600">Saving...</div>
+            )}
           </div>
         ))}
       </div>
