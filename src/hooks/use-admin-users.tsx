@@ -14,39 +14,37 @@ export const useAdminUsers = (isAdmin: boolean) => {
   const [users, setUsers] = useState<UserWithRole[]>([]);
   const [usersLoading, setUsersLoading] = useState<boolean>(true);
 
-  // Fetch users with their roles
+  // Fetch users with their roles using edge function
   useEffect(() => {
     const fetchUsers = async () => {
-      if (!isAdmin) return;
+      if (!isAdmin) {
+        setUsersLoading(false);
+        return;
+      }
 
       try {
-        // First get all users
-        const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
+        const { data: { session } } = await supabase.auth.getSession();
         
-        if (authError) {
-          throw authError;
+        if (!session?.access_token) {
+          throw new Error('No valid session found');
         }
 
-        // Then get all roles
-        const { data: roles, error: rolesError } = await supabase
-          .from('user_roles')
-          .select('user_id, role');
-
-        if (rolesError) {
-          throw rolesError;
-        }
-
-        // Match users with roles
-        const usersWithRoles = authUsers.users.map(authUser => {
-          const userRole = roles?.find(role => role.user_id === authUser.id);
-          return {
-            id: authUser.id,
-            email: authUser.email || null,
-            role: userRole ? userRole.role : 'user'
-          };
+        // Call the edge function
+        const { data, error } = await supabase.functions.invoke('admin-users', {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
         });
 
-        setUsers(usersWithRoles);
+        if (error) {
+          throw error;
+        }
+
+        if (data?.users) {
+          setUsers(data.users);
+        } else {
+          throw new Error('Invalid response format');
+        }
       } catch (error) {
         console.error('Error fetching users:', error);
         toast.error('Failed to fetch users');

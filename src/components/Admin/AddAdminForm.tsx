@@ -29,19 +29,6 @@ interface AddAdminResult {
   userId: string;
 }
 
-// Define the Supabase user type to match what comes from the API
-interface SupabaseUser {
-  id: string;
-  email?: string;
-  // Add other properties as needed, but these are the minimum we use
-}
-
-// Define the response type from listUsers to avoid the 'never' type error
-interface ListUsersResponse {
-  users: SupabaseUser[];
-  aud: string;
-}
-
 const AddAdminForm = ({ onAdminAdded }: AddAdminFormProps) => {
   const [error, setError] = useState<string | null>(null);
 
@@ -53,58 +40,40 @@ const AddAdminForm = ({ onAdminAdded }: AddAdminFormProps) => {
     },
   });
 
-  // Add admin mutation with explicit type definitions to fix TypeScript errors
+  // Add admin mutation using edge function
   const addAdminMutation = useMutation<AddAdminResult, Error, string>({
     mutationFn: async (email: string): Promise<AddAdminResult> => {
       setError(null);
       
-      // First check if user exists
-      const { data, error: userError } = await supabase.auth.admin.listUsers();
+      const { data: { session } } = await supabase.auth.getSession();
       
-      if (userError) {
-        throw userError;
+      if (!session?.access_token) {
+        throw new Error('No valid session found');
       }
 
-      // Explicitly type the data as ListUsersResponse
-      const userData = data as unknown as ListUsersResponse;
-      
-      const user = userData.users.find(u => u.email === email);
-      
-      if (!user || !user.email) {
-        throw new Error('User not found with this email address');
+      // Call the edge function
+      const { data, error } = await supabase.functions.invoke('add-admin', {
+        body: { email },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) {
+        throw new Error(error.message || 'Failed to add admin');
       }
 
-      // Check if user already has admin role
-      const { data: existingRole, error: roleError } = await supabase
-        .from('user_roles')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('role', 'admin');
-
-      if (roleError) {
-        throw roleError;
+      if (data?.error) {
+        throw new Error(data.error);
       }
 
-      if (existingRole && existingRole.length > 0) {
-        throw new Error('User already has admin role');
+      if (!data?.success || !data?.email || !data?.userId) {
+        throw new Error('Invalid response from server');
       }
 
-      // Add admin role to user
-      const { error: insertError } = await supabase
-        .from('user_roles')
-        .insert({
-          user_id: user.id,
-          role: 'admin',
-        });
-
-      if (insertError) {
-        throw insertError;
-      }
-
-      // Explicitly return the required structure to match AddAdminResult type
       return {
-        email: email,
-        userId: user.id
+        email: data.email,
+        userId: data.userId
       };
     },
     onSuccess: (data) => {
