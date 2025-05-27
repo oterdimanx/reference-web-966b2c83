@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ interface MobileMenuProps {
 export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const { user, signOut, isAdmin } = useAuth();
   const { t } = useLanguage();
+  const [isDirectoriesOpen, setIsDirectoriesOpen] = useState(false);
 
   if (!isOpen) return null;
 
@@ -21,15 +23,30 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         <Link to="/" className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal" onClick={onClose}>
           {t('common', 'home')}
         </Link>
-        <Link to="/directories" className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal" onClick={onClose}>
-          Directories
-        </Link>
-        <Link to="/about" className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal" onClick={onClose}>
-          {t('common', 'about')}
-        </Link>
-        <Link to="/pricing" className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal" onClick={onClose}>
-          Pricing
-        </Link>
+        
+        <div>
+          <button
+            onClick={() => setIsDirectoriesOpen(!isDirectoriesOpen)}
+            className="flex items-center justify-between w-full text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal"
+          >
+            Directories
+            {isDirectoriesOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </button>
+          {isDirectoriesOpen && (
+            <div className="ml-4 mt-2 space-y-2">
+              <Link to="/directories" className="block text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal" onClick={onClose}>
+                Directories
+              </Link>
+              <Link to="/about" className="block text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal" onClick={onClose}>
+                {t('common', 'about')}
+              </Link>
+              <Link to="/pricing" className="block text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal" onClick={onClose}>
+                Pricing
+              </Link>
+            </div>
+          )}
+        </div>
+        
         {user ? (
           <>
             <Link to="/all-websites" className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal" onClick={onClose}>
