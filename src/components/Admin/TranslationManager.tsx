@@ -14,6 +14,7 @@ export function TranslationManager() {
   const [selectedLanguage, setSelectedLanguage] = useState<Language>('en');
   const [editedTranslations, setEditedTranslations] = useState<Partial<Translations>>({});
   const initializedRef = useRef(false);
+  const lastLanguageRef = useRef<Language | null>(null);
   
   // Collapsible states for each section group
   const [openSections, setOpenSections] = useState({
@@ -25,7 +26,7 @@ export function TranslationManager() {
   
   // Initialize edited translations with current values only once or when language changes
   useEffect(() => {
-    if (!initializedRef.current || language !== selectedLanguage) {
+    if (!initializedRef.current || lastLanguageRef.current !== selectedLanguage) {
       setEditedTranslations({
         common: { ...translations.common },
         admin: { ...translations.admin },
@@ -40,8 +41,9 @@ export function TranslationManager() {
         quickTips: { ...translations.quickTips }
       });
       initializedRef.current = true;
+      lastLanguageRef.current = selectedLanguage;
     }
-  }, [language, selectedLanguage, translations]);
+  }, [selectedLanguage]); // Removed translations from dependencies
   
   // Handle translation text change
   const handleTranslationChange = (
