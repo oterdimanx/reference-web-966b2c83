@@ -18,7 +18,6 @@ export function useCustomTranslations() {
   const queryClient = useQueryClient();
   const [migrationComplete, setMigrationComplete] = useState(false);
   
-  // Query to fetch custom translations from database
   const { data: customTranslations = [], isLoading } = useQuery({
     queryKey: ['custom-translations'],
     queryFn: async () => {
@@ -35,7 +34,6 @@ export function useCustomTranslations() {
     }
   });
 
-  // Mutation to save/update translations
   const saveTranslationMutation = useMutation({
     mutationFn: async ({ 
       language, 
@@ -69,7 +67,6 @@ export function useCustomTranslations() {
     }
   });
 
-  // Function to migrate localStorage data to database (run once)
   const migrateLocalStorageToDatabase = async () => {
     if (migrationComplete) return;
     
@@ -83,7 +80,6 @@ export function useCustomTranslations() {
       const parsed = JSON.parse(customTranslationsLS);
       const migrations = [];
 
-      // Process English translations
       if (parsed.en) {
         Object.keys(parsed.en).forEach(sectionKey => {
           const section = parsed.en[sectionKey];
@@ -100,7 +96,6 @@ export function useCustomTranslations() {
         });
       }
 
-      // Process French translations
       if (parsed.fr) {
         Object.keys(parsed.fr).forEach(sectionKey => {
           const section = parsed.fr[sectionKey];
@@ -117,7 +112,6 @@ export function useCustomTranslations() {
         });
       }
 
-      // Batch insert all migrations
       if (migrations.length > 0) {
         const { error } = await supabase
           .from('custom_translations')
@@ -128,11 +122,8 @@ export function useCustomTranslations() {
         if (error) {
           console.error('Error migrating translations:', error);
         } else {
-          // Clear localStorage after successful migration
           localStorage.removeItem('customTranslations');
           console.log(`Migrated ${migrations.length} translations to database`);
-          
-          // Invalidate query to refetch
           queryClient.invalidateQueries({ queryKey: ['custom-translations'] });
         }
       }
@@ -143,15 +134,10 @@ export function useCustomTranslations() {
     setMigrationComplete(true);
   };
 
-  // Build final translations object with proper defaults
   const buildTranslations = (language: Language): Translations => {
-    // Start with base translations (this ensures we always have the defaults)
     const baseTranslations = language === 'en' ? enTranslations : frTranslations;
-    
-    // Deep clone to avoid mutating the original
     const result: Translations = JSON.parse(JSON.stringify(baseTranslations));
 
-    // Apply custom translations from database, only overriding where they exist
     customTranslations
       .filter(t => t.language === language)
       .forEach(translation => {

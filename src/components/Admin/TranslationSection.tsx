@@ -34,12 +34,11 @@ export function TranslationSection({
   };
 
   const saveTranslation = async (key: string, value: string) => {
-    if (savingKeys.has(key)) return; // Prevent double saves
+    if (savingKeys.has(key)) return;
     
     setSavingKeys(prev => new Set(prev).add(key));
     try {
       await onTranslationChange(sectionKey, key, value);
-      // Clear the editing value after successful save
       setEditingValues(prev => {
         const newValues = { ...prev };
         delete newValues[`${sectionKey}-${key}`];
@@ -80,7 +79,10 @@ export function TranslationSection({
     <div className="space-y-4 border-t pt-4 first:border-t-0 first:pt-0">
       <h3 className="text-lg font-semibold flex items-center">
         <File className={`mr-2 ${iconColor}`} size={18} />
-        {title} - {language === 'en' ? 'English' : 'Français'}
+        {title}
+        <span className="ml-2 text-sm bg-blue-100 dark:bg-blue-900 px-2 py-1 rounded">
+          Editing: {language === 'en' ? 'English' : 'Français'}
+        </span>
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {Object.keys(sectionTranslations).map((key) => (

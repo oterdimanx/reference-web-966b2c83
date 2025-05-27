@@ -3,7 +3,6 @@ import { createContext, useContext, useState, ReactNode, useEffect } from 'react
 import { Language, Translations } from '@/types/translations';
 import { useCustomTranslations } from '@/hooks/useCustomTranslations';
 
-// Define the context type
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
@@ -17,7 +16,6 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  // Try to get stored language preference or default to English
   const [language, setLanguageState] = useState<Language>(() => {
     const storedLang = localStorage.getItem('language') as Language;
     return storedLang === 'fr' ? 'fr' : 'en';
@@ -31,21 +29,17 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     migrateLocalStorageToDatabase 
   } = useCustomTranslations();
 
-  // Save language preference to localStorage
   const setLanguage = (lang: Language) => {
     localStorage.setItem('language', lang);
     setLanguageState(lang);
   };
 
-  // Run migration once on mount
   useEffect(() => {
     migrateLocalStorageToDatabase();
   }, [migrateLocalStorageToDatabase]);
 
-  // Get current translations for the selected language
   const translations = buildTranslations(language);
 
-  // Translation function
   const t = (section: keyof Translations, key: string): string => {
     try {
       const value = translations[section][key as keyof Translations[typeof section]];
@@ -56,7 +50,6 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Function to update translations (for admin use)
   const updateTranslation = async (section: keyof Translations, key: string, value: string, lang: Language) => {
     try {
       await saveTranslationAsync({
@@ -87,7 +80,6 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// Create a hook for easy access to language context
 export const useLanguage = () => {
   const context = useContext(LanguageContext);
   if (context === undefined) {
@@ -96,5 +88,4 @@ export const useLanguage = () => {
   return context;
 };
 
-// Re-export types for convenience
 export type { Language, Translations };
