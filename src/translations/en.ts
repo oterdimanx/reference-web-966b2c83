@@ -1,3 +1,4 @@
+
 import { Translations } from '../types/translations';
 
 export const enTranslations: Translations = {
