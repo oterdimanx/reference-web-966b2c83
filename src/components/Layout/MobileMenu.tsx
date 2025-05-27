@@ -21,6 +21,9 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         <Link to="/" className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal" onClick={onClose}>
           {t('common', 'home')}
         </Link>
+        <Link to="/directories" className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal" onClick={onClose}>
+          Directories
+        </Link>
         <Link to="/about" className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal" onClick={onClose}>
           {t('common', 'about')}
         </Link>

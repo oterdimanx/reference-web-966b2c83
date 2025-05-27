@@ -21,6 +21,10 @@ export function DesktopNavigation() {
         {t('common', 'home')}
       </Link>
       
+      <Link to="/directories" className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal">
+        Directories
+      </Link>
+      
       <NavigationMenu>
         <NavigationMenuList>
           <NavigationMenuItem>

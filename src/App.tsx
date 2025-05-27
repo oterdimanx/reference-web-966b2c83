@@ -24,6 +24,7 @@ import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/Admin/Dashboard";
 import AdminPricing from "./pages/Admin/Pricing";
 import AdminAnalytics from "./pages/Admin/Analytics";
+import Directories from "./pages/Directories";
 import Sitemap from "./pages/Sitemap";
 import SitemapXml from "./pages/SitemapXml";
 
@@ -51,6 +52,7 @@ const App = () => (
                   <Route path="/pricing" element={<Pricing />} />
                   <Route path="/privacy" element={<Privacy />} />
                   <Route path="/terms" element={<Terms />} />
+                  <Route path="/directories" element={<Directories />} />
                   <Route path="/rankings" element={<Rankings />} />
                   <Route path="/keywords" element={<Keywords />} />
                   <Route path="/sitemap" element={<Sitemap />} />

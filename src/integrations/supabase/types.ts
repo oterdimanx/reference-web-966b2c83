@@ -9,6 +9,114 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      directory_websites: {
+        Row: {
+          avg_position: number | null
+          category_id: string | null
+          contact_email: string | null
+          contact_name: string | null
+          created_at: string
+          description: string | null
+          domain: string
+          id: string
+          image_path: string | null
+          is_active: boolean
+          keyword_count: number | null
+          phone_number: string | null
+          phone_prefix: string | null
+          position_change: number | null
+          reciprocal_link: string | null
+          title: string | null
+          top_keyword: string | null
+          top_keyword_position: number | null
+          updated_at: string
+          website_id: string | null
+        }
+        Insert: {
+          avg_position?: number | null
+          category_id?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          created_at?: string
+          description?: string | null
+          domain: string
+          id?: string
+          image_path?: string | null
+          is_active?: boolean
+          keyword_count?: number | null
+          phone_number?: string | null
+          phone_prefix?: string | null
+          position_change?: number | null
+          reciprocal_link?: string | null
+          title?: string | null
+          top_keyword?: string | null
+          top_keyword_position?: number | null
+          updated_at?: string
+          website_id?: string | null
+        }
+        Update: {
+          avg_position?: number | null
+          category_id?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          created_at?: string
+          description?: string | null
+          domain?: string
+          id?: string
+          image_path?: string | null
+          is_active?: boolean
+          keyword_count?: number | null
+          phone_number?: string | null
+          phone_prefix?: string | null
+          position_change?: number | null
+          reciprocal_link?: string | null
+          title?: string | null
+          top_keyword?: string | null
+          top_keyword_position?: number | null
+          updated_at?: string
+          website_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "directory_websites_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "directory_websites_website_id_fkey"
+            columns: ["website_id"]
+            isOneToOne: false
+            referencedRelation: "websites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           click_x: number | null
