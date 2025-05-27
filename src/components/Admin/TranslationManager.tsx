@@ -29,6 +29,7 @@ export function TranslationManager() {
       admin: { ...translations.admin },
       homepage: { ...translations.homepage },
       pages: { ...translations.pages },
+      directoryPage: { ...translations.directoryPage },
       aboutPage: { ...translations.aboutPage },
       allWebsitesPage: { ...translations.allWebsitesPage },
       addWebsiteForm: { ...translations.addWebsiteForm },
@@ -160,6 +161,14 @@ export function TranslationManager() {
               />
               
               <TranslationSection
+                title="Directory Page"
+                sectionKey="directoryPage"
+                translations={editedTranslations}
+                onTranslationChange={handleTranslationChange}
+                iconColor="text-purple-600"
+              />
+              
+              <TranslationSection
                 title="About Page"
                 sectionKey="aboutPage"
                 translations={editedTranslations}
@@ -246,6 +255,14 @@ export function TranslationManager() {
               <TranslationSection
                 title="Textes des pages généraux"
                 sectionKey="pages"
+                translations={editedTranslations}
+                onTranslationChange={handleTranslationChange}
+                iconColor="text-purple-600"
+              />
+              
+              <TranslationSection
+                title="Page Répertoire"
+                sectionKey="directoryPage"
                 translations={editedTranslations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-purple-600"

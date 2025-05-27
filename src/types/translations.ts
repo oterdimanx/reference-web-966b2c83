@@ -1,3 +1,4 @@
+
 // Define available languages
 export type Language = 'en' | 'fr';
 
@@ -70,6 +71,26 @@ export interface Translations {
     whyKeywordResearch: string;
     yourWebsiteRankings: string;
     yourKeywords: string;
+  };
+  directoryPage: {
+    title: string;
+    subtitle: string;
+    searchPlaceholder: string;
+    allCategories: string;
+    selectCategory: string;
+    showingResults: string;
+    website: string;
+    websites: string;
+    in: string;
+    matching: string;
+    noWebsitesTitle: string;
+    noWebsitesMessage: string;
+    noWebsitesFilter: string;
+    avgPosition: string;
+    keywords: string;
+    change: string;
+    contactInformation: string;
+    topKeyword: string;
   };
   aboutPage: {
     title: string;
