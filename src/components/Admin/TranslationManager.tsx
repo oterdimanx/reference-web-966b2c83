@@ -1,32 +1,17 @@
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { toast } from 'sonner';
-import { useLanguage, Language, Translations } from '@/contexts/LanguageContext';
+import { useLanguage, Language } from '@/contexts/LanguageContext';
 import { TranslationSection } from './TranslationSection';
 import { ChevronDown, ChevronRight, Globe, FileText, Scale, Lightbulb } from 'lucide-react';
 
 export function TranslationManager() {
-  const { t, language, translations, updateTranslation, isSaving } = useLanguage();
+  const { t, translations, updateTranslation, isSaving, isLoading } = useLanguage();
   const [selectedLanguage, setSelectedLanguage] = useState<Language>('en');
-  
-  // Local state for editing - this will now be stable since we don't reset it on every render
-  const [editedTranslations, setEditedTranslations] = useState<Partial<Translations>>(() => ({
-    common: { ...translations.common },
-    admin: { ...translations.admin },
-    homepage: { ...translations.homepage },
-    pages: { ...translations.pages },
-    directoryPage: { ...translations.directoryPage },
-    aboutPage: { ...translations.aboutPage },
-    allWebsitesPage: { ...translations.allWebsitesPage },
-    addWebsiteForm: { ...translations.addWebsiteForm },
-    pricingPage: { ...translations.pricingPage },
-    legalPages: { ...translations.legalPages },
-    quickTips: { ...translations.quickTips }
-  }));
   
   // Collapsible states for each section group
   const [openSections, setOpenSections] = useState({
@@ -36,42 +21,18 @@ export function TranslationManager() {
     features: true,
   });
   
-  // Handle translation text change - this is now stable and won't cause re-renders
-  const handleTranslationChange = (
-    section: keyof Translations, 
+  // Handle translation text change
+  const handleTranslationChange = async (
+    section: keyof typeof translations, 
     key: string, 
     value: string
   ) => {
-    setEditedTranslations(prev => ({
-      ...prev,
-      [section]: {
-        ...prev[section],
-        [key]: value
-      }
-    }));
-  };
-  
-  // Save translations
-  const saveTranslations = async () => {
     try {
-      const savePromises: Promise<void>[] = [];
-      
-      // Update each changed translation
-      Object.keys(editedTranslations).forEach((section) => {
-        const sectionKey = section as keyof Translations;
-        Object.keys(editedTranslations[sectionKey] || {}).forEach((key) => {
-          const value = editedTranslations[sectionKey]?.[key as keyof typeof editedTranslations[typeof sectionKey]];
-          if (value) {
-            savePromises.push(updateTranslation(sectionKey, key, value, selectedLanguage));
-          }
-        });
-      });
-      
-      await Promise.all(savePromises);
-      toast.success(`Translations for ${selectedLanguage.toUpperCase()} updated successfully`);
+      await updateTranslation(section, key, value, selectedLanguage);
+      toast.success(`Translation updated successfully`);
     } catch (error) {
-      console.error('Error saving translations:', error);
-      toast.error('Failed to save translations');
+      console.error('Error saving translation:', error);
+      toast.error('Failed to save translation');
     }
   };
 
@@ -80,28 +41,6 @@ export function TranslationManager() {
       ...prev,
       [section]: !prev[section]
     }));
-  };
-
-  // Handle language tab change
-  const handleLanguageChange = (newLanguage: string) => {
-    const lang = newLanguage as Language;
-    setSelectedLanguage(lang);
-    
-    // Reset edited translations to current values for the new language
-    const currentTranslations = lang === 'en' ? translations : translations;
-    setEditedTranslations({
-      common: { ...currentTranslations.common },
-      admin: { ...currentTranslations.admin },
-      homepage: { ...currentTranslations.homepage },
-      pages: { ...currentTranslations.pages },
-      directoryPage: { ...currentTranslations.directoryPage },
-      aboutPage: { ...currentTranslations.aboutPage },
-      allWebsitesPage: { ...currentTranslations.allWebsitesPage },
-      addWebsiteForm: { ...currentTranslations.addWebsiteForm },
-      pricingPage: { ...currentTranslations.pricingPage },
-      legalPages: { ...currentTranslations.legalPages },
-      quickTips: { ...currentTranslations.quickTips }
-    });
   };
 
   const SectionGroup = ({ 
@@ -139,13 +78,26 @@ export function TranslationManager() {
     </div>
   );
 
+  if (isLoading) {
+    return (
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>{t('admin', 'translationManager')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-4">Loading translations...</div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="mb-8">
       <CardHeader>
         <CardTitle>{t('admin', 'translationManager')}</CardTitle>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="en" onValueChange={handleLanguageChange}>
+        <Tabs value={selectedLanguage} onValueChange={(value) => setSelectedLanguage(value as Language)}>
           <TabsList className="mb-4">
             <TabsTrigger value="en">English</TabsTrigger>
             <TabsTrigger value="fr">Français</TabsTrigger>
@@ -156,25 +108,28 @@ export function TranslationManager() {
               <TranslationSection
                 title="Common Texts"
                 sectionKey="common"
-                translations={editedTranslations}
+                translations={translations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-blue-600"
+                language={selectedLanguage}
               />
               
               <TranslationSection
                 title="Admin Texts"
                 sectionKey="admin"
-                translations={editedTranslations}
+                translations={translations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-blue-600"
+                language={selectedLanguage}
               />
               
               <TranslationSection
                 title="Homepage Texts"
                 sectionKey="homepage"
-                translations={editedTranslations}
+                translations={translations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-blue-600"
+                language={selectedLanguage}
               />
             </SectionGroup>
             
@@ -182,49 +137,55 @@ export function TranslationManager() {
               <TranslationSection
                 title="General Page Texts"
                 sectionKey="pages"
-                translations={editedTranslations}
+                translations={translations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-purple-600"
+                language={selectedLanguage}
               />
               
               <TranslationSection
                 title="Directory Page"
                 sectionKey="directoryPage"
-                translations={editedTranslations}
+                translations={translations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-purple-600"
+                language={selectedLanguage}
               />
               
               <TranslationSection
                 title="About Page"
                 sectionKey="aboutPage"
-                translations={editedTranslations}
+                translations={translations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-purple-600"
+                language={selectedLanguage}
               />
               
               <TranslationSection
                 title="All Websites Page"
                 sectionKey="allWebsitesPage"
-                translations={editedTranslations}
+                translations={translations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-purple-600"
+                language={selectedLanguage}
               />
               
               <TranslationSection
                 title="Add Website Form"
                 sectionKey="addWebsiteForm"
-                translations={editedTranslations}
+                translations={translations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-purple-600"
+                language={selectedLanguage}
               />
               
               <TranslationSection
                 title="Pricing Page"
                 sectionKey="pricingPage"
-                translations={editedTranslations}
+                translations={translations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-purple-600"
+                language={selectedLanguage}
               />
             </SectionGroup>
 
@@ -232,9 +193,10 @@ export function TranslationManager() {
               <TranslationSection
                 title="Privacy Policy & Terms of Service"
                 sectionKey="legalPages"
-                translations={editedTranslations}
+                translations={translations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-gray-700"
+                language={selectedLanguage}
               />
             </SectionGroup>
             
@@ -242,19 +204,12 @@ export function TranslationManager() {
               <TranslationSection
                 title="Quick Tips"
                 sectionKey="quickTips"
-                translations={editedTranslations}
+                translations={translations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-amber-500"
+                language={selectedLanguage}
               />
             </SectionGroup>
-            
-            <Button 
-              onClick={saveTranslations} 
-              className="mt-4" 
-              disabled={isSaving}
-            >
-              {isSaving ? 'Saving...' : t('admin', 'saveTranslations')}
-            </Button>
           </TabsContent>
           
           <TabsContent value="fr" className="space-y-6">
@@ -262,25 +217,28 @@ export function TranslationManager() {
               <TranslationSection
                 title="Textes communs"
                 sectionKey="common"
-                translations={editedTranslations}
+                translations={translations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-blue-600"
+                language={selectedLanguage}
               />
               
               <TranslationSection
                 title="Textes administrateur"
                 sectionKey="admin"
-                translations={editedTranslations}
+                translations={translations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-blue-600"
+                language={selectedLanguage}
               />
               
               <TranslationSection
                 title="Textes de la page d'accueil"
                 sectionKey="homepage"
-                translations={editedTranslations}
+                translations={translations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-blue-600"
+                language={selectedLanguage}
               />
             </SectionGroup>
             
@@ -288,49 +246,55 @@ export function TranslationManager() {
               <TranslationSection
                 title="Textes des pages généraux"
                 sectionKey="pages"
-                translations={editedTranslations}
+                translations={translations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-purple-600"
+                language={selectedLanguage}
               />
               
               <TranslationSection
                 title="Page Répertoire"
                 sectionKey="directoryPage"
-                translations={editedTranslations}
+                translations={translations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-purple-600"
+                language={selectedLanguage}
               />
               
               <TranslationSection
                 title="Page À propos"
                 sectionKey="aboutPage"
-                translations={editedTranslations}
+                translations={translations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-purple-600"
+                language={selectedLanguage}
               />
               
               <TranslationSection
                 title="Page Tous les sites web"
                 sectionKey="allWebsitesPage"
-                translations={editedTranslations}
+                translations={translations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-purple-600"
+                language={selectedLanguage}
               />
               
               <TranslationSection
                 title="Formulaire d'ajout de site web"
                 sectionKey="addWebsiteForm"
-                translations={editedTranslations}
+                translations={translations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-purple-600"
+                language={selectedLanguage}
               />
               
               <TranslationSection
                 title="Page de tarification"
                 sectionKey="pricingPage"
-                translations={editedTranslations}
+                translations={translations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-purple-600"
+                language={selectedLanguage}
               />
             </SectionGroup>
 
@@ -338,9 +302,10 @@ export function TranslationManager() {
               <TranslationSection
                 title="Politique de confidentialité & Conditions d'utilisation"
                 sectionKey="legalPages"
-                translations={editedTranslations}
+                translations={translations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-gray-700"
+                language={selectedLanguage}
               />
             </SectionGroup>
             
@@ -348,19 +313,12 @@ export function TranslationManager() {
               <TranslationSection
                 title="Conseils rapides"
                 sectionKey="quickTips"
-                translations={editedTranslations}
+                translations={translations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-amber-500"
+                language={selectedLanguage}
               />
             </SectionGroup>
-            
-            <Button 
-              onClick={saveTranslations} 
-              className="mt-4"
-              disabled={isSaving}
-            >
-              {isSaving ? 'Enregistrement...' : t('admin', 'saveTranslations')}
-            </Button>
           </TabsContent>
         </Tabs>
       </CardContent>

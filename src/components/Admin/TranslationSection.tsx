@@ -1,14 +1,16 @@
 
+import { useState } from 'react';
 import { Input } from '@/components/ui/input';
-import { Translations } from '@/contexts/LanguageContext';
+import { Translations, Language } from '@/contexts/LanguageContext';
 import { File } from 'lucide-react';
 
 interface TranslationSectionProps {
   title: string;
   sectionKey: keyof Translations;
-  translations: Partial<Translations>;
-  onTranslationChange: (section: keyof Translations, key: string, value: string) => void;
+  translations: Translations;
+  onTranslationChange: (section: keyof Translations, key: string, value: string) => Promise<void>;
   iconColor?: string;
+  language: Language;
 }
 
 export function TranslationSection({ 
@@ -16,9 +18,40 @@ export function TranslationSection({
   sectionKey, 
   translations, 
   onTranslationChange,
-  iconColor = 'text-blue-600'
+  iconColor = 'text-blue-600',
+  language
 }: TranslationSectionProps) {
+  const [editingValues, setEditingValues] = useState<{[key: string]: string}>({});
   const sectionTranslations = translations[sectionKey] || {};
+  
+  const handleInputChange = (key: string, value: string) => {
+    setEditingValues(prev => ({
+      ...prev,
+      [`${sectionKey}-${key}`]: value
+    }));
+  };
+
+  const handleInputBlur = async (key: string, value: string) => {
+    try {
+      await onTranslationChange(sectionKey, key, value);
+      // Clear the editing value after successful save
+      setEditingValues(prev => {
+        const newValues = { ...prev };
+        delete newValues[`${sectionKey}-${key}`];
+        return newValues;
+      });
+    } catch (error) {
+      console.error('Failed to save translation:', error);
+    }
+  };
+
+  const getInputValue = (key: string) => {
+    const editingKey = `${sectionKey}-${key}`;
+    if (editingKey in editingValues) {
+      return editingValues[editingKey];
+    }
+    return sectionTranslations[key as keyof typeof sectionTranslations] || '';
+  };
   
   return (
     <div className="space-y-4 border-t pt-4 first:border-t-0 first:pt-0">
@@ -33,8 +66,9 @@ export function TranslationSection({
               {key}
             </label>
             <Input 
-              value={sectionTranslations[key as keyof typeof sectionTranslations] || ''}
-              onChange={(e) => onTranslationChange(sectionKey, key, e.target.value)}
+              value={getInputValue(key)}
+              onChange={(e) => handleInputChange(key, e.target.value)}
+              onBlur={(e) => handleInputBlur(key, e.target.value)}
               className="bg-white dark:bg-slate-800"
             />
           </div>

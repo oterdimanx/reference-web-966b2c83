@@ -16,9 +16,10 @@ interface CustomTranslation {
 
 export function useCustomTranslations() {
   const queryClient = useQueryClient();
+  const [migrationComplete, setMigrationComplete] = useState(false);
   
   // Query to fetch custom translations from database
-  const { data: customTranslations = [] } = useQuery({
+  const { data: customTranslations = [], isLoading } = useQuery({
     queryKey: ['custom-translations'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -70,8 +71,13 @@ export function useCustomTranslations() {
 
   // Function to migrate localStorage data to database (run once)
   const migrateLocalStorageToDatabase = async () => {
+    if (migrationComplete) return;
+    
     const customTranslationsLS = localStorage.getItem('customTranslations');
-    if (!customTranslationsLS) return;
+    if (!customTranslationsLS) {
+      setMigrationComplete(true);
+      return;
+    }
 
     try {
       const parsed = JSON.parse(customTranslationsLS);
@@ -81,14 +87,16 @@ export function useCustomTranslations() {
       if (parsed.en) {
         Object.keys(parsed.en).forEach(sectionKey => {
           const section = parsed.en[sectionKey];
-          Object.keys(section).forEach(translationKey => {
-            migrations.push({
-              language: 'en' as Language,
-              section_key: sectionKey,
-              translation_key: translationKey,
-              value: section[translationKey]
+          if (section && typeof section === 'object') {
+            Object.keys(section).forEach(translationKey => {
+              migrations.push({
+                language: 'en' as Language,
+                section_key: sectionKey,
+                translation_key: translationKey,
+                value: section[translationKey]
+              });
             });
-          });
+          }
         });
       }
 
@@ -96,14 +104,16 @@ export function useCustomTranslations() {
       if (parsed.fr) {
         Object.keys(parsed.fr).forEach(sectionKey => {
           const section = parsed.fr[sectionKey];
-          Object.keys(section).forEach(translationKey => {
-            migrations.push({
-              language: 'fr' as Language,
-              section_key: sectionKey,
-              translation_key: translationKey,
-              value: section[translationKey]
+          if (section && typeof section === 'object') {
+            Object.keys(section).forEach(translationKey => {
+              migrations.push({
+                language: 'fr' as Language,
+                section_key: sectionKey,
+                translation_key: translationKey,
+                value: section[translationKey]
+              });
             });
-          });
+          }
         });
       }
 
@@ -129,12 +139,14 @@ export function useCustomTranslations() {
     } catch (error) {
       console.error('Error parsing localStorage translations:', error);
     }
+    
+    setMigrationComplete(true);
   };
 
   // Build final translations object
   const buildTranslations = (language: Language): Translations => {
     const baseTranslations = language === 'en' ? enTranslations : frTranslations;
-    const result = { ...baseTranslations };
+    const result = JSON.parse(JSON.stringify(baseTranslations)); // Deep clone
 
     // Apply custom translations from database
     customTranslations
@@ -153,6 +165,7 @@ export function useCustomTranslations() {
     saveTranslation: saveTranslationMutation.mutate,
     saveTranslationAsync: saveTranslationMutation.mutateAsync,
     isSaving: saveTranslationMutation.isPending,
+    isLoading,
     buildTranslations,
     migrateLocalStorageToDatabase
   };

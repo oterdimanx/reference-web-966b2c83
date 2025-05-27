@@ -11,6 +11,7 @@ interface LanguageContextType {
   translations: Translations;
   updateTranslation: (section: keyof Translations, key: string, value: string, lang: Language) => Promise<void>;
   isSaving: boolean;
+  isLoading: boolean;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -26,6 +27,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     buildTranslations, 
     saveTranslationAsync, 
     isSaving,
+    isLoading,
     migrateLocalStorageToDatabase 
   } = useCustomTranslations();
 
@@ -38,7 +40,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   // Run migration once on mount
   useEffect(() => {
     migrateLocalStorageToDatabase();
-  }, []);
+  }, [migrateLocalStorageToDatabase]);
 
   // Get current translations
   const translations = buildTranslations(language);
@@ -46,7 +48,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   // Translation function
   const t = (section: keyof Translations, key: string): string => {
     try {
-      return translations[section][key as keyof Translations[typeof section]] || key;
+      const value = translations[section][key as keyof Translations[typeof section]];
+      return value || key;
     } catch (error) {
       console.error(`Translation missing for ${section}.${key} in ${language}`);
       return key;
@@ -76,7 +79,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       t, 
       translations, 
       updateTranslation,
-      isSaving 
+      isSaving,
+      isLoading
     }}>
       {children}
     </LanguageContext.Provider>
