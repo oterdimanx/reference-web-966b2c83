@@ -9,11 +9,26 @@ interface WelcomeAnimationProps {
 export const WelcomeAnimation = ({ onComplete }: WelcomeAnimationProps) => {
   const [currentStep, setCurrentStep] = useState(0);
 
+  console.log('WelcomeAnimation: Rendering with currentStep:', currentStep);
+
   useEffect(() => {
-    const timer1 = setTimeout(() => setCurrentStep(1), 500);
-    const timer2 = setTimeout(() => setCurrentStep(2), 1500);
-    const timer3 = setTimeout(() => setCurrentStep(3), 2500);
-    const timer4 = setTimeout(() => onComplete(), 3500);
+    console.log('WelcomeAnimation: Starting animation sequence');
+    const timer1 = setTimeout(() => {
+      console.log('WelcomeAnimation: Step 1');
+      setCurrentStep(1);
+    }, 500);
+    const timer2 = setTimeout(() => {
+      console.log('WelcomeAnimation: Step 2');
+      setCurrentStep(2);
+    }, 1500);
+    const timer3 = setTimeout(() => {
+      console.log('WelcomeAnimation: Step 3');
+      setCurrentStep(3);
+    }, 2500);
+    const timer4 = setTimeout(() => {
+      console.log('WelcomeAnimation: Animation complete, calling onComplete');
+      onComplete();
+    }, 3500);
 
     return () => {
       clearTimeout(timer1);
