@@ -74,29 +74,48 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         }
       };
       
-      // Save custom translations to localStorage
+      // Save all custom translations to localStorage
       const customTranslations = {
         en: {},
         fr: {}
       };
       
-      // Only store the differences from the original translations
-      Object.keys(updated.en).forEach(sectionKey => {
-        const section = sectionKey as keyof Translations;
-        Object.keys(updated.en[section]).forEach(key => {
-          if (updated.en[section][key as keyof typeof updated.en[typeof section]] !== enTranslations[section][key as keyof typeof enTranslations[typeof section]]) {
-            if (!customTranslations.en[section]) customTranslations.en[section] = {};
-            customTranslations.en[section][key] = updated.en[section][key as keyof typeof updated.en[typeof section]];
+      // For English translations, save all that differ from original
+      const enSections = updated.en;
+      Object.keys(enSections).forEach(sectionKey => {
+        const sectionName = sectionKey as keyof Translations;
+        const sectionData = enSections[sectionName];
+        const originalSection = enTranslations[sectionName];
+        
+        Object.keys(sectionData).forEach(translationKey => {
+          const currentValue = sectionData[translationKey as keyof typeof sectionData];
+          const originalValue = originalSection[translationKey as keyof typeof originalSection];
+          
+          if (currentValue !== originalValue) {
+            if (!customTranslations.en[sectionName]) {
+              customTranslations.en[sectionName] = {};
+            }
+            customTranslations.en[sectionName][translationKey] = currentValue;
           }
         });
       });
       
-      Object.keys(updated.fr).forEach(sectionKey => {
-        const section = sectionKey as keyof Translations;
-        Object.keys(updated.fr[section]).forEach(key => {
-          if (updated.fr[section][key as keyof typeof updated.fr[typeof section]] !== frTranslations[section][key as keyof typeof frTranslations[typeof section]]) {
-            if (!customTranslations.fr[section]) customTranslations.fr[section] = {};
-            customTranslations.fr[section][key] = updated.fr[section][key as keyof typeof updated.fr[typeof section]];
+      // For French translations, save all that differ from original
+      const frSections = updated.fr;
+      Object.keys(frSections).forEach(sectionKey => {
+        const sectionName = sectionKey as keyof Translations;
+        const sectionData = frSections[sectionName];
+        const originalSection = frTranslations[sectionName];
+        
+        Object.keys(sectionData).forEach(translationKey => {
+          const currentValue = sectionData[translationKey as keyof typeof sectionData];
+          const originalValue = originalSection[translationKey as keyof typeof originalSection];
+          
+          if (currentValue !== originalValue) {
+            if (!customTranslations.fr[sectionName]) {
+              customTranslations.fr[sectionName] = {};
+            }
+            customTranslations.fr[sectionName][translationKey] = currentValue;
           }
         });
       });
