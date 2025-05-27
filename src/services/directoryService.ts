@@ -37,6 +37,26 @@ export interface Category {
   updated_at: string;
 }
 
+export interface CreateDirectoryWebsiteData {
+  domain: string;
+  title?: string | null;
+  description?: string | null;
+  category_id?: string | null;
+  website_id?: string | null;
+  avg_position?: number;
+  keyword_count?: number;
+  position_change?: number;
+  top_keyword?: string | null;
+  top_keyword_position?: number | null;
+  image_path?: string | null;
+  contact_name?: string | null;
+  contact_email?: string | null;
+  phone_number?: string | null;
+  phone_prefix?: string | null;
+  reciprocal_link?: string | null;
+  is_active?: boolean;
+}
+
 export const getDirectoryWebsites = async (): Promise<DirectoryWebsite[]> => {
   try {
     const { data, error } = await supabase
@@ -80,11 +100,11 @@ export const getCategories = async (): Promise<Category[]> => {
 };
 
 // Admin functions for managing directory websites
-export const createDirectoryWebsite = async (website: Partial<DirectoryWebsite>): Promise<DirectoryWebsite | null> => {
+export const createDirectoryWebsite = async (website: CreateDirectoryWebsiteData): Promise<DirectoryWebsite | null> => {
   try {
     const { data, error } = await supabase
       .from('directory_websites')
-      .insert([website])
+      .insert(website)
       .select(`
         *,
         category:categories(id, name, description)
