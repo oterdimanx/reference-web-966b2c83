@@ -33,6 +33,36 @@ export type Database = {
         }
         Relationships: []
       }
+      custom_translations: {
+        Row: {
+          created_at: string
+          id: string
+          language: string
+          section_key: string
+          translation_key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          language: string
+          section_key: string
+          translation_key: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          language?: string
+          section_key?: string
+          translation_key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
       directory_websites: {
         Row: {
           avg_position: number | null

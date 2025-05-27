@@ -1,0 +1,159 @@
+
+import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { Language, Translations } from '@/types/translations';
+import { enTranslations } from '@/translations/en';
+import { frTranslations } from '@/translations/fr';
+
+interface CustomTranslation {
+  id: string;
+  language: Language;
+  section_key: keyof Translations;
+  translation_key: string;
+  value: string;
+}
+
+export function useCustomTranslations() {
+  const queryClient = useQueryClient();
+  
+  // Query to fetch custom translations from database
+  const { data: customTranslations = [] } = useQuery({
+    queryKey: ['custom-translations'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('custom_translations')
+        .select('*');
+      
+      if (error) {
+        console.error('Error fetching custom translations:', error);
+        return [];
+      }
+      
+      return data as CustomTranslation[];
+    }
+  });
+
+  // Mutation to save/update translations
+  const saveTranslationMutation = useMutation({
+    mutationFn: async ({ 
+      language, 
+      sectionKey, 
+      translationKey, 
+      value 
+    }: {
+      language: Language;
+      sectionKey: keyof Translations;
+      translationKey: string;
+      value: string;
+    }) => {
+      const { data, error } = await supabase
+        .from('custom_translations')
+        .upsert({
+          language,
+          section_key: sectionKey,
+          translation_key: translationKey,
+          value
+        }, {
+          onConflict: 'language,section_key,translation_key'
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['custom-translations'] });
+    }
+  });
+
+  // Function to migrate localStorage data to database (run once)
+  const migrateLocalStorageToDatabase = async () => {
+    const customTranslationsLS = localStorage.getItem('customTranslations');
+    if (!customTranslationsLS) return;
+
+    try {
+      const parsed = JSON.parse(customTranslationsLS);
+      const migrations = [];
+
+      // Process English translations
+      if (parsed.en) {
+        Object.keys(parsed.en).forEach(sectionKey => {
+          const section = parsed.en[sectionKey];
+          Object.keys(section).forEach(translationKey => {
+            migrations.push({
+              language: 'en' as Language,
+              section_key: sectionKey,
+              translation_key: translationKey,
+              value: section[translationKey]
+            });
+          });
+        });
+      }
+
+      // Process French translations
+      if (parsed.fr) {
+        Object.keys(parsed.fr).forEach(sectionKey => {
+          const section = parsed.fr[sectionKey];
+          Object.keys(section).forEach(translationKey => {
+            migrations.push({
+              language: 'fr' as Language,
+              section_key: sectionKey,
+              translation_key: translationKey,
+              value: section[translationKey]
+            });
+          });
+        });
+      }
+
+      // Batch insert all migrations
+      if (migrations.length > 0) {
+        const { error } = await supabase
+          .from('custom_translations')
+          .upsert(migrations, {
+            onConflict: 'language,section_key,translation_key'
+          });
+
+        if (error) {
+          console.error('Error migrating translations:', error);
+        } else {
+          // Clear localStorage after successful migration
+          localStorage.removeItem('customTranslations');
+          console.log(`Migrated ${migrations.length} translations to database`);
+          
+          // Invalidate query to refetch
+          queryClient.invalidateQueries({ queryKey: ['custom-translations'] });
+        }
+      }
+    } catch (error) {
+      console.error('Error parsing localStorage translations:', error);
+    }
+  };
+
+  // Build final translations object
+  const buildTranslations = (language: Language): Translations => {
+    const baseTranslations = language === 'en' ? enTranslations : frTranslations;
+    const result = { ...baseTranslations };
+
+    // Apply custom translations from database
+    customTranslations
+      .filter(t => t.language === language)
+      .forEach(translation => {
+        if (result[translation.section_key]) {
+          (result[translation.section_key] as any)[translation.translation_key] = translation.value;
+        }
+      });
+
+    return result;
+  };
+
+  return {
+    customTranslations,
+    saveTranslation: saveTranslationMutation.mutate,
+    saveTranslationAsync: saveTranslationMutation.mutateAsync,
+    isSaving: saveTranslationMutation.isPending,
+    buildTranslations,
+    migrateLocalStorageToDatabase
+  };
+}

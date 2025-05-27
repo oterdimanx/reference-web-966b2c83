@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -7,14 +7,26 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { toast } from 'sonner';
 import { useLanguage, Language, Translations } from '@/contexts/LanguageContext';
 import { TranslationSection } from './TranslationSection';
-import { ChevronDown, ChevronRight, Globe, Settings, Home, FileText, Scale, Lightbulb, Info, Euro } from 'lucide-react';
+import { ChevronDown, ChevronRight, Globe, FileText, Scale, Lightbulb } from 'lucide-react';
 
 export function TranslationManager() {
-  const { t, language, translations, updateTranslation } = useLanguage();
+  const { t, language, translations, updateTranslation, isSaving } = useLanguage();
   const [selectedLanguage, setSelectedLanguage] = useState<Language>('en');
-  const [editedTranslations, setEditedTranslations] = useState<Partial<Translations>>({});
-  const initializedRef = useRef(false);
-  const lastLanguageRef = useRef<Language | null>(null);
+  
+  // Local state for editing - this will now be stable since we don't reset it on every render
+  const [editedTranslations, setEditedTranslations] = useState<Partial<Translations>>(() => ({
+    common: { ...translations.common },
+    admin: { ...translations.admin },
+    homepage: { ...translations.homepage },
+    pages: { ...translations.pages },
+    directoryPage: { ...translations.directoryPage },
+    aboutPage: { ...translations.aboutPage },
+    allWebsitesPage: { ...translations.allWebsitesPage },
+    addWebsiteForm: { ...translations.addWebsiteForm },
+    pricingPage: { ...translations.pricingPage },
+    legalPages: { ...translations.legalPages },
+    quickTips: { ...translations.quickTips }
+  }));
   
   // Collapsible states for each section group
   const [openSections, setOpenSections] = useState({
@@ -24,28 +36,7 @@ export function TranslationManager() {
     features: true,
   });
   
-  // Initialize edited translations with current values only once or when language changes
-  useEffect(() => {
-    if (!initializedRef.current || lastLanguageRef.current !== selectedLanguage) {
-      setEditedTranslations({
-        common: { ...translations.common },
-        admin: { ...translations.admin },
-        homepage: { ...translations.homepage },
-        pages: { ...translations.pages },
-        directoryPage: { ...translations.directoryPage },
-        aboutPage: { ...translations.aboutPage },
-        allWebsitesPage: { ...translations.allWebsitesPage },
-        addWebsiteForm: { ...translations.addWebsiteForm },
-        pricingPage: { ...translations.pricingPage },
-        legalPages: { ...translations.legalPages },
-        quickTips: { ...translations.quickTips }
-      });
-      initializedRef.current = true;
-      lastLanguageRef.current = selectedLanguage;
-    }
-  }, [selectedLanguage]); // Removed translations from dependencies
-  
-  // Handle translation text change
+  // Handle translation text change - this is now stable and won't cause re-renders
   const handleTranslationChange = (
     section: keyof Translations, 
     key: string, 
@@ -61,19 +52,27 @@ export function TranslationManager() {
   };
   
   // Save translations
-  const saveTranslations = () => {
-    // Update each changed translation
-    Object.keys(editedTranslations).forEach((section) => {
-      const sectionKey = section as keyof Translations;
-      Object.keys(editedTranslations[sectionKey] || {}).forEach((key) => {
-        const value = editedTranslations[sectionKey]?.[key as keyof typeof editedTranslations[typeof sectionKey]];
-        if (value) {
-          updateTranslation(sectionKey, key, value, selectedLanguage);
-        }
+  const saveTranslations = async () => {
+    try {
+      const savePromises: Promise<void>[] = [];
+      
+      // Update each changed translation
+      Object.keys(editedTranslations).forEach((section) => {
+        const sectionKey = section as keyof Translations;
+        Object.keys(editedTranslations[sectionKey] || {}).forEach((key) => {
+          const value = editedTranslations[sectionKey]?.[key as keyof typeof editedTranslations[typeof sectionKey]];
+          if (value) {
+            savePromises.push(updateTranslation(sectionKey, key, value, selectedLanguage));
+          }
+        });
       });
-    });
-    
-    toast.success(`Translations for ${selectedLanguage.toUpperCase()} updated successfully`);
+      
+      await Promise.all(savePromises);
+      toast.success(`Translations for ${selectedLanguage.toUpperCase()} updated successfully`);
+    } catch (error) {
+      console.error('Error saving translations:', error);
+      toast.error('Failed to save translations');
+    }
   };
 
   const toggleSection = (section: keyof typeof openSections) => {
@@ -87,7 +86,22 @@ export function TranslationManager() {
   const handleLanguageChange = (newLanguage: string) => {
     const lang = newLanguage as Language;
     setSelectedLanguage(lang);
-    initializedRef.current = false; // Reset to allow re-initialization with new language
+    
+    // Reset edited translations to current values for the new language
+    const currentTranslations = lang === 'en' ? translations : translations;
+    setEditedTranslations({
+      common: { ...currentTranslations.common },
+      admin: { ...currentTranslations.admin },
+      homepage: { ...currentTranslations.homepage },
+      pages: { ...currentTranslations.pages },
+      directoryPage: { ...currentTranslations.directoryPage },
+      aboutPage: { ...currentTranslations.aboutPage },
+      allWebsitesPage: { ...currentTranslations.allWebsitesPage },
+      addWebsiteForm: { ...currentTranslations.addWebsiteForm },
+      pricingPage: { ...currentTranslations.pricingPage },
+      legalPages: { ...currentTranslations.legalPages },
+      quickTips: { ...currentTranslations.quickTips }
+    });
   };
 
   const SectionGroup = ({ 
@@ -234,7 +248,13 @@ export function TranslationManager() {
               />
             </SectionGroup>
             
-            <Button onClick={saveTranslations} className="mt-4">{t('admin', 'saveTranslations')}</Button>
+            <Button 
+              onClick={saveTranslations} 
+              className="mt-4" 
+              disabled={isSaving}
+            >
+              {isSaving ? 'Saving...' : t('admin', 'saveTranslations')}
+            </Button>
           </TabsContent>
           
           <TabsContent value="fr" className="space-y-6">
@@ -334,7 +354,13 @@ export function TranslationManager() {
               />
             </SectionGroup>
             
-            <Button onClick={saveTranslations} className="mt-4">{t('admin', 'saveTranslations')}</Button>
+            <Button 
+              onClick={saveTranslations} 
+              className="mt-4"
+              disabled={isSaving}
+            >
+              {isSaving ? 'Enregistrement...' : t('admin', 'saveTranslations')}
+            </Button>
           </TabsContent>
         </Tabs>
       </CardContent>
