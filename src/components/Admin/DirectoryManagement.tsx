@@ -20,18 +20,12 @@ import {
   CreateDirectoryWebsiteData
 } from '@/services/directoryService';
 import { getUserWebsites } from '@/services/websiteService';
-
-interface Website {
-  id: string;
-  domain: string;
-  title?: string;
-  description?: string;
-}
+import { RankingSummary } from '@/lib/mockData';
 
 export function DirectoryManagement() {
   const [directoryWebsites, setDirectoryWebsites] = useState<DirectoryWebsite[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [userWebsites, setUserWebsites] = useState<Website[]>([]);
+  const [userWebsites, setUserWebsites] = useState<RankingSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedWebsite, setSelectedWebsite] = useState<string>('');
   const [isManualEntry, setIsManualEntry] = useState(false);
@@ -75,7 +69,7 @@ export function DirectoryManagement() {
 
   const handleWebsiteSelection = (websiteId: string) => {
     setSelectedWebsite(websiteId);
-    const website = userWebsites.find(w => w.id === websiteId);
+    const website = userWebsites.find(w => w.websiteId === websiteId);
     if (website) {
       setFormData(prev => ({
         ...prev,
@@ -202,7 +196,7 @@ export function DirectoryManagement() {
                   </SelectTrigger>
                   <SelectContent>
                     {userWebsites.map((website) => (
-                      <SelectItem key={website.id} value={website.id}>
+                      <SelectItem key={website.websiteId} value={website.websiteId}>
                         {website.domain}
                       </SelectItem>
                     ))}
