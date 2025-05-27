@@ -15,6 +15,13 @@ export const frTranslations: Translations = {
     privacyPolicy: 'Politique de confidentialité',
     termsOfService: 'Conditions d\'utilisation',
     copyright: '© {year} Reference-Web. Tous droits réservés.',
+    // Navigation
+    directories: 'Répertoires',
+    // Dashboard stats
+    websitesTracked: 'Sites web suivis',
+    totalKeywords: 'Total mots-clés',
+    averagePosition: 'Position moyenne',
+    improvingWebsites: 'Sites en amélioration',
   },
   admin: {
     dashboard: 'Tableau de bord',

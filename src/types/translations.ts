@@ -1,4 +1,3 @@
-
 // Define available languages
 export type Language = 'en' | 'fr';
 
@@ -18,6 +17,13 @@ export interface Translations {
     privacyPolicy: string;
     termsOfService: string;
     copyright: string;
+    // Navigation
+    directories: string;
+    // Dashboard stats
+    websitesTracked: string;
+    totalKeywords: string;
+    averagePosition: string;
+    improvingWebsites: string;
   };
   admin: {
     dashboard: string;

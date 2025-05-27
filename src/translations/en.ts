@@ -15,6 +15,13 @@ export const enTranslations: Translations = {
     privacyPolicy: 'Privacy Policy',
     termsOfService: 'Terms of Service',
     copyright: '© {year} Reference-Web. All rights reserved.',
+    // Navigation
+    directories: 'Directories',
+    // Dashboard stats
+    websitesTracked: 'Websites Tracked',
+    totalKeywords: 'Total Keywords',
+    averagePosition: 'Average Position',
+    improvingWebsites: 'Improving Websites',
   },
   admin: {
     dashboard: 'Dashboard',

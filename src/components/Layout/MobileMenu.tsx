@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -29,13 +28,13 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             onClick={() => setIsDirectoriesOpen(!isDirectoriesOpen)}
             className="flex items-center justify-between w-full text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal"
           >
-            Directories
+            {t('common', 'directories')}
             {isDirectoriesOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
           {isDirectoriesOpen && (
             <div className="ml-4 mt-2 space-y-2">
               <Link to="/directories" className="block text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal" onClick={onClose}>
-                Directories
+                {t('common', 'directories')}
               </Link>
               <Link to="/about" className="block text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal" onClick={onClose}>
                 {t('common', 'about')}
