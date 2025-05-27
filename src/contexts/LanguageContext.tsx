@@ -29,9 +29,25 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   };
 
   // Store translations in state so they can be updated
-  const [translations, setTranslations] = useState({
-    en: enTranslations,
-    fr: frTranslations
+  const [translations, setTranslations] = useState(() => {
+    // Try to load custom translations from localStorage
+    const customTranslations = localStorage.getItem('customTranslations');
+    if (customTranslations) {
+      try {
+        const parsed = JSON.parse(customTranslations);
+        return {
+          en: { ...enTranslations, ...parsed.en },
+          fr: { ...frTranslations, ...parsed.fr }
+        };
+      } catch (error) {
+        console.error('Error parsing custom translations:', error);
+      }
+    }
+    
+    return {
+      en: enTranslations,
+      fr: frTranslations
+    };
   });
 
   // Translation function
@@ -46,18 +62,50 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   // Function to update translations (for admin use)
   const updateTranslation = (section: keyof Translations, key: string, value: string, lang: Language) => {
-    setTranslations(prev => ({
-      ...prev,
-      [lang]: {
-        ...prev[lang],
-        [section]: {
-          ...prev[lang][section],
-          [key]: value
+    setTranslations(prev => {
+      const updated = {
+        ...prev,
+        [lang]: {
+          ...prev[lang],
+          [section]: {
+            ...prev[lang][section],
+            [key]: value
+          }
         }
-      }
-    }));
+      };
+      
+      // Save custom translations to localStorage
+      const customTranslations = {
+        en: {},
+        fr: {}
+      };
+      
+      // Only store the differences from the original translations
+      Object.keys(updated.en).forEach(sectionKey => {
+        const section = sectionKey as keyof Translations;
+        Object.keys(updated.en[section]).forEach(key => {
+          if (updated.en[section][key as keyof typeof updated.en[typeof section]] !== enTranslations[section][key as keyof typeof enTranslations[typeof section]]) {
+            if (!customTranslations.en[section]) customTranslations.en[section] = {};
+            customTranslations.en[section][key] = updated.en[section][key as keyof typeof updated.en[typeof section]];
+          }
+        });
+      });
+      
+      Object.keys(updated.fr).forEach(sectionKey => {
+        const section = sectionKey as keyof Translations;
+        Object.keys(updated.fr[section]).forEach(key => {
+          if (updated.fr[section][key as keyof typeof updated.fr[typeof section]] !== frTranslations[section][key as keyof typeof frTranslations[typeof section]]) {
+            if (!customTranslations.fr[section]) customTranslations.fr[section] = {};
+            customTranslations.fr[section][key] = updated.fr[section][key as keyof typeof updated.fr[typeof section]];
+          }
+        });
+      });
+      
+      localStorage.setItem('customTranslations', JSON.stringify(customTranslations));
+      
+      return updated;
+    });
     
-    // In a real app, we would save this to a database
     console.log(`Updated ${lang} translation for ${section}.${key} to: ${value}`);
   };
 
