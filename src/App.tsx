@@ -34,8 +34,8 @@ const App = () => (
     <ThemeProvider 
       attribute="class" 
       defaultTheme="system" 
-      enableSystem
-      themes={['light', 'dark']}
+      enableSystem={false}
+      themes={['light', 'dark', 'system']}
     >
       <TooltipProvider>
         <BrowserRouter>
