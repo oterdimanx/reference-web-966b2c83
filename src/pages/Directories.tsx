@@ -66,9 +66,9 @@ const Directories = () => {
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-4">Website Directory</h1>
+          <h1 className="text-4xl font-bold mb-4">{t('directoryPage', 'title')}</h1>
           <p className="text-lg text-muted-foreground">
-            Discover and explore our curated collection of supported websites, organized by categories.
+            {t('directoryPage', 'subtitle')}
           </p>
         </div>
 
@@ -101,11 +101,11 @@ const Directories = () => {
         ) : filteredWebsites.length > 0 ? (
           <>
             <div className="mb-4 text-sm text-muted-foreground">
-              Showing {filteredWebsites.length} website{filteredWebsites.length !== 1 ? 's' : ''}
+              {t('directoryPage', 'showingResults')} {filteredWebsites.length} {filteredWebsites.length !== 1 ? t('directoryPage', 'websites') : t('directoryPage', 'website')}
               {selectedCategory && (
-                <span> in {categories.find(c => c.id === selectedCategory)?.name}</span>
+                <span> {t('directoryPage', 'in')} {categories.find(c => c.id === selectedCategory)?.name}</span>
               )}
-              {searchQuery && <span> matching "{searchQuery}"</span>}
+              {searchQuery && <span> {t('directoryPage', 'matching')} "{searchQuery}"</span>}
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -117,11 +117,11 @@ const Directories = () => {
         ) : (
           <Card>
             <CardContent className="py-12 text-center">
-              <h3 className="text-lg font-semibold mb-2">No websites found</h3>
+              <h3 className="text-lg font-semibold mb-2">{t('directoryPage', 'noWebsitesTitle')}</h3>
               <p className="text-muted-foreground">
                 {searchQuery || selectedCategory
-                  ? 'Try adjusting your filters or search terms.'
-                  : 'No websites have been added to the directory yet.'}
+                  ? t('directoryPage', 'noWebsitesFilter')
+                  : t('directoryPage', 'noWebsitesMessage')}
               </p>
             </CardContent>
           </Card>

@@ -4,12 +4,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { DirectoryWebsite } from '@/services/directoryService';
 import { ExternalLink, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface DirectoryWebsiteCardProps {
   website: DirectoryWebsite;
 }
 
 export function DirectoryWebsiteCard({ website }: DirectoryWebsiteCardProps) {
+  const { t } = useLanguage();
+
   const getPositionChangeIcon = () => {
     if (website.position_change > 0) {
       return <TrendingUp className="h-4 w-4 text-green-500" />;
@@ -60,12 +63,12 @@ export function DirectoryWebsiteCard({ website }: DirectoryWebsiteCardProps) {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
           <div className="text-center">
             <p className="font-semibold text-rank-teal">{website.avg_position}</p>
-            <p className="text-muted-foreground">Avg Position</p>
+            <p className="text-muted-foreground">{t('directoryPage', 'avgPosition')}</p>
           </div>
           
           <div className="text-center">
             <p className="font-semibold">{website.keyword_count}</p>
-            <p className="text-muted-foreground">Keywords</p>
+            <p className="text-muted-foreground">{t('directoryPage', 'keywords')}</p>
           </div>
           
           <div className="text-center flex items-center justify-center gap-1">
@@ -73,7 +76,7 @@ export function DirectoryWebsiteCard({ website }: DirectoryWebsiteCardProps) {
             <span className="font-semibold">
               {website.position_change > 0 ? '+' : ''}{website.position_change}
             </span>
-            <p className="text-muted-foreground ml-1">Change</p>
+            <p className="text-muted-foreground ml-1">{t('directoryPage', 'change')}</p>
           </div>
           
           {website.top_keyword && (
@@ -88,7 +91,7 @@ export function DirectoryWebsiteCard({ website }: DirectoryWebsiteCardProps) {
         
         {(website.contact_name || website.contact_email) && (
           <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <h4 className="text-sm font-semibold mb-2">Contact Information</h4>
+            <h4 className="text-sm font-semibold mb-2">{t('directoryPage', 'contactInformation')}</h4>
             {website.contact_name && (
               <p className="text-sm text-muted-foreground">{website.contact_name}</p>
             )}
