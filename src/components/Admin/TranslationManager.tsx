@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,7 @@ export function TranslationManager() {
   const { t, language, translations, updateTranslation } = useLanguage();
   const [selectedLanguage, setSelectedLanguage] = useState<Language>('en');
   const [editedTranslations, setEditedTranslations] = useState<Partial<Translations>>({});
+  const initializedRef = useRef(false);
   
   // Collapsible states for each section group
   const [openSections, setOpenSections] = useState({
@@ -22,22 +23,25 @@ export function TranslationManager() {
     features: true,
   });
   
-  // Initialize edited translations with current values
+  // Initialize edited translations with current values only once or when language changes
   useEffect(() => {
-    setEditedTranslations({
-      common: { ...translations.common },
-      admin: { ...translations.admin },
-      homepage: { ...translations.homepage },
-      pages: { ...translations.pages },
-      directoryPage: { ...translations.directoryPage },
-      aboutPage: { ...translations.aboutPage },
-      allWebsitesPage: { ...translations.allWebsitesPage },
-      addWebsiteForm: { ...translations.addWebsiteForm },
-      pricingPage: { ...translations.pricingPage },
-      legalPages: { ...translations.legalPages },
-      quickTips: { ...translations.quickTips }
-    });
-  }, [language, translations]);
+    if (!initializedRef.current || language !== selectedLanguage) {
+      setEditedTranslations({
+        common: { ...translations.common },
+        admin: { ...translations.admin },
+        homepage: { ...translations.homepage },
+        pages: { ...translations.pages },
+        directoryPage: { ...translations.directoryPage },
+        aboutPage: { ...translations.aboutPage },
+        allWebsitesPage: { ...translations.allWebsitesPage },
+        addWebsiteForm: { ...translations.addWebsiteForm },
+        pricingPage: { ...translations.pricingPage },
+        legalPages: { ...translations.legalPages },
+        quickTips: { ...translations.quickTips }
+      });
+      initializedRef.current = true;
+    }
+  }, [language, selectedLanguage, translations]);
   
   // Handle translation text change
   const handleTranslationChange = (
@@ -75,6 +79,13 @@ export function TranslationManager() {
       ...prev,
       [section]: !prev[section]
     }));
+  };
+
+  // Handle language tab change
+  const handleLanguageChange = (newLanguage: string) => {
+    const lang = newLanguage as Language;
+    setSelectedLanguage(lang);
+    initializedRef.current = false; // Reset to allow re-initialization with new language
   };
 
   const SectionGroup = ({ 
@@ -118,7 +129,7 @@ export function TranslationManager() {
         <CardTitle>{t('admin', 'translationManager')}</CardTitle>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="en" onValueChange={(val) => setSelectedLanguage(val as Language)}>
+        <Tabs defaultValue="en" onValueChange={handleLanguageChange}>
           <TabsList className="mb-4">
             <TabsTrigger value="en">English</TabsTrigger>
             <TabsTrigger value="fr">Français</TabsTrigger>
