@@ -1,35 +1,47 @@
-name: Secure Public Repo Sync
-on: [push]
+name: Sync and Create Pull Request
+
+on:
+  push:
+    branches:
+      - main  # or your source branch in reference-web-966b2c83
 
 jobs:
-  sync:
+  create-pr:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout source repository
+        uses: actions/checkout@v4
         with:
-          persist-credentials: false
           fetch-depth: 0
 
-      - name: Debug Home Directory
+      # (Optional) Add your sync or code modification steps here
+
+      - name: Configure git for target repo
         run: |
-          ls -al $HOME
-          ls -al $HOME/.gitconfig || echo "No .gitconfig"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Configure Minimal Git Identity (local)
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git config --unset-all http.https://github.com/.extraheader || true
-
-      - name: Add PAT-authenticated Remote
-        run: |
-          git remote add mirror "https://${{ secrets.GH_PAT }}@github.com/oterdimanx/reference-web.git"
-
-      - name: Fetch All Branches
-        run: git fetch --all
-
-      - name: Push Changes to Mirror Remote
+      - name: Push changes to target repo
         env:
-          BRANCH: ${{ github.ref_name }}
+          TARGET_REPO: oterdimanx/reference-web
+          TARGET_BRANCH: main  # or your desired target branch
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}  # You need a Personal Access Token with repo permissions in reference-web secrets
         run: |
-          git push mirror $BRANCH:$BRANCH --force
+          git remote add target https://x-access-token:${GITHUB_TOKEN}@github.com/${TARGET_REPO}.git
+          git fetch target ${TARGET_BRANCH}
+          git checkout -b sync-to-target
+          # (Make your changes here, or copy files as needed)
+          git add .
+          git commit -m "Automated sync"
+          git push target sync-to-target
+
+      - name: Create Pull Request in target repo
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GH_PAT }}
+          repository: oterdimanx/reference-web
+          base: main   # or your target branch
+          head: sync-to-target
+          title: "Automated sync from reference-web-966b2c83"
+          body: "This PR contains automated changes."
