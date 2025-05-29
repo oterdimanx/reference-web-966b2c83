@@ -14,7 +14,7 @@ jobs:
 
       - name: Copy source files to a temporary directory
         run: |
-          mkdir /tmp/source
+          mkdir -p /tmp/source
           rsync -av --exclude='.git' ./ /tmp/source/
 
       - name: Checkout target repository
@@ -27,10 +27,10 @@ jobs:
 
       - name: Sync source to target repo
         run: |
-          rsync -av --delete /tmp/source/ ./target-repo/
+          rsync -av --delete --exclude='.git' --exclude='.github/workflows/one-shot-repo-sync.yml' /tmp/source/ ./target-repo/
           cd target-repo
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add .
-          git commit -m "Full sync from source repo" || echo "Nothing to commit"
+          git diff-index --quiet HEAD || git commit -m "Full sync from source repo"
           git push origin main
