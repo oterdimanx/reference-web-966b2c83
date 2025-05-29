@@ -62,7 +62,7 @@ export const useWebsiteSubmission = () => {
     // Save user subscription first
     await saveUserSubscription(selectedPlan);
     
-    // Add the additional fields including image path
+    // Add the additional fields including image path and all keywords
     const detailedWebsiteData = {
       ...websiteData,
       title: data.title,
@@ -75,7 +75,8 @@ export const useWebsiteSubmission = () => {
       pricingId: data.pricing_id,
       pricingTitle: selectedPlan?.title || 'Unknown',
       pricingPrice: selectedPlan?.price || 0,
-      imagePath: imagePath
+      imagePath: imagePath,
+      keywords: data.keywords // Save all keywords as entered by user
     };
     
     const savedWebsite = await saveWebsiteDetailed(detailedWebsiteData);
