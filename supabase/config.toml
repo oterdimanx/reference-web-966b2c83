@@ -3,3 +3,9 @@ project_id = "jixmwjplysaqlyzhpcmk"
 
 [functions.track-event]
 verify_jwt = false
+
+[functions.fetch-rankings]
+verify_jwt = false
+
+[functions.schedule-rankings]
+verify_jwt = false
