@@ -42,6 +42,12 @@ export const useWebsiteSubmission = () => {
     // Create a website entry with the form data
     const keywordsArray = data.keywords.split(',').filter(k => k.trim().length > 0);
     
+    console.log('Keywords processing:', {
+      originalKeywords: data.keywords,
+      keywordsArray: keywordsArray,
+      firstKeyword: keywordsArray[0]?.trim()
+    });
+    
     const websiteData: RankingSummary = {
       websiteId: uuidv4(),
       domain: data.domain,
@@ -76,12 +82,15 @@ export const useWebsiteSubmission = () => {
       pricingTitle: selectedPlan?.title || 'Unknown',
       pricingPrice: selectedPlan?.price || 0,
       imagePath: imagePath,
-      keywords: data.keywords // Save all keywords as entered by user
+      keywords: data.keywords // This should save the full keywords string
     };
+    
+    console.log('Detailed website data before saving:', detailedWebsiteData);
     
     const savedWebsite = await saveWebsiteDetailed(detailedWebsiteData);
     
     if (savedWebsite) {
+      console.log('Saved website result:', savedWebsite);
       toast.success("Website added successfully!");
       // Navigate to home instead of staying on success page
       setTimeout(() => {

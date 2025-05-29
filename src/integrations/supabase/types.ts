@@ -374,6 +374,7 @@ export type Database = {
           id: string
           image_path: string | null
           keyword_count: number
+          keywords: string | null
           phone_number: string | null
           phone_prefix: string | null
           position_change: number
@@ -395,6 +396,7 @@ export type Database = {
           id?: string
           image_path?: string | null
           keyword_count: number
+          keywords?: string | null
           phone_number?: string | null
           phone_prefix?: string | null
           position_change: number
@@ -416,6 +418,7 @@ export type Database = {
           id?: string
           image_path?: string | null
           keyword_count?: number
+          keywords?: string | null
           phone_number?: string | null
           phone_prefix?: string | null
           position_change?: number
