@@ -29,6 +29,8 @@ export function useUserPreferences() {
 
     try {
       setLoading(true);
+      console.log('Loading preferences for user:', user.id);
+      
       const { data, error } = await supabase
         .from('user_preferences')
         .select('theme_preference')
@@ -41,10 +43,12 @@ export function useUserPreferences() {
       }
 
       if (data) {
+        console.log('Loaded preferences:', data);
         setPreferences({
           theme_preference: data.theme_preference as ThemePreference
         });
       } else {
+        console.log('No preferences found, creating default');
         // Create default preferences if none exist
         await createDefaultPreferences();
       }
@@ -59,6 +63,8 @@ export function useUserPreferences() {
     if (!user) return;
 
     try {
+      console.log('Creating default preferences for user:', user.id);
+      
       const { data, error } = await supabase
         .from('user_preferences')
         .insert([
@@ -75,6 +81,7 @@ export function useUserPreferences() {
         return;
       }
 
+      console.log('Created default preferences:', data);
       setPreferences({
         theme_preference: data.theme_preference as ThemePreference
       });
@@ -84,9 +91,14 @@ export function useUserPreferences() {
   };
 
   const updateThemePreference = async (theme: ThemePreference) => {
-    if (!user) return;
+    if (!user) {
+      console.log('No user authenticated, skipping theme save');
+      return;
+    }
 
     try {
+      console.log('Updating theme preference to:', theme);
+      
       const { error } = await supabase
         .from('user_preferences')
         .update({ theme_preference: theme })
@@ -98,7 +110,9 @@ export function useUserPreferences() {
         return;
       }
 
+      console.log('Successfully updated theme preference');
       setPreferences(prev => prev ? { ...prev, theme_preference: theme } : { theme_preference: theme });
+      toast.success('Theme preference saved');
     } catch (error) {
       console.error('Error updating theme preference:', error);
       toast.error('Failed to save theme preference');
