@@ -14,7 +14,7 @@ interface TranslationTabsProps {
     legal: boolean;
     features: boolean;
   };
-  toggleSection: (section: keyof typeof openSections) => void;
+  toggleSection: (section: keyof TranslationTabsProps['openSections']) => void;
 }
 
 export function TranslationTabs({ 
