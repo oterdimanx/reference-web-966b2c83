@@ -33,25 +33,28 @@ export function ThemeToggle() {
     }
   }, [user, preferences, mounted, setTheme, theme]);
 
-  // Ensure system theme gets its own class
+  // Ensure all themes get their proper classes, including system
   useEffect(() => {
-    if (mounted && theme) {
+    if (mounted) {
       console.log('Current theme:', theme, 'Resolved theme:', resolvedTheme);
       document.documentElement.classList.remove('light', 'dark', 'system');
       
-      if (theme === 'system') {
-        document.documentElement.classList.add('system');
-      } else {
+      // Always apply the theme class based on the actual theme selection
+      if (theme) {
         document.documentElement.classList.add(theme);
+        console.log('Applied theme class:', theme);
       }
-      
-      console.log('Applied theme class:', theme);
     }
   }, [mounted, theme, resolvedTheme]);
 
   const handleThemeChange = async (newTheme: ThemePreference) => {
     console.log('Changing theme to:', newTheme);
     setTheme(newTheme);
+    
+    // Immediately apply the class for system theme to avoid reload requirement
+    document.documentElement.classList.remove('light', 'dark', 'system');
+    document.documentElement.classList.add(newTheme);
+    console.log('Immediately applied theme class:', newTheme);
     
     // Save to database if user is authenticated
     if (user) {
