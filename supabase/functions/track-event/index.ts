@@ -175,14 +175,14 @@ serve(async (req) => {
       website_id: body.website_id || null
     };
 
-    // Initialize Supabase client with explicit configuration
+    // Initialize Supabase client with service role key for server-side operations
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     
     console.log('Creating Supabase client with URL:', supabaseUrl);
-    console.log('Using anon key (first 20 chars):', supabaseAnonKey?.substring(0, 20));
+    console.log('Using service role key (first 20 chars):', supabaseServiceKey?.substring(0, 20));
     
-    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
       auth: {
         persistSession: false,
         autoRefreshToken: false,
