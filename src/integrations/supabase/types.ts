@@ -145,6 +145,13 @@ export type Database = {
             referencedRelation: "websites"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_directory_websites_category"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
         ]
       }
       events: {

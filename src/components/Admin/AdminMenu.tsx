@@ -1,7 +1,7 @@
 
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Home, DollarSign, Settings, ArrowLeftCircle, BarChart3, Globe } from 'lucide-react';
+import { Home, DollarSign, Settings, ArrowLeftCircle, BarChart3, Globe, Tags } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const AdminMenu = () => {
@@ -51,13 +51,24 @@ const AdminMenu = () => {
         </Button>
         
         <Button
-          variant={isActive('/admin/directory') ? "default" : "outline"}
+          variant={isActive('/admin/directory') && !isActive('/admin/directory/categories') ? "default" : "outline"}
           size="sm"
           asChild
         >
           <Link to="/admin/directory">
             <Globe className="mr-2 h-4 w-4" />
             Directory
+          </Link>
+        </Button>
+        
+        <Button
+          variant={isActive('/admin/directory/categories') ? "default" : "outline"}
+          size="sm"
+          asChild
+        >
+          <Link to="/admin/directory/categories">
+            <Tags className="mr-2 h-4 w-4" />
+            Categories
           </Link>
         </Button>
         
