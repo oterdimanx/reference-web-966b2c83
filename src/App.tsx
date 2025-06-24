@@ -11,6 +11,7 @@ import Auth from './pages/Auth';
 import Profile from './pages/Profile';
 import AdminPage from './pages/Admin';
 import AddWebsite from './pages/AddWebsite';
+import AllWebsites from './pages/AllWebsites';
 import Directories from './pages/Directories';
 import AdminDirectory from './pages/Admin/Directory';
 import AdminDirectoryCategories from './pages/Admin/DirectoryCategories';
@@ -32,6 +33,7 @@ function App() {
               <Route path="/profile" element={<Profile />} />
               <Route path="/admin" element={<AdminPage />} />
               <Route path="/add-website" element={<AddWebsite />} />
+              <Route path="/all-websites" element={<AllWebsites />} />
               <Route path="/directories" element={<Directories />} />
               <Route path="/admin/directory" element={<AdminDirectory />} />
               <Route path="/admin/directory/categories" element={<AdminDirectoryCategories />} />
