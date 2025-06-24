@@ -1,4 +1,3 @@
-
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from 'next-themes';
@@ -31,14 +30,10 @@ function App() {
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
-          enableSystem
+          enableSystem={true}
           disableTransitionOnChange={false}
-          themes={['light', 'dark', 'system']}
-          value={{
-            light: 'light',
-            dark: 'dark',
-            system: 'system'
-          }}
+          storageKey="theme"
+          forcedTheme={undefined}
         >
           <LanguageProvider>
             <AuthProvider>

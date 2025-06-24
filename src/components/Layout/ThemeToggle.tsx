@@ -19,7 +19,6 @@ export function ThemeToggle() {
   const { user } = useAuth();
   const { preferences, updateThemePreference } = useUserPreferences();
   const [mounted, setMounted] = useState(false);
-  const [isUpdatingTheme, setIsUpdatingTheme] = useState(false);
 
   // Avoid hydration mismatch
   useEffect(() => {
@@ -28,42 +27,20 @@ export function ThemeToggle() {
 
   // Apply saved theme preference when user is authenticated and preferences are loaded
   useEffect(() => {
-    if (user && preferences && mounted && preferences.theme_preference !== theme && !isUpdatingTheme) {
+    if (user && preferences && mounted && preferences.theme_preference !== theme) {
       console.log('Applying saved theme preference:', preferences.theme_preference);
       setTheme(preferences.theme_preference);
     }
-  }, [user, preferences, mounted, setTheme, theme, isUpdatingTheme]);
-
-  // Apply the correct theme class based on user selection
-  useEffect(() => {
-    if (mounted && theme) {
-      console.log('Current theme:', theme, 'Resolved theme:', resolvedTheme);
-      document.documentElement.classList.remove('light', 'dark', 'system');
-      document.documentElement.classList.add(theme);
-      console.log('Applied theme class:', theme);
-    }
-  }, [mounted, theme, resolvedTheme]);
+  }, [user, preferences, mounted, setTheme, theme]);
 
   const handleThemeChange = async (newTheme: ThemePreference) => {
     console.log('Changing theme to:', newTheme);
-    setIsUpdatingTheme(true);
-    
-    // Immediately apply the class and set theme
-    document.documentElement.classList.remove('light', 'dark', 'system');
-    document.documentElement.classList.add(newTheme);
-    console.log('Immediately applied theme class:', newTheme);
-    
     setTheme(newTheme);
     
     // Save to database if user is authenticated
     if (user) {
       await updateThemePreference(newTheme);
     }
-    
-    // Reset the flag after a short delay to allow theme to stabilize
-    setTimeout(() => {
-      setIsUpdatingTheme(false);
-    }, 100);
   };
 
   if (!mounted) {
