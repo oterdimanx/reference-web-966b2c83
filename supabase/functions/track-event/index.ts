@@ -175,10 +175,21 @@ serve(async (req) => {
       website_id: body.website_id || null
     };
 
-    // Initialize Supabase client
+    // Initialize Supabase client with explicit configuration
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    
+    console.log('Creating Supabase client with URL:', supabaseUrl);
+    console.log('Using anon key (first 20 chars):', supabaseAnonKey?.substring(0, 20));
+    
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    });
+
+    console.log('Attempting to insert event data:', JSON.stringify(eventData, null, 2));
 
     // Insert event into database
     const { data, error } = await supabase
@@ -189,8 +200,9 @@ serve(async (req) => {
 
     if (error) {
       console.error('Database error:', error);
+      console.error('Error details:', JSON.stringify(error, null, 2));
       return new Response(
-        JSON.stringify({ error: 'Failed to save event' }),
+        JSON.stringify({ error: 'Failed to save event', details: error.message }),
         { 
           status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -215,7 +227,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Unexpected error:', error);
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
+      JSON.stringify({ error: 'Internal server error', details: error.message }),
       { 
         status: 500, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
