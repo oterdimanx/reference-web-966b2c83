@@ -26,12 +26,17 @@ export function useDirectoryManagement() {
 
   const fetchData = async () => {
     setIsLoading(true);
+    console.log('Fetching directory management data...');
     try {
       const [directoryData, categoriesData, websitesData] = await Promise.all([
         getDirectoryWebsites(),
         getCategories(),
         getUserWebsites()
       ]);
+      
+      console.log('Directory websites fetched:', directoryData);
+      console.log('Categories fetched:', categoriesData);
+      console.log('User websites fetched:', websitesData);
       
       setDirectoryWebsites(directoryData);
       setCategories(categoriesData);
@@ -46,6 +51,7 @@ export function useDirectoryManagement() {
 
   const addWebsiteToDirectory = async (formData: CreateDirectoryWebsiteData) => {
     try {
+      console.log('Adding website to directory:', formData);
       const result = await createDirectoryWebsite(formData);
       if (result) {
         toast.success('Website added to directory');

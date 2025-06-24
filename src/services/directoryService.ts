@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export interface DirectoryWebsite {
@@ -59,24 +58,34 @@ export interface CreateDirectoryWebsiteData {
 
 export const getDirectoryWebsites = async (): Promise<DirectoryWebsite[]> => {
   try {
-    const { data, error } = await supabase
+    // First get directory websites
+    const { data: directoryData, error: directoryError } = await supabase
       .from('directory_websites')
-      .select(`
-        *,
-        categories!category_id(id, name, description)
-      `)
+      .select('*')
       .eq('is_active', true)
       .order('created_at', { ascending: false });
 
-    if (error) {
-      console.error('Error fetching directory websites:', error);
-      throw error;
+    if (directoryError) {
+      console.error('Error fetching directory websites:', directoryError);
+      throw directoryError;
     }
 
-    // Transform the data to match our interface
-    const transformedData = data?.map(item => ({
+    // Then get categories separately
+    const { data: categoriesData, error: categoriesError } = await supabase
+      .from('categories')
+      .select('*');
+
+    if (categoriesError) {
+      console.error('Error fetching categories:', categoriesError);
+      throw categoriesError;
+    }
+
+    // Manually join the data
+    const transformedData = directoryData?.map(item => ({
       ...item,
-      category: item.categories || null
+      category: item.category_id 
+        ? categoriesData?.find(cat => cat.id === item.category_id) || null
+        : null
     })) || [];
 
     return transformedData;
@@ -111,10 +120,7 @@ export const createDirectoryWebsite = async (website: CreateDirectoryWebsiteData
     const { data, error } = await supabase
       .from('directory_websites')
       .insert(website)
-      .select(`
-        *,
-        categories!category_id(id, name, description)
-      `)
+      .select('*')
       .single();
 
     if (error) {
@@ -122,13 +128,24 @@ export const createDirectoryWebsite = async (website: CreateDirectoryWebsiteData
       throw error;
     }
 
-    // Transform the data to match our interface
-    const transformedData = {
-      ...data,
-      category: data.categories || null
-    };
+    // Get the category separately if needed
+    let category = null;
+    if (data.category_id) {
+      const { data: categoryData, error: categoryError } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('id', data.category_id)
+        .single();
+      
+      if (!categoryError) {
+        category = categoryData;
+      }
+    }
 
-    return transformedData;
+    return {
+      ...data,
+      category
+    };
   } catch (error) {
     console.error('Error in createDirectoryWebsite:', error);
     return null;
@@ -141,10 +158,7 @@ export const updateDirectoryWebsite = async (id: string, updates: Partial<Direct
       .from('directory_websites')
       .update(updates)
       .eq('id', id)
-      .select(`
-        *,
-        categories!category_id(id, name, description)
-      `)
+      .select('*')
       .single();
 
     if (error) {
@@ -152,13 +166,24 @@ export const updateDirectoryWebsite = async (id: string, updates: Partial<Direct
       throw error;
     }
 
-    // Transform the data to match our interface
-    const transformedData = {
-      ...data,
-      category: data.categories || null
-    };
+    // Get the category separately if needed
+    let category = null;
+    if (data.category_id) {
+      const { data: categoryData, error: categoryError } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('id', data.category_id)
+        .single();
+      
+      if (!categoryError) {
+        category = categoryData;
+      }
+    }
 
-    return transformedData;
+    return {
+      ...data,
+      category
+    };
   } catch (error) {
     console.error('Error in updateDirectoryWebsite:', error);
     return null;
