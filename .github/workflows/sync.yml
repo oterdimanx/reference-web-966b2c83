@@ -34,7 +34,6 @@ jobs:
           cd target-repo
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          # Try to checkout the branch or create it if it doesn't exist
           git fetch origin sync-to-target || true
           if git show-ref --verify --quiet refs/remotes/origin/sync-to-target; then
             git checkout sync-to-target
