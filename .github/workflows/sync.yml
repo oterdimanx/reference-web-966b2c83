@@ -34,7 +34,14 @@ jobs:
           cd target-repo
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b sync-to-target || git checkout sync-to-target
+          # Try to checkout the branch or create it if it doesn't exist
+          git fetch origin sync-to-target || true
+          if git show-ref --verify --quiet refs/remotes/origin/sync-to-target; then
+            git checkout sync-to-target
+            git pull origin sync-to-target --rebase
+          else
+            git checkout -b sync-to-target
+          fi
           git add .
           timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
           git diff-index --quiet HEAD || git commit -m "Automated sync from reference-web-966b2c83 at $timestamp"
