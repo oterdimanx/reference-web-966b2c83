@@ -18,6 +18,8 @@ import AllWebsites from './pages/AllWebsites';
 import Directories from './pages/Directories';
 import AdminDirectory from './pages/Admin/Directory';
 import AdminDirectoryCategories from './pages/Admin/DirectoryCategories';
+import Sitemap from './pages/Sitemap';
+import SitemapXml from './pages/SitemapXml';
 
 const queryClient = new QueryClient();
 
@@ -43,6 +45,8 @@ function App() {
               <Route path="/directories" element={<Directories />} />
               <Route path="/admin/directory" element={<AdminDirectory />} />
               <Route path="/admin/directory/categories" element={<AdminDirectoryCategories />} />
+              <Route path="/sitemap" element={<Sitemap />} />
+              <Route path="/sitemap.xml" element={<SitemapXml />} />
             </Routes>
           </AuthProvider>
         </LanguageProvider>
