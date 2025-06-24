@@ -14,6 +14,7 @@ export function useUserPreferences() {
   const { user } = useAuth();
   const [preferences, setPreferences] = useState<UserPreferences | null>(null);
   const [loading, setLoading] = useState(false);
+  const [hasAppliedInitialTheme, setHasAppliedInitialTheme] = useState(false);
 
   // Load user preferences when user is authenticated
   useEffect(() => {
@@ -21,6 +22,7 @@ export function useUserPreferences() {
       loadPreferences();
     } else {
       setPreferences(null);
+      setHasAppliedInitialTheme(false);
     }
   }, [user]);
 
@@ -122,6 +124,8 @@ export function useUserPreferences() {
   return {
     preferences,
     loading,
-    updateThemePreference
+    updateThemePreference,
+    hasAppliedInitialTheme,
+    setHasAppliedInitialTheme
   };
 }

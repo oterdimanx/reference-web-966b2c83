@@ -17,7 +17,7 @@ type ThemePreference = 'light' | 'dark' | 'system';
 export function ThemeToggle() {
   const { theme, setTheme, resolvedTheme } = useTheme();
   const { user } = useAuth();
-  const { preferences, updateThemePreference } = useUserPreferences();
+  const { preferences, updateThemePreference, hasAppliedInitialTheme, setHasAppliedInitialTheme } = useUserPreferences();
   const [mounted, setMounted] = useState(false);
 
   // Avoid hydration mismatch
@@ -25,13 +25,14 @@ export function ThemeToggle() {
     setMounted(true);
   }, []);
 
-  // Apply saved theme preference when user is authenticated and preferences are loaded
+  // Apply saved theme preference ONLY on initial load
   useEffect(() => {
-    if (user && preferences && mounted && preferences.theme_preference !== theme) {
-      console.log('Applying saved theme preference:', preferences.theme_preference);
+    if (user && preferences && mounted && !hasAppliedInitialTheme) {
+      console.log('Applying initial saved theme preference:', preferences.theme_preference);
       setTheme(preferences.theme_preference);
+      setHasAppliedInitialTheme(true);
     }
-  }, [user, preferences, mounted, setTheme, theme]);
+  }, [user, preferences, mounted, hasAppliedInitialTheme, setTheme, setHasAppliedInitialTheme]);
 
   const handleThemeChange = async (newTheme: ThemePreference) => {
     console.log('Changing theme to:', newTheme);
