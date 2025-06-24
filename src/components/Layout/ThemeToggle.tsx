@@ -15,9 +15,9 @@ import { useUserPreferences } from "@/hooks/use-user-preferences";
 type ThemePreference = 'light' | 'dark' | 'system';
 
 export function ThemeToggle() {
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const { user } = useAuth();
-  const { preferences, updateThemePreference, hasAppliedInitialTheme, setHasAppliedInitialTheme } = useUserPreferences();
+  const { preferences, updateThemePreference } = useUserPreferences();
   const [mounted, setMounted] = useState(false);
 
   // Avoid hydration mismatch
@@ -25,17 +25,14 @@ export function ThemeToggle() {
     setMounted(true);
   }, []);
 
-  // Apply saved theme preference ONLY on initial load
+  // Apply saved theme preference when user is authenticated and preferences are loaded
   useEffect(() => {
-    if (user && preferences && mounted && !hasAppliedInitialTheme) {
-      console.log('Applying initial saved theme preference:', preferences.theme_preference);
+    if (user && preferences && mounted) {
       setTheme(preferences.theme_preference);
-      setHasAppliedInitialTheme(true);
     }
-  }, [user, preferences, mounted, hasAppliedInitialTheme, setTheme, setHasAppliedInitialTheme]);
+  }, [user, preferences, mounted, setTheme]);
 
   const handleThemeChange = async (newTheme: ThemePreference) => {
-    console.log('Changing theme to:', newTheme);
     setTheme(newTheme);
     
     // Save to database if user is authenticated
@@ -63,25 +60,25 @@ export function ThemeToggle() {
       </DropdownMenuTrigger>
       <DropdownMenuContent 
         align="end" 
-        className="chrome-card border-0 backdrop-blur-xl bg-white/90 dark:bg-slate-800/90 z-50"
+        className="chrome-card border-0 backdrop-blur-xl bg-white/80 dark:bg-slate-800/80"
       >
         <DropdownMenuItem 
           onClick={() => handleThemeChange("light")}
-          className="chrome-button border-0 mb-1 hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:hover:from-slate-700 dark:hover:to-slate-600 transition-all duration-300 cursor-pointer"
+          className="chrome-button border-0 mb-1 hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 dark:hover:from-slate-700 dark:hover:to-slate-600 transition-all duration-300"
         >
           <Sun className="mr-2 h-4 w-4 text-amber-500" />
           <span className="font-medium">Light</span>
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={() => handleThemeChange("dark")}
-          className="chrome-button border-0 mb-1 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-slate-700 dark:hover:to-slate-600 transition-all duration-300 cursor-pointer"
+          className="chrome-button border-0 mb-1 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 dark:hover:from-slate-700 dark:hover:to-slate-600 transition-all duration-300"
         >
           <Moon className="mr-2 h-4 w-4 text-indigo-400" />
           <span className="font-medium">Dark</span>
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={() => handleThemeChange("system")}
-          className="chrome-button border-0 hover:bg-gradient-to-r hover:from-teal-50 hover:to-cyan-50 dark:hover:from-slate-700 dark:hover:to-slate-600 transition-all duration-300 cursor-pointer"
+          className="chrome-button border-0 hover:bg-gradient-to-r hover:from-teal-50 hover:to-cyan-50 dark:hover:from-slate-700 dark:hover:to-slate-600 transition-all duration-300"
         >
           <Monitor className="mr-2 h-4 w-4 text-teal-500" />
           <span className="font-medium">System</span>
