@@ -1,0 +1,25 @@
+
+export const profileTranslations = {
+  title: 'Your Profile',
+  accountInformation: 'Account Information',
+  profileDetails: 'Profile Details',
+  editProfileDetails: 'Edit your profile information below',
+  personalInformationPreferences: 'Your personal information and preferences',
+  fullName: 'Full Name',
+  fullNamePlaceholder: 'Your name',
+  username: 'Username',
+  usernamePlaceholder: 'username',
+  usernameDescription: 'This is your public username',
+  email: 'Email',
+  emailPlaceholder: 'email@example.com',
+  emailDescription: 'Email address cannot be changed',
+  website: 'Website',
+  websitePlaceholder: 'https://example.com',
+  memberSince: 'Member since',
+  cancel: 'Cancel',
+  saveChanges: 'Save Changes',
+  saving: 'Saving...',
+  editProfile: 'Edit Profile',
+  profileUpdated: 'Profile updated successfully',
+  profileUpdateFailed: 'Failed to update profile'
+};

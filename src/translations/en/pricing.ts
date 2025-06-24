@@ -1,0 +1,20 @@
+
+export const pricingTranslations = {
+  title: 'Choose Your Plan',
+  subtitle: 'Select the perfect plan for your website tracking needs',
+  startMessage: 'Start with Just',
+  startAmount: '€1!',
+  choosePlan: 'Choose Your Plan',
+  monthly: '/month',
+  loadingPlans: 'Loading plans...',
+  noPricingPlans: 'No pricing plans available at the moment.',
+  contactSupport: 'Please contact support for more information.',
+  getStarted: 'Get Started',
+  oneTime: 'one-time',
+  signUpTo: 'Sign Up to',
+  mostPopular: 'Most Popular',
+  startDescription: 'Try our service with the starter plan - perfect for testing our platform with one website. Upgrade anytime as your business grows.',
+  addFirstWebsite: 'Add Your First Website',
+  signUpStart: 'Sign Up & Start Tracking',
+  learnMore: 'Learn More About Our Service',
+};

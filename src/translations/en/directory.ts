@@ -1,0 +1,21 @@
+
+export const directoryTranslations = {
+  title: 'Website Directory',
+  subtitle: 'Discover and explore our curated collection of supported websites, organized by categories.',
+  searchPlaceholder: 'Search websites...',
+  allCategories: 'All Categories',
+  selectCategory: 'Select category',
+  showingResults: 'Showing',
+  website: 'website',
+  websites: 'websites',
+  in: 'in',
+  matching: 'matching',
+  noWebsitesTitle: 'No websites found',
+  noWebsitesMessage: 'No websites have been added to the directory yet.',
+  noWebsitesFilter: 'Try adjusting your filters or search terms.',
+  avgPosition: 'Avg Position',
+  keywords: 'Keywords',
+  change: 'Change',
+  contactInformation: 'Contact Information',
+  topKeyword: 'Top Keyword',
+};
