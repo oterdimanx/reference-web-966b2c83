@@ -3,7 +3,7 @@ name: Sync and Create Pull Request
 on:
   push:
     branches:
-      - main  # or your source branch in reference-web-966b2c83
+      - main
 
 jobs:
   create-pr:
@@ -28,9 +28,8 @@ jobs:
           token: ${{ secrets.GH_PAT }}
           path: target-repo
 
-      - name: Sync source to target repo
+      - name: Prepare sync branch in target repo
         run: |
-          rsync -av --delete --exclude='.git' --exclude='netlify.toml' /tmp/source/ ./target-repo/
           cd target-repo
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -41,6 +40,11 @@ jobs:
           else
             git checkout -b sync-to-target
           fi
+
+      - name: Sync source to target repo
+        run: |
+          rsync -av --delete --exclude='.git' --exclude='netlify.toml' /tmp/source/ ./target-repo/
+          cd target-repo
           git add .
           timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
           git diff-index --quiet HEAD || git commit -m "Automated sync from reference-web-966b2c83 at $timestamp"
