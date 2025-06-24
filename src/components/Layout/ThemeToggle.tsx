@@ -15,7 +15,7 @@ import { useUserPreferences } from "@/hooks/use-user-preferences";
 type ThemePreference = 'light' | 'dark' | 'system';
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const { user } = useAuth();
   const { preferences, updateThemePreference } = useUserPreferences();
   const [mounted, setMounted] = useState(false);
@@ -27,12 +27,25 @@ export function ThemeToggle() {
 
   // Apply saved theme preference when user is authenticated and preferences are loaded
   useEffect(() => {
-    if (user && preferences && mounted) {
+    if (user && preferences && mounted && preferences.theme_preference !== theme) {
+      console.log('Applying saved theme preference:', preferences.theme_preference);
       setTheme(preferences.theme_preference);
     }
-  }, [user, preferences, mounted, setTheme]);
+  }, [user, preferences, mounted, setTheme, theme]);
+
+  // Ensure theme classes are applied to document body
+  useEffect(() => {
+    if (mounted && resolvedTheme) {
+      document.documentElement.classList.remove('light', 'dark');
+      if (resolvedTheme !== 'system') {
+        document.documentElement.classList.add(resolvedTheme);
+      }
+      console.log('Applied theme class:', resolvedTheme);
+    }
+  }, [mounted, resolvedTheme]);
 
   const handleThemeChange = async (newTheme: ThemePreference) => {
+    console.log('Changing theme to:', newTheme);
     setTheme(newTheme);
     
     // Save to database if user is authenticated
@@ -61,7 +74,6 @@ export function ThemeToggle() {
       <DropdownMenuContent 
         align="end" 
         className="chrome-card border-0 backdrop-blur-xl bg-white/90 dark:bg-slate-800/90 z-50"
-        style={{ backgroundColor: 'var(--popover)', color: 'var(--popover-foreground)' }}
       >
         <DropdownMenuItem 
           onClick={() => handleThemeChange("light")}
