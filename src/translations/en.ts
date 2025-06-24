@@ -1,4 +1,3 @@
-
 import { Translations } from '../types/translations';
 
 export const enTranslations: Translations = {
@@ -76,6 +75,30 @@ export const enTranslations: Translations = {
     whyKeywordResearch: 'Why Keyword Research Matters',
     yourWebsiteRankings: 'Your Website Rankings',
     yourKeywords: 'Your Keywords',
+  },
+  profilePage: {
+    title: 'Your Profile',
+    accountInformation: 'Account Information',
+    profileDetails: 'Profile Details',
+    editProfileDetails: 'Edit your profile information below',
+    personalInformationPreferences: 'Your personal information and preferences',
+    fullName: 'Full Name',
+    fullNamePlaceholder: 'Your name',
+    username: 'Username',
+    usernamePlaceholder: 'username',
+    usernameDescription: 'This is your public username',
+    email: 'Email',
+    emailPlaceholder: 'email@example.com',
+    emailDescription: 'Email address cannot be changed',
+    website: 'Website',
+    websitePlaceholder: 'https://example.com',
+    memberSince: 'Member since',
+    cancel: 'Cancel',
+    saveChanges: 'Save Changes',
+    saving: 'Saving...',
+    editProfile: 'Edit Profile',
+    profileUpdated: 'Profile updated successfully',
+    profileUpdateFailed: 'Failed to update profile'
   },
   directoryPage: {
     title: 'Website Directory',
@@ -174,7 +197,7 @@ export const enTranslations: Translations = {
     startAmount: '€1!',
     choosePlan: 'Choose Your Plan',
     monthly: '/month',
-    loadingPlans: 'Loading pricing plans...',
+    loadingPlans: 'Loading plans...',
     noPricingPlans: 'No pricing plans available at the moment.',
     contactSupport: 'Please contact support for more information.',
     getStarted: 'Get Started',

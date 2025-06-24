@@ -1,7 +1,6 @@
-// Define available languages
+
 export type Language = 'en' | 'fr';
 
-// Define translation keys structure
 export interface Translations {
   common: {
     home: string;
@@ -13,13 +12,10 @@ export interface Translations {
     profile: string;
     admin: string;
     returnToFront: string;
-    // Footer links
     privacyPolicy: string;
     termsOfService: string;
     copyright: string;
-    // Navigation
     directories: string;
-    // Dashboard stats
     websitesTracked: string;
     totalKeywords: string;
     averagePosition: string;
@@ -45,11 +41,9 @@ export interface Translations {
     title: string;
     subtitle: string;
     getStarted: string;
-    // New homepage sections
     featuresTitle: string;
     rankingsSection: string;
     keywordsSection: string;
-    // Add Website section
     addWebsiteTitle: string;
     addWebsiteDescription: string;
     websiteUrlLabel: string;
@@ -61,14 +55,12 @@ export interface Translations {
     continueToFormButton: string;
   };
   pages: {
-    // Page titles
     rankings: string;
     keywords: string;
     about: string;
     profile: string;
     addWebsite: string;
     allWebsites: string;
-    // Section titles
     rankingsTitle: string;
     keywordsTitle: string;
     monitorRankings: string;
@@ -77,6 +69,30 @@ export interface Translations {
     whyKeywordResearch: string;
     yourWebsiteRankings: string;
     yourKeywords: string;
+  };
+  profilePage: {
+    title: string;
+    accountInformation: string;
+    profileDetails: string;
+    editProfileDetails: string;
+    personalInformationPreferences: string;
+    fullName: string;
+    fullNamePlaceholder: string;
+    username: string;
+    usernamePlaceholder: string;
+    usernameDescription: string;
+    email: string;
+    emailPlaceholder: string;
+    emailDescription: string;
+    website: string;
+    websitePlaceholder: string;
+    memberSince: string;
+    cancel: string;
+    saveChanges: string;
+    saving: string;
+    editProfile: string;
+    profileUpdated: string;
+    profileUpdateFailed: string;
   };
   directoryPage: {
     title: string;
@@ -157,7 +173,6 @@ export interface Translations {
     noPlansAvailable: string;
     addingWebsite: string;
     addWebsiteButton: string;
-    // Form validation messages
     titleRequired: string;
     domainRequired: string;
     descriptionRequired: string;

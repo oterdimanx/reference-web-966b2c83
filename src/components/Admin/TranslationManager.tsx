@@ -151,6 +151,15 @@ export function TranslationManager() {
               />
               
               <TranslationSection
+                title="Profile Page"
+                sectionKey="profilePage"
+                translations={currentTranslations}
+                onTranslationChange={handleTranslationChange}
+                iconColor="text-purple-600"
+                language={selectedLanguage}
+              />
+              
+              <TranslationSection
                 title="Directory Page"
                 sectionKey="directoryPage"
                 translations={currentTranslations}
@@ -253,6 +262,15 @@ export function TranslationManager() {
               <TranslationSection
                 title="Textes des pages généraux"
                 sectionKey="pages"
+                translations={currentTranslations}
+                onTranslationChange={handleTranslationChange}
+                iconColor="text-purple-600"
+                language={selectedLanguage}
+              />
+              
+              <TranslationSection
+                title="Page Profil"
+                sectionKey="profilePage"
                 translations={currentTranslations}
                 onTranslationChange={handleTranslationChange}
                 iconColor="text-purple-600"

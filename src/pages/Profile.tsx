@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Header } from '@/components/Layout/Header';
 import { Footer } from '@/components/Layout/Footer';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -37,6 +38,7 @@ interface Profile {
 
 const ProfilePage = () => {
   const { user, loading } = useAuth();
+  const { t } = useLanguage();
   const [isEditing, setIsEditing] = useState(false);
   const queryClient = useQueryClient();
   
@@ -78,11 +80,11 @@ const ProfilePage = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['profile'] });
-      toast.success("Profile updated successfully");
+      toast.success(t('profilePage', 'profileUpdated'));
       setIsEditing(false);
     },
     onError: (error) => {
-      toast.error(`Failed to update profile: ${error.message}`);
+      toast.error(`${t('profilePage', 'profileUpdateFailed')}: ${error.message}`);
     }
   });
   
@@ -131,7 +133,7 @@ const ProfilePage = () => {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">Your Profile</h1>
+        <h1 className="text-3xl font-bold mb-6">{t('profilePage', 'title')}</h1>
         
         {loading || profileLoading ? (
           <Card>
@@ -148,7 +150,7 @@ const ProfilePage = () => {
           <div className="grid md:grid-cols-3 gap-6">
             <Card className="md:col-span-1">
               <CardHeader>
-                <CardTitle>Account Information</CardTitle>
+                <CardTitle>{t('profilePage', 'accountInformation')}</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col items-center text-center">
                 <Avatar className="h-24 w-24 mb-4">
@@ -163,16 +165,16 @@ const ProfilePage = () => {
                 
                 <div className="w-full mt-4 text-sm">
                   <div className="flex justify-between py-2 border-b">
-                    <span className="font-medium">Username:</span>
+                    <span className="font-medium">{t('profilePage', 'username')}:</span>
                     <span>{profile?.username || '-'}</span>
                   </div>
                   <div className="flex justify-between py-2 border-b">
-                    <span className="font-medium">Member since:</span>
+                    <span className="font-medium">{t('profilePage', 'memberSince')}:</span>
                     <span>{new Date(user?.created_at || Date.now()).toLocaleDateString()}</span>
                   </div>
                   {profile?.website && (
                     <div className="flex justify-between py-2 border-b">
-                      <span className="font-medium">Website:</span>
+                      <span className="font-medium">{t('profilePage', 'website')}:</span>
                       <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
                         {new URL(profile.website).hostname}
                       </a>
@@ -184,9 +186,9 @@ const ProfilePage = () => {
             
             <Card className="md:col-span-2">
               <CardHeader>
-                <CardTitle>Profile Details</CardTitle>
+                <CardTitle>{t('profilePage', 'profileDetails')}</CardTitle>
                 <CardDescription>
-                  {isEditing ? 'Edit your profile information below' : 'Your personal information and preferences'}
+                  {isEditing ? t('profilePage', 'editProfileDetails') : t('profilePage', 'personalInformationPreferences')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -198,9 +200,9 @@ const ProfilePage = () => {
                         name="full_name"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Full Name</FormLabel>
+                            <FormLabel>{t('profilePage', 'fullName')}</FormLabel>
                             <FormControl>
-                              <Input placeholder="Your name" {...field} value={field.value || ''} />
+                              <Input placeholder={t('profilePage', 'fullNamePlaceholder')} {...field} value={field.value || ''} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -212,12 +214,12 @@ const ProfilePage = () => {
                         name="username"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Username</FormLabel>
+                            <FormLabel>{t('profilePage', 'username')}</FormLabel>
                             <FormControl>
-                              <Input placeholder="username" {...field} value={field.value || ''} />
+                              <Input placeholder={t('profilePage', 'usernamePlaceholder')} {...field} value={field.value || ''} />
                             </FormControl>
                             <FormDescription>
-                              This is your public username
+                              {t('profilePage', 'usernameDescription')}
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -229,12 +231,12 @@ const ProfilePage = () => {
                         name="email"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Email</FormLabel>
+                            <FormLabel>{t('profilePage', 'email')}</FormLabel>
                             <FormControl>
-                              <Input placeholder="email@example.com" {...field} disabled />
+                              <Input placeholder={t('profilePage', 'emailPlaceholder')} {...field} disabled />
                             </FormControl>
                             <FormDescription>
-                              Email address cannot be changed
+                              {t('profilePage', 'emailDescription')}
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -246,9 +248,9 @@ const ProfilePage = () => {
                         name="website"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Website</FormLabel>
+                            <FormLabel>{t('profilePage', 'website')}</FormLabel>
                             <FormControl>
-                              <Input placeholder="https://example.com" {...field} value={field.value || ''} />
+                              <Input placeholder={t('profilePage', 'websitePlaceholder')} {...field} value={field.value || ''} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -268,10 +270,10 @@ const ProfilePage = () => {
                             });
                           }}
                         >
-                          Cancel
+                          {t('profilePage', 'cancel')}
                         </Button>
                         <Button type="submit" disabled={updateProfileMutation.isPending}>
-                          {updateProfileMutation.isPending ? "Saving..." : "Save Changes"}
+                          {updateProfileMutation.isPending ? t('profilePage', 'saving') : t('profilePage', 'saveChanges')}
                         </Button>
                       </div>
                     </form>
@@ -279,28 +281,28 @@ const ProfilePage = () => {
                 ) : (
                   <div className="space-y-6">
                     <div className="space-y-1">
-                      <label className="text-sm font-medium">Full Name</label>
+                      <label className="text-sm font-medium">{t('profilePage', 'fullName')}</label>
                       <p className="text-base border rounded-md bg-slate-50 p-2">
                         {profile?.full_name || '-'}
                       </p>
                     </div>
                     
                     <div className="space-y-1">
-                      <label className="text-sm font-medium">Username</label>
+                      <label className="text-sm font-medium">{t('profilePage', 'username')}</label>
                       <p className="text-base border rounded-md bg-slate-50 p-2">
                         {profile?.username || '-'}
                       </p>
                     </div>
                     
                     <div className="space-y-1">
-                      <label className="text-sm font-medium">Email</label>
+                      <label className="text-sm font-medium">{t('profilePage', 'email')}</label>
                       <p className="text-base border rounded-md bg-slate-50 p-2">
                         {user?.email}
                       </p>
                     </div>
                     
                     <div className="space-y-1">
-                      <label className="text-sm font-medium">Website</label>
+                      <label className="text-sm font-medium">{t('profilePage', 'website')}</label>
                       <p className="text-base border rounded-md bg-slate-50 p-2">
                         {profile?.website ? (
                           <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
@@ -314,7 +316,7 @@ const ProfilePage = () => {
                     
                     <div className="flex justify-end">
                       <Button onClick={() => setIsEditing(true)}>
-                        Edit Profile
+                        {t('profilePage', 'editProfile')}
                       </Button>
                     </div>
                   </div>
