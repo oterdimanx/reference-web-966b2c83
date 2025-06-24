@@ -18,7 +18,7 @@ jobs:
       - name: Copy source files to temp directory
         run: |
           mkdir /tmp/source
-          rsync -av --exclude='.git' ./ /tmp/source/
+          rsync -av --exclude='.git' --exclude='netlify.toml' ./ /tmp/source/
 
       - name: Checkout target repository
         uses: actions/checkout@v4
@@ -30,13 +30,14 @@ jobs:
 
       - name: Sync source to target repo
         run: |
-          rsync -av --delete --exclude='.git' /tmp/source/ ./target-repo/
+          rsync -av --delete --exclude='.git' --exclude='netlify.toml' /tmp/source/ ./target-repo/
           cd target-repo
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git checkout -b sync-to-target || git checkout sync-to-target
           git add .
-          git diff-index --quiet HEAD || git commit -m "Automated sync from reference-web-966b2c83"
+          timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+          git diff-index --quiet HEAD || git commit -m "Automated sync from reference-web-966b2c83 at $timestamp"
           git push origin sync-to-target
 
       - name: Create Pull Request in target repo
