@@ -33,17 +33,15 @@ export function ThemeToggle() {
     }
   }, [user, preferences, mounted, setTheme, theme]);
 
-  // Ensure all themes get their proper classes, including system
+  // Apply the correct theme class based on user selection, not resolved theme
   useEffect(() => {
-    if (mounted) {
+    if (mounted && theme) {
       console.log('Current theme:', theme, 'Resolved theme:', resolvedTheme);
       document.documentElement.classList.remove('light', 'dark', 'system');
       
-      // Always apply the theme class based on the actual theme selection
-      if (theme) {
-        document.documentElement.classList.add(theme);
-        console.log('Applied theme class:', theme);
-      }
+      // Always apply the theme class based on what the user actually selected
+      document.documentElement.classList.add(theme);
+      console.log('Applied theme class:', theme);
     }
   }, [mounted, theme, resolvedTheme]);
 
@@ -51,7 +49,7 @@ export function ThemeToggle() {
     console.log('Changing theme to:', newTheme);
     setTheme(newTheme);
     
-    // Immediately apply the class for system theme to avoid reload requirement
+    // Immediately apply the class to ensure instant visual feedback
     document.documentElement.classList.remove('light', 'dark', 'system');
     document.documentElement.classList.add(newTheme);
     console.log('Immediately applied theme class:', newTheme);
