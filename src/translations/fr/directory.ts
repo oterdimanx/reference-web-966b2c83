@@ -1,0 +1,21 @@
+
+export const directoryTranslations = {
+  title: 'Répertoire de sites web',
+  subtitle: 'Découvrez et explorez notre collection organisée de sites web pris en charge, organisés par catégories.',
+  searchPlaceholder: 'Rechercher des sites web...',
+  allCategories: 'Toutes les catégories',
+  selectCategory: 'Sélectionner une catégorie',
+  showingResults: 'Affichage de',
+  website: 'site web',
+  websites: 'sites web',
+  in: 'dans',
+  matching: 'correspondant à',
+  noWebsitesTitle: 'Aucun site web trouvé',
+  noWebsitesMessage: 'Aucun site web n\'a encore été ajouté au répertoire.',
+  noWebsitesFilter: 'Essayez d\'ajuster vos filtres ou termes de recherche.',
+  avgPosition: 'Position moyenne',
+  keywords: 'Mots-clés',
+  change: 'Changement',
+  contactInformation: 'Informations de contact',
+  topKeyword: 'Mot-clé principal',
+};
