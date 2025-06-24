@@ -33,6 +33,12 @@ function App() {
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange={false}
+          themes={['light', 'dark', 'system']}
+          value={{
+            light: 'light',
+            dark: 'dark',
+            system: 'system'
+          }}
         >
           <LanguageProvider>
             <AuthProvider>

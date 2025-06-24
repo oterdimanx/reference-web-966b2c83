@@ -33,6 +33,22 @@ export function ThemeToggle() {
     }
   }, [user, preferences, mounted, setTheme, theme]);
 
+  // Ensure system theme gets its own class
+  useEffect(() => {
+    if (mounted && theme) {
+      console.log('Current theme:', theme, 'Resolved theme:', resolvedTheme);
+      document.documentElement.classList.remove('light', 'dark', 'system');
+      
+      if (theme === 'system') {
+        document.documentElement.classList.add('system');
+      } else {
+        document.documentElement.classList.add(theme);
+      }
+      
+      console.log('Applied theme class:', theme);
+    }
+  }, [mounted, theme, resolvedTheme]);
+
   const handleThemeChange = async (newTheme: ThemePreference) => {
     console.log('Changing theme to:', newTheme);
     setTheme(newTheme);
