@@ -33,17 +33,6 @@ export function ThemeToggle() {
     }
   }, [user, preferences, mounted, setTheme, theme]);
 
-  // Ensure theme classes are applied to document body
-  useEffect(() => {
-    if (mounted && resolvedTheme) {
-      document.documentElement.classList.remove('light', 'dark');
-      if (resolvedTheme !== 'system') {
-        document.documentElement.classList.add(resolvedTheme);
-      }
-      console.log('Applied theme class:', resolvedTheme);
-    }
-  }, [mounted, resolvedTheme]);
-
   const handleThemeChange = async (newTheme: ThemePreference) => {
     console.log('Changing theme to:', newTheme);
     setTheme(newTheme);
