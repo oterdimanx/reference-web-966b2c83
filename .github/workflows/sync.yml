@@ -15,33 +15,36 @@ jobs:
         with:
           fetch-depth: 0
 
-      # (Optional) Add your sync or code modification steps here
-
-      - name: Configure git for target repo
+      - name: Copy source files to temp directory
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          mkdir /tmp/source
+          rsync -av --exclude='.git' ./ /tmp/source/
 
-      - name: Push changes to target repo
-        env:
-          TARGET_REPO: oterdimanx/reference-web
-          TARGET_BRANCH: main  # or your desired target branch
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}  # You need a Personal Access Token with repo permissions in reference-web secrets
+      - name: Checkout target repository
+        uses: actions/checkout@v4
+        with:
+          repository: oterdimanx/reference-web
+          ref: main
+          token: ${{ secrets.GH_PAT }}
+          path: target-repo
+
+      - name: Sync source to target repo
         run: |
-          git remote add target https://x-access-token:${GITHUB_TOKEN}@github.com/${TARGET_REPO}.git
-          git fetch target ${TARGET_BRANCH}
-          git checkout -b sync-to-target
-          # (Make your changes here, or copy files as needed)
+          rsync -av --delete --exclude='.git' /tmp/source/ ./target-repo/
+          cd target-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b sync-to-target || git checkout sync-to-target
           git add .
-          git commit -m "Automated sync"
-          git push target sync-to-target
+          git diff-index --quiet HEAD || git commit -m "Automated sync from reference-web-966b2c83"
+          git push origin sync-to-target
 
       - name: Create Pull Request in target repo
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GH_PAT }}
           repository: oterdimanx/reference-web
-          base: main   # or your target branch
+          base: main
           head: sync-to-target
           title: "Automated sync from reference-web-966b2c83"
           body: "This PR contains automated changes."
