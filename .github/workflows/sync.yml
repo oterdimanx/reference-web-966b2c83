@@ -51,11 +51,8 @@ jobs:
           git push origin sync-to-target
 
       - name: Create Pull Request in target repo
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{ secrets.GH_PAT }}
-          repository: oterdimanx/reference-web
-          base: main
-          head: sync-to-target
-          title: "Automated sync from reference-web-966b2c83"
-          body: "This PR contains automated changes."
+        run: |
+          cd target-repo
+          gh pr create --repo oterdimanx/reference-web --base main --head sync-to-target --title "Automated sync from reference-web-966b2c83" --body "This PR contains automated changes."
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
