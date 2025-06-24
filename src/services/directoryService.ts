@@ -26,7 +26,7 @@ export interface DirectoryWebsite {
     id: string;
     name: string;
     description: string | null;
-  };
+  } | null;
 }
 
 export interface Category {
@@ -63,7 +63,7 @@ export const getDirectoryWebsites = async (): Promise<DirectoryWebsite[]> => {
       .from('directory_websites')
       .select(`
         *,
-        category:categories(id, name, description)
+        categories!category_id(id, name, description)
       `)
       .eq('is_active', true)
       .order('created_at', { ascending: false });
@@ -73,7 +73,13 @@ export const getDirectoryWebsites = async (): Promise<DirectoryWebsite[]> => {
       throw error;
     }
 
-    return data || [];
+    // Transform the data to match our interface
+    const transformedData = data?.map(item => ({
+      ...item,
+      category: item.categories || null
+    })) || [];
+
+    return transformedData;
   } catch (error) {
     console.error('Error in getDirectoryWebsites:', error);
     return [];
@@ -107,7 +113,7 @@ export const createDirectoryWebsite = async (website: CreateDirectoryWebsiteData
       .insert(website)
       .select(`
         *,
-        category:categories(id, name, description)
+        categories!category_id(id, name, description)
       `)
       .single();
 
@@ -116,7 +122,13 @@ export const createDirectoryWebsite = async (website: CreateDirectoryWebsiteData
       throw error;
     }
 
-    return data;
+    // Transform the data to match our interface
+    const transformedData = {
+      ...data,
+      category: data.categories || null
+    };
+
+    return transformedData;
   } catch (error) {
     console.error('Error in createDirectoryWebsite:', error);
     return null;
@@ -131,7 +143,7 @@ export const updateDirectoryWebsite = async (id: string, updates: Partial<Direct
       .eq('id', id)
       .select(`
         *,
-        category:categories(id, name, description)
+        categories!category_id(id, name, description)
       `)
       .single();
 
@@ -140,7 +152,13 @@ export const updateDirectoryWebsite = async (id: string, updates: Partial<Direct
       throw error;
     }
 
-    return data;
+    // Transform the data to match our interface
+    const transformedData = {
+      ...data,
+      category: data.categories || null
+    };
+
+    return transformedData;
   } catch (error) {
     console.error('Error in updateDirectoryWebsite:', error);
     return null;

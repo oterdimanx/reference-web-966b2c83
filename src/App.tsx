@@ -1,37 +1,36 @@
+
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { QueryClient } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
 import { AuthProvider } from './contexts/AuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
-import Home from './pages/Home';
+import Index from './pages/Index';
 import About from './pages/About';
 import Pricing from './pages/Pricing';
-import Contact from './pages/Contact';
 import Auth from './pages/Auth';
 import Profile from './pages/Profile';
 import AdminPage from './pages/Admin';
-import Websites from './pages/Websites';
 import AddWebsite from './pages/AddWebsite';
 import Directories from './pages/Directories';
 import AdminDirectory from './pages/Admin/Directory';
 import AdminDirectoryCategories from './pages/Admin/DirectoryCategories';
 
+const queryClient = new QueryClient();
+
 function App() {
   return (
     <BrowserRouter>
-      <QueryClient>
+      <QueryClientProvider client={queryClient}>
         <LanguageProvider>
           <AuthProvider>
             <Toaster />
             <Routes>
-              <Route path="/" element={<Home />} />
+              <Route path="/" element={<Index />} />
               <Route path="/about" element={<About />} />
               <Route path="/pricing" element={<Pricing />} />
-              <Route path="/contact" element={<Contact />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/admin" element={<AdminPage />} />
-              <Route path="/websites" element={<Websites />} />
               <Route path="/add-website" element={<AddWebsite />} />
               <Route path="/directories" element={<Directories />} />
               <Route path="/admin/directory" element={<AdminDirectory />} />
@@ -39,7 +38,7 @@ function App() {
             </Routes>
           </AuthProvider>
         </LanguageProvider>
-      </QueryClient>
+      </QueryClientProvider>
     </BrowserRouter>
   );
 }
