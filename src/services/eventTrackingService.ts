@@ -79,12 +79,82 @@ export const generateTrackingScript = (websiteId: string) => {
   var DEBOUNCE_DELAY = 300; // 300ms debounce
   var BATCH_SIZE = 10;
   
+  // Session-based deduplication variables
+  var sessionEvents = new Map();
+  var SESSION_STORAGE_KEY = 'tracking_session_events_' + sessionId;
+  var MAX_SESSION_EVENTS = 1000; // Prevent memory bloat
+  var PAGEVIEW_COOLDOWN = 30000; // 30 seconds between same pageview
+  var CLICK_COOLDOWN = 10000; // 10 seconds between same click
+  
+  // Load existing session events from sessionStorage
+  try {
+    var storedEvents = sessionStorage.getItem(SESSION_STORAGE_KEY);
+    if (storedEvents) {
+      var parsed = JSON.parse(storedEvents);
+      sessionEvents = new Map(Object.entries(parsed));
+    }
+  } catch (e) {
+    console.log('Error loading session events:', e);
+  }
+  
+  function saveSessionEvents() {
+    try {
+      var eventsObj = Object.fromEntries(sessionEvents);
+      sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(eventsObj));
+    } catch (e) {
+      console.log('Error saving session events:', e);
+    }
+  }
+  
   function createEventKey(eventData) {
     // Create a unique key for similar events to prevent duplicates
     if (eventData.event_type === 'click') {
       return eventData.event_type + '_' + (eventData.element_id || '') + '_' + (eventData.element_tag || '') + '_' + eventData.url;
     }
     return eventData.event_type + '_' + eventData.url;
+  }
+  
+  function createSessionEventKey(eventData) {
+    // Create a more detailed key for session-based deduplication
+    if (eventData.event_type === 'click') {
+      return 'session_' + eventData.event_type + '_' + (eventData.element_id || 'no-id') + '_' + (eventData.element_tag || 'no-tag') + '_' + (eventData.element_classes || 'no-class') + '_' + window.location.href;
+    }
+    return 'session_' + eventData.event_type + '_' + window.location.href;
+  }
+  
+  function isSessionDuplicate(eventData) {
+    var sessionKey = createSessionEventKey(eventData);
+    var lastTime = sessionEvents.get(sessionKey);
+    var now = Date.now();
+    
+    if (!lastTime) {
+      return false; // First time seeing this event
+    }
+    
+    var cooldown = eventData.event_type === 'pageview' ? PAGEVIEW_COOLDOWN : CLICK_COOLDOWN;
+    return (now - lastTime) < cooldown;
+  }
+  
+  function recordSessionEvent(eventData) {
+    var sessionKey = createSessionEventKey(eventData);
+    var now = Date.now();
+    
+    sessionEvents.set(sessionKey, now);
+    
+    // Clean up old events to prevent memory bloat
+    if (sessionEvents.size > MAX_SESSION_EVENTS) {
+      var oldestAllowed = now - Math.max(PAGEVIEW_COOLDOWN, CLICK_COOLDOWN) * 2;
+      for (var [key, timestamp] of sessionEvents.entries()) {
+        if (timestamp < oldestAllowed) {
+          sessionEvents.delete(key);
+        }
+      }
+    }
+    
+    // Save to sessionStorage periodically
+    if (sessionEvents.size % 10 === 0) {
+      saveSessionEvents();
+    }
   }
   
   function sendQueuedEvents() {
@@ -117,6 +187,11 @@ export const generateTrackingScript = (websiteId: string) => {
   }
   
   function trackEvent(eventData) {
+    // First check session-based deduplication
+    if (isSessionDuplicate(eventData)) {
+      return; // Skip session duplicate
+    }
+    
     var eventKey = createEventKey(eventData);
     var now = Date.now();
     
@@ -125,6 +200,9 @@ export const generateTrackingScript = (websiteId: string) => {
     if (lastSent && (now - lastSent) < DEBOUNCE_DELAY) {
       return; // Skip duplicate event
     }
+    
+    // Record this event in session memory
+    recordSessionEvent(eventData);
     
     // Add to queue
     eventQueue.push(eventData);
@@ -172,6 +250,9 @@ export const generateTrackingScript = (websiteId: string) => {
   
   // Send any remaining events when page is about to unload
   window.addEventListener('beforeunload', function() {
+    // Save session events before leaving
+    saveSessionEvents();
+    
     if (eventQueue.length > 0) {
       // Use sendBeacon for reliable delivery during page unload
       var eventsToSend = eventQueue.splice(0);
@@ -191,6 +272,11 @@ export const generateTrackingScript = (websiteId: string) => {
       });
     }
   });
+  
+  // Clean up session storage periodically
+  setInterval(function() {
+    saveSessionEvents();
+  }, 60000); // Save every minute
 })();
 `.trim();
 };
