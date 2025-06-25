@@ -24,61 +24,12 @@ interface Website {
 }
 
 const AdminRankingsPage = () => {
-  const { user, loading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { isAdmin, adminLoading } = useAdminStatus(user?.id);
   const [websites, setWebsites] = useState<Website[]>([]);
   const [websitesLoading, setWebsitesLoading] = useState(true);
   const [selectedWebsite, setSelectedWebsite] = useState<Website | null>(null);
   const [triggeringCheck, setTriggeringCheck] = useState<string | null>(null);
-
-  // If not logged in, redirect to auth page
-  if (!loading && !user) {
-    return <Navigate to="/auth" />;
-  }
-
-  // If loading admin status
-  if (loading || adminLoading) {
-    return (
-      <div className="flex flex-col min-h-screen">
-        <Header />
-        <main className="flex-grow container mx-auto px-4 py-8">
-          <div className="space-y-4">
-            <Skeleton className="h-12 w-full max-w-lg" />
-            <Skeleton className="h-64 w-full" />
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
-  // If not admin, show access denied
-  if (!isAdmin) {
-    return (
-      <div className="flex flex-col min-h-screen">
-        <Header />
-        <main className="flex-grow container mx-auto px-4 py-8">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-center py-10">
-                <h2 className="text-2xl font-semibold mb-4 text-red-600">Access Denied</h2>
-                <p className="mb-6 text-muted-foreground">
-                  You don't have administrator privileges to access this page.
-                </p>
-                <Button 
-                  variant="default" 
-                  onClick={() => window.location.href = '/'}
-                >
-                  Return to Dashboard
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
 
   const loadWebsites = async () => {
     try {
@@ -122,8 +73,59 @@ const AdminRankingsPage = () => {
   };
 
   useEffect(() => {
-    loadWebsites();
-  }, []);
+    if (!authLoading && user && isAdmin) {
+      loadWebsites();
+    }
+  }, [authLoading, user, isAdmin]);
+
+  // If not logged in, redirect to auth page
+  if (!authLoading && !user) {
+    return <Navigate to="/auth" />;
+  }
+
+  // If loading admin status
+  if (authLoading || adminLoading) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Header />
+        <main className="flex-grow container mx-auto px-4 py-8">
+          <div className="space-y-4">
+            <Skeleton className="h-12 w-full max-w-lg" />
+            <Skeleton className="h-64 w-full" />
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // If not admin, show access denied
+  if (!isAdmin) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Header />
+        <main className="flex-grow container mx-auto px-4 py-8">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="text-center py-10">
+                <h2 className="text-2xl font-semibold mb-4 text-red-600">Access Denied</h2>
+                <p className="mb-6 text-muted-foreground">
+                  You don't have administrator privileges to access this page.
+                </p>
+                <Button 
+                  variant="default" 
+                  onClick={() => window.location.href = '/'}
+                >
+                  Return to Dashboard
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
