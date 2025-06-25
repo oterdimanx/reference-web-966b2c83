@@ -12,6 +12,7 @@ interface UserSubscription {
   websites_allowed: number;
   websites_used: number;
   is_active: boolean;
+  status: string;
   created_at: string;
 }
 
@@ -23,7 +24,7 @@ export const useUserSubscription = () => {
     queryFn: async () => {
       if (!user?.id) return null;
       
-      // Get user's current subscription with pricing details
+      // Get user's current active subscription with pricing details
       const { data: subData, error: subError } = await supabase
         .from('user_subscriptions')
         .select(`
@@ -34,7 +35,7 @@ export const useUserSubscription = () => {
           )
         `)
         .eq('user_id', user.id)
-        .eq('is_active', true)
+        .eq('status', 'active')
         .maybeSingle();
         
       if (subError) {

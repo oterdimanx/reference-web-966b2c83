@@ -2,6 +2,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { PricingPlan } from '@/types/addWebsiteForm';
+import { subscriptionService } from '@/services/subscriptionService';
 
 export const useSubscriptionManager = () => {
   const { user } = useAuth();
@@ -12,39 +13,55 @@ export const useSubscriptionManager = () => {
         throw new Error('No authenticated user');
       }
       
-      // Check if user already has an active subscription for this plan
+      // Check if user already has an active subscription
       const { data: existingSub } = await supabase
         .from('user_subscriptions')
         .select('*')
         .eq('user_id', user.id)
-        .eq('pricing_id', pricingPlan.id)
-        .eq('is_active', true)
+        .eq('status', 'active')
         .maybeSingle();
         
       if (existingSub) {
-        console.log('User already has active subscription for this plan');
-        return;
-      }
-      
-      // Create new subscription
-      const { error } = await supabase
-        .from('user_subscriptions')
-        .insert({
-          user_id: user.id,
-          pricing_id: pricingPlan.id,
-          is_active: true
-        });
+        // If user has a subscription, upgrade it
+        await subscriptionService.upgradeSubscription(user.id, pricingPlan);
+        console.log('User subscription upgraded successfully');
+      } else {
+        // Create new subscription
+        const { error } = await supabase
+          .from('user_subscriptions')
+          .insert({
+            user_id: user.id,
+            pricing_id: pricingPlan.id,
+            status: 'active',
+            is_active: true,
+            started_at: new Date().toISOString()
+          });
+          
+        if (error) {
+          throw error;
+        }
         
-      if (error) {
-        throw error;
+        console.log('User subscription created successfully');
       }
-      
-      console.log('User subscription saved successfully');
     } catch (error) {
-      console.error('Error saving user subscription:', error);
+      console.error('Error managing user subscription:', error);
       throw error;
     }
   };
 
-  return { saveUserSubscription };
+  const upgradeSubscription = async (newPricingPlan: PricingPlan) => {
+    try {
+      if (!user?.id) {
+        throw new Error('No authenticated user');
+      }
+      
+      await subscriptionService.upgradeSubscription(user.id, newPricingPlan);
+      console.log('Subscription upgraded successfully');
+    } catch (error) {
+      console.error('Error upgrading subscription:', error);
+      throw error;
+    }
+  };
+
+  return { saveUserSubscription, upgradeSubscription };
 };

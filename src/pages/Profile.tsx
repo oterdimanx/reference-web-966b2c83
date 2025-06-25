@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Header } from '@/components/Layout/Header';
 import { Footer } from '@/components/Layout/Footer';
@@ -13,6 +12,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ProfileAvatar } from '@/components/Profile/ProfileAvatar';
 import { ProfileForm } from '@/components/Profile/ProfileForm';
 import { ProfileDisplay } from '@/components/Profile/ProfileDisplay';
+import { SubscriptionHistoryCard } from '@/components/Profile/SubscriptionHistory';
 import { z } from 'zod';
 
 const profileFormSchema = z.object({
@@ -117,38 +117,42 @@ const ProfilePage = () => {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid md:grid-cols-3 gap-6">
-            <ProfileAvatar 
-              profile={profile}
-              userEmail={user?.email}
-              userCreatedAt={user?.created_at}
-            />
+          <div className="space-y-6">
+            <div className="grid md:grid-cols-3 gap-6">
+              <ProfileAvatar 
+                profile={profile}
+                userEmail={user?.email}
+                userCreatedAt={user?.created_at}
+              />
+              
+              <Card className="md:col-span-2">
+                <CardHeader>
+                  <CardTitle>{t('profilePage', 'profileDetails')}</CardTitle>
+                  <CardDescription>
+                    {isEditing ? t('profilePage', 'editProfileDetails') : t('profilePage', 'personalInformationPreferences')}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {isEditing ? (
+                    <ProfileForm
+                      profile={profile}
+                      userEmail={user?.email}
+                      onSubmit={handleSubmit}
+                      onCancel={handleCancel}
+                      isLoading={updateProfileMutation.isPending}
+                    />
+                  ) : (
+                    <ProfileDisplay
+                      profile={profile}
+                      userEmail={user?.email}
+                      onEdit={() => setIsEditing(true)}
+                    />
+                  )}
+                </CardContent>
+              </Card>
+            </div>
             
-            <Card className="md:col-span-2">
-              <CardHeader>
-                <CardTitle>{t('profilePage', 'profileDetails')}</CardTitle>
-                <CardDescription>
-                  {isEditing ? t('profilePage', 'editProfileDetails') : t('profilePage', 'personalInformationPreferences')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {isEditing ? (
-                  <ProfileForm
-                    profile={profile}
-                    userEmail={user?.email}
-                    onSubmit={handleSubmit}
-                    onCancel={handleCancel}
-                    isLoading={updateProfileMutation.isPending}
-                  />
-                ) : (
-                  <ProfileDisplay
-                    profile={profile}
-                    userEmail={user?.email}
-                    onEdit={() => setIsEditing(true)}
-                  />
-                )}
-              </CardContent>
-            </Card>
+            <SubscriptionHistoryCard />
           </div>
         )}
       </main>
