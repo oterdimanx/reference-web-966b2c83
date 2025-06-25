@@ -72,26 +72,94 @@ export const generateTrackingScript = (websiteId: string) => {
   
   var apiUrl = 'https://jixmwjplysaqlyzhpcmk.supabase.co/functions/v1/track-event';
   
-  function trackEvent(eventData) {
-    fetch(apiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        session_id: sessionId,
-        website_id: '${websiteId}',
-        url: window.location.href,
-        screen_resolution: window.screen.width + 'x' + window.screen.height,
-        client_timestamp: new Date().toISOString(),
-        ...eventData
-      })
-    }).catch(function(e) { console.log('Tracking error:', e); });
+  // Debouncing variables
+  var eventQueue = [];
+  var pendingEvents = new Map();
+  var debounceTimeout = null;
+  var DEBOUNCE_DELAY = 300; // 300ms debounce
+  var BATCH_SIZE = 10;
+  
+  function createEventKey(eventData) {
+    // Create a unique key for similar events to prevent duplicates
+    if (eventData.event_type === 'click') {
+      return eventData.event_type + '_' + (eventData.element_id || '') + '_' + (eventData.element_tag || '') + '_' + eventData.url;
+    }
+    return eventData.event_type + '_' + eventData.url;
   }
   
-  // Track pageview
+  function sendQueuedEvents() {
+    if (eventQueue.length === 0) return;
+    
+    var eventsToSend = eventQueue.splice(0, BATCH_SIZE);
+    
+    // Send events individually (could be batched on server-side in future)
+    eventsToSend.forEach(function(eventData) {
+      fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: sessionId,
+          website_id: '${websiteId}',
+          url: window.location.href,
+          screen_resolution: window.screen.width + 'x' + window.screen.height,
+          client_timestamp: new Date().toISOString(),
+          ...eventData
+        })
+      }).catch(function(e) { console.log('Tracking error:', e); });
+    });
+    
+    // If there are more events, schedule another batch
+    if (eventQueue.length > 0) {
+      debounceTimeout = setTimeout(sendQueuedEvents, 100);
+    } else {
+      debounceTimeout = null;
+    }
+  }
+  
+  function trackEvent(eventData) {
+    var eventKey = createEventKey(eventData);
+    var now = Date.now();
+    
+    // Check if we recently sent the same event (debounce)
+    var lastSent = pendingEvents.get(eventKey);
+    if (lastSent && (now - lastSent) < DEBOUNCE_DELAY) {
+      return; // Skip duplicate event
+    }
+    
+    // Add to queue
+    eventQueue.push(eventData);
+    pendingEvents.set(eventKey, now);
+    
+    // Clean up old entries from pendingEvents (prevent memory leaks)
+    if (pendingEvents.size > 100) {
+      var oldestAllowed = now - DEBOUNCE_DELAY * 2;
+      for (var [key, timestamp] of pendingEvents.entries()) {
+        if (timestamp < oldestAllowed) {
+          pendingEvents.delete(key);
+        }
+      }
+    }
+    
+    // Schedule batch send
+    if (!debounceTimeout) {
+      debounceTimeout = setTimeout(sendQueuedEvents, DEBOUNCE_DELAY);
+    }
+  }
+  
+  // Track pageview immediately (no debouncing needed for pageviews)
   trackEvent({ event_type: 'pageview' });
   
-  // Track clicks
+  // Track clicks with debouncing
+  var lastClickTime = 0;
+  var CLICK_THROTTLE = 100; // Minimum 100ms between any clicks
+  
   document.addEventListener('click', function(e) {
+    var now = Date.now();
+    if (now - lastClickTime < CLICK_THROTTLE) {
+      return; // Ignore rapid clicks
+    }
+    lastClickTime = now;
+    
     trackEvent({
       event_type: 'click',
       element_tag: e.target.tagName,
@@ -100,6 +168,28 @@ export const generateTrackingScript = (websiteId: string) => {
       click_x: e.clientX,
       click_y: e.clientY
     });
+  });
+  
+  // Send any remaining events when page is about to unload
+  window.addEventListener('beforeunload', function() {
+    if (eventQueue.length > 0) {
+      // Use sendBeacon for reliable delivery during page unload
+      var eventsToSend = eventQueue.splice(0);
+      eventsToSend.forEach(function(eventData) {
+        var payload = JSON.stringify({
+          session_id: sessionId,
+          website_id: '${websiteId}',
+          url: window.location.href,
+          screen_resolution: window.screen.width + 'x' + window.screen.height,
+          client_timestamp: new Date().toISOString(),
+          ...eventData
+        });
+        
+        if (navigator.sendBeacon) {
+          navigator.sendBeacon(apiUrl, payload);
+        }
+      });
+    }
   });
 })();
 `.trim();
