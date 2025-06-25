@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -25,6 +26,7 @@ import AdminPricing from "./pages/Admin/Pricing";
 import AdminAnalytics from "./pages/Admin/Analytics";
 import AdminDirectory from "./pages/Admin/Directory";
 import AdminDirectoryCategories from './pages/Admin/DirectoryCategories';
+import AdminRankings from "./pages/Admin/Rankings";
 import Directories from "./pages/Directories";
 import Sitemap from "./pages/Sitemap";
 import SitemapXml from "./pages/SitemapXml";
@@ -91,6 +93,11 @@ const App = () => (
                   <Route path="/admin/analytics" element={
                     <ProtectedRoute>
                       <AdminAnalytics />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/admin/rankings" element={
+                    <ProtectedRoute>
+                      <AdminRankings />
                     </ProtectedRoute>
                   } />
                   <Route path="/admin/directory" element={
