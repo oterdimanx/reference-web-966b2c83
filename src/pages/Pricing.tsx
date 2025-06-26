@@ -243,7 +243,27 @@ const Pricing = () => {
           </>
         )}
         </div>
-      </main>
+        <div className="mt-16 text-center">
+            <div className="chrome-card-subtle rounded-lg p-8 border-blue-200 dark:border-blue-800">
+              <h3 className="text-2xl font-semibold mb-4 text-blue-800 dark:text-blue-200 gradient-text">
+                {t('pricingPage', 'startMessage')} {t('pricingPage', 'startAmount')}
+              </h3>
+              <p className="text-blue-700 dark:text-blue-300 mb-6">
+                {t('pricingPage', 'startDescription')}
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button asChild className="chrome-accent-subtle text-white">
+                  <Link to={user ? "/add-website" : "/auth"}>
+                    {user ? t('pricingPage', 'addFirstWebsite') : t('pricingPage', 'signUpStart')}
+                  </Link>
+                </Button>
+                <Button variant="outline" asChild className="chrome-button-subtle">
+                  <Link to="/about">{t('pricingPage', 'learnMore')}</Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </main>
       <Footer />
     </div>
   );
