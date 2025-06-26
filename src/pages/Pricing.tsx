@@ -211,14 +211,6 @@ const Pricing = () => {
                           ))}
                         </ul>
                         
-                        {/*<Button 
-                          onClick={() => handleSelectPlan(plan)}
-                          disabled={selectedPlan === plan.id}
-                          className={`w-full chrome-button ${isPopular ? 'chrome-accent' : ''}`}
-                          size="lg"
-                        >*/}
-                          {selectedPlan === plan.id ? 'Processing...' : t('pricing', 'getStarted')}
-                        </Button>
                       </CardContent>
                       <CardFooter>
                         {user ? (
@@ -228,7 +220,7 @@ const Pricing = () => {
                             disabled={selectedPlan === plan.id}
                             size="lg"
                           >
-                            <Link to={`/add-website?plan=${plan.id}`}>{t('pricingPage', 'getStarted')}</Link>
+                            <Link to={`/add-website?plan=${plan.id}`}>{selectedPlan === plan.id ? 'Processing...' : t('pricing', 'getStarted')}</Link>
                           </Button>
                         ) : (
                           <Button 
