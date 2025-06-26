@@ -184,13 +184,10 @@ const Pricing = () => {
                   
                   return (
                     <Card key={plan.id} className={`chrome-card card-hover relative ${isPopular ? 'border-primary shadow-lg scale-105 pulse-glow' : ''}`}>
-                      {isPopular && (
-                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                          <Badge className="chrome-accent px-3 py-1">
-                            <Star className="w-3 h-3 mr-1" />
-                            {t('pricing', 'mostPopular')}
-                          </Badge>
-                        </div>
+                      {plan.price === 1 && (
+                        <Badge className="metallic-badge absolute -top-3 left-1/2 transform -translate-x-1/2 z-[200]">
+                          {t('pricingPage', 'mostPopular')}
+                        </Badge>
                       )}
                       
                       <CardHeader className="text-center">
