@@ -202,6 +202,25 @@ export interface Translations {
     signUpStart: string;
     learnMore: string;
   };
+  pricing: {
+    title: string;
+    subtitle: string;
+    startMessage: string;
+    startAmount: string;
+    choosePlan: string;
+    monthly: string;
+    loadingPlans: string;
+    noPricingPlans: string;
+    contactSupport: string;
+    getStarted: string;
+    oneTime: string;
+    signUpTo: string;
+    mostPopular: string;
+    startDescription: string;
+    addFirstWebsite: string;
+    signUpStart: string;
+    learnMore: string;
+  };
   legalPages: {
     privacyTitle: string;
     privacyLastUpdated: string;

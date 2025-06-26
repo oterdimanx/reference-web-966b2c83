@@ -24,6 +24,7 @@ export const enTranslations: Translations = {
   allWebsitesPage: websitesTranslations,
   addWebsiteForm: formsTranslations,
   pricingPage: pricingTranslations,
+  pricing: pricingTranslations,
   legalPages: legalTranslations,
   quickTips: quickTipsTranslations,
 };
