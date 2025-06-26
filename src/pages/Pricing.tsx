@@ -214,9 +214,9 @@ const Pricing = () => {
                       {user ? (
                         <Button 
                           asChild 
-                          className={`w-full chrome-button-subtle ${
+                          className={`w-full chrome-accent ${
                             plan.price === 1 
-                              ? 'chrome-accent-subtle text-white' 
+                              ? 'chrome-accent-subtle text-black' 
                               : 'chrome-button-subtle'
                           }`}
                         >
@@ -225,9 +225,9 @@ const Pricing = () => {
                       ) : (
                         <Button 
                           asChild 
-                          className={`w-full chrome-button-subtle ${
+                          className={`w-full chrome-accent ${
                             plan.price === 1 
-                              ? 'chrome-accent-subtle text-white' 
+                              ? 'chrome-accent-subtle text-black' 
                               : 'chrome-button-subtle'
                           }`}
                         >
