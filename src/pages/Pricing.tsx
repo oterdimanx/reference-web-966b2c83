@@ -113,8 +113,6 @@ const Pricing = () => {
         {/* Show regular pricing for new users or users without subscription */}
         {(!user || !hasSubscription) && (
           <>
-            <h2 className="text-2xl font-bold text-center mb-8 gradient-text">{t('pricing', 'choosePlan')}</h2>
-            
             {isLoading ? (
               <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
                 {[1, 2, 3].map((i) => (
