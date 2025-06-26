@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
-import { subscriptionService } from '@/services/subscriptionService';
 import { PricingPlan } from '@/types/addWebsiteForm';
 
 export const SubscriptionUpgrade = () => {
@@ -62,13 +61,26 @@ export const SubscriptionUpgrade = () => {
     
     setUpgrading(plan.id);
     try {
-      await subscriptionService.upgradeSubscription(user.id, plan);
-      toast.success(`Successfully upgraded to ${plan.title}!`);
-      // Refresh the page to update the subscription data
-      window.location.reload();
+      // Redirect to payment process instead of direct upgrade
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: {
+          priceId: plan.id,
+          userId: user.id,
+          isUpgrade: true
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.url) {
+        // Redirect to Stripe checkout
+        window.location.href = data.url;
+      } else {
+        throw new Error('No checkout URL received');
+      }
     } catch (error) {
-      console.error('Error upgrading subscription:', error);
-      toast.error('Failed to upgrade subscription');
+      console.error('Error starting upgrade process:', error);
+      toast.error('Failed to start upgrade process');
     } finally {
       setUpgrading(null);
     }
@@ -110,7 +122,7 @@ export const SubscriptionUpgrade = () => {
       <div>
         <h3 className="text-xl font-semibold mb-2">Upgrade Your Plan</h3>
         <p className="text-muted-foreground">
-          Choose a higher plan to track more websites and unlock additional features.
+          Choose a higher plan to track more websites and unlock additional features. You'll be redirected to complete payment.
         </p>
       </div>
 
@@ -155,10 +167,10 @@ export const SubscriptionUpgrade = () => {
                   className="w-full"
                   variant={isCurrentPlan ? "secondary" : "default"}
                 >
-                  {upgrading === plan.id ? 'Upgrading...' : 
+                  {upgrading === plan.id ? 'Redirecting to payment...' : 
                    isCurrentPlan ? 'Current Plan' :
                    isDowngrade ? 'Downgrade not available' : 
-                   'Upgrade to this plan'}
+                   `Upgrade for €${plan.price}/month`}
                 </Button>
               </CardContent>
             </Card>

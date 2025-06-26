@@ -2,7 +2,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { PricingPlan } from '@/types/addWebsiteForm';
-import { subscriptionService } from '@/services/subscriptionService';
 
 export const useSubscriptionManager = () => {
   const { user } = useAuth();
@@ -22,26 +21,40 @@ export const useSubscriptionManager = () => {
         .maybeSingle();
         
       if (existingSub) {
-        // If user has a subscription, upgrade it
-        await subscriptionService.upgradeSubscription(user.id, pricingPlan);
-        console.log('User subscription upgraded successfully');
-      } else {
-        // Create new subscription
-        const { error } = await supabase
-          .from('user_subscriptions')
-          .insert({
-            user_id: user.id,
-            pricing_id: pricingPlan.id,
-            status: 'active',
-            is_active: true,
-            started_at: new Date().toISOString()
-          });
-          
-        if (error) {
-          throw error;
+        // If user has a subscription, redirect to payment for upgrade
+        const { data, error } = await supabase.functions.invoke('create-checkout', {
+          body: {
+            priceId: pricingPlan.id,
+            userId: user.id,
+            isUpgrade: true
+          }
+        });
+
+        if (error) throw error;
+
+        if (data?.url) {
+          window.location.href = data.url;
+          return;
+        } else {
+          throw new Error('No checkout URL received for upgrade');
         }
-        
-        console.log('User subscription created successfully');
+      } else {
+        // Create new subscription - this should also go through payment
+        const { data, error } = await supabase.functions.invoke('create-checkout', {
+          body: {
+            priceId: pricingPlan.id,
+            userId: user.id,
+            isUpgrade: false
+          }
+        });
+
+        if (error) throw error;
+
+        if (data?.url) {
+          window.location.href = data.url;
+        } else {
+          throw new Error('No checkout URL received');
+        }
       }
     } catch (error) {
       console.error('Error managing user subscription:', error);
@@ -55,8 +68,22 @@ export const useSubscriptionManager = () => {
         throw new Error('No authenticated user');
       }
       
-      await subscriptionService.upgradeSubscription(user.id, newPricingPlan);
-      console.log('Subscription upgraded successfully');
+      // Redirect to payment for upgrade instead of direct upgrade
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: {
+          priceId: newPricingPlan.id,
+          userId: user.id,
+          isUpgrade: true
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error('No checkout URL received for upgrade');
+      }
     } catch (error) {
       console.error('Error upgrading subscription:', error);
       throw error;
