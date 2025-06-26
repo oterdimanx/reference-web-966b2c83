@@ -220,6 +220,31 @@ const Pricing = () => {
                           {selectedPlan === plan.id ? 'Processing...' : t('pricing', 'getStarted')}
                         </Button>
                       </CardContent>
+                      <CardFooter>
+                        {user ? (
+                          <Button 
+                            asChild 
+                            className={`w-full chrome-button-subtle ${
+                              plan.price === 1 
+                                ? 'chrome-accent-subtle text-white' 
+                                : 'chrome-button-subtle'
+                            }`}
+                          >
+                            <Link to={`/add-website?plan=${plan.id}`}>{t('pricingPage', 'getStarted')}</Link>
+                          </Button>
+                        ) : (
+                          <Button 
+                            asChild 
+                            className={`w-full chrome-button-subtle ${
+                              plan.price === 1 
+                                ? 'chrome-accent-subtle text-white' 
+                                : 'chrome-button-subtle'
+                            }`}
+                          >
+                            <Link to="/auth">{t('pricingPage', 'signUpTo')} {t('pricingPage', 'getStarted')}</Link>
+                          </Button>
+                        )}
+                      </CardFooter>
                     </Card>
                   );
                 })}
