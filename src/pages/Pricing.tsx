@@ -21,10 +21,13 @@ interface PricingPlan {
   title: string;
   price: number;
   active: boolean;
+  description_en?: string;
+  description_fr?: string;
+  title_fr?: string;
 }
 
 const PricingPage = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { user } = useAuth();
   const { saveUserSubscription } = useSubscriptionManager();
   const { hasSubscription } = useUserSubscription();
@@ -77,17 +80,25 @@ const PricingPage = () => {
     return pricingPlans.find(plan => plan.price >= 5 && plan.price <= 10) || pricingPlans[1];
   };
 
+  const getPlanTitle = (plan: PricingPlan) => {
+    return language === 'fr' && plan.title_fr ? plan.title_fr : plan.title;
+  };
+
+  const getPlanDescription = (plan: PricingPlan) => {
+    return language === 'fr' && plan.description_fr ? plan.description_fr : plan.description_en;
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">{t('pricing', 'title')}</h1>
+          <h1 className="text-4xl font-bold mb-4 gradient-text">{t('pricing', 'title')}</h1>
           <p className="text-xl text-muted-foreground mb-6">{t('pricing', 'subtitle')}</p>
           
-          <div className="text-center mb-8">
+          <div className="text-center mb-8 chrome-card p-6 rounded-lg">
             <p className="text-lg mb-2">{t('pricing', 'startMessage')}</p>
-            <span className="text-3xl font-bold text-primary">{t('pricing', 'startAmount')}</span>
+            <span className="text-3xl font-bold text-primary gradient-text">{t('pricing', 'startAmount')}</span>
           </div>
         </div>
 
@@ -101,12 +112,12 @@ const PricingPage = () => {
         {/* Show regular pricing for new users or users without subscription */}
         {(!user || !hasSubscription) && (
           <>
-            <h2 className="text-2xl font-bold text-center mb-8">{t('pricing', 'choosePlan')}</h2>
+            <h2 className="text-2xl font-bold text-center mb-8 gradient-text">{t('pricing', 'choosePlan')}</h2>
             
             {isLoading ? (
               <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
                 {[1, 2, 3].map((i) => (
-                  <Card key={i}>
+                  <Card key={i} className="chrome-card">
                     <CardHeader>
                       <Skeleton className="h-6 w-32" />
                       <Skeleton className="h-8 w-24" />
@@ -118,7 +129,7 @@ const PricingPage = () => {
                 ))}
               </div>
             ) : !pricingPlans || pricingPlans.length === 0 ? (
-              <Card className="max-w-md mx-auto">
+              <Card className="max-w-md mx-auto chrome-card">
                 <CardContent className="pt-6">
                   <div className="text-center">
                     <h3 className="text-lg font-semibold mb-2">{t('pricing', 'noPricingPlans')}</h3>
@@ -134,10 +145,10 @@ const PricingPage = () => {
                   const isPopular = mostPopular?.id === plan.id;
                   
                   return (
-                    <Card key={plan.id} className={`relative ${isPopular ? 'border-primary shadow-lg scale-105' : ''}`}>
+                    <Card key={plan.id} className={`chrome-card card-hover relative ${isPopular ? 'border-primary shadow-lg scale-105 pulse-glow' : ''}`}>
                       {isPopular && (
                         <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                          <Badge className="bg-primary text-primary-foreground px-3 py-1">
+                          <Badge className="chrome-accent px-3 py-1">
                             <Star className="w-3 h-3 mr-1" />
                             {t('pricing', 'mostPopular')}
                           </Badge>
@@ -145,11 +156,14 @@ const PricingPage = () => {
                       )}
                       
                       <CardHeader className="text-center">
-                        <CardTitle className="text-xl">{plan.title}</CardTitle>
+                        <CardTitle className="text-xl gradient-text">{getPlanTitle(plan)}</CardTitle>
                         <CardDescription>
-                          <span className="text-3xl font-bold">€{plan.price}</span>
+                          <span className="text-3xl font-bold gradient-text">€{plan.price}</span>
                           <span className="text-muted-foreground">{t('pricing', 'monthly')}</span>
                         </CardDescription>
+                        {getPlanDescription(plan) && (
+                          <p className="text-sm text-muted-foreground mt-2">{getPlanDescription(plan)}</p>
+                        )}
                       </CardHeader>
                       
                       <CardContent>
@@ -177,9 +191,8 @@ const PricingPage = () => {
                         <Button 
                           onClick={() => handleSelectPlan(plan)}
                           disabled={selectedPlan === plan.id}
-                          className="w-full"
+                          className={`w-full chrome-button ${isPopular ? 'chrome-accent' : ''}`}
                           size="lg"
-                          variant={isPopular ? "default" : "outline"}
                         >
                           {selectedPlan === plan.id ? 'Processing...' : t('pricing', 'getStarted')}
                         </Button>
