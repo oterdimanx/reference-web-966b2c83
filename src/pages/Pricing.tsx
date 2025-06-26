@@ -80,8 +80,47 @@ const Pricing = () => {
     return pricingPlans.find(plan => plan.price >= 5 && plan.price <= 10) || pricingPlans[1];
   };
 
+  const getFeatures = (plan: PricingPlan) => {
+    // Get the appropriate description based on language
+    const description = language === 'fr' && plan.description_fr ? plan.description_fr : plan.description_en;
+    
+    // If we have a description from the database, use it
+    if (description) {
+      return description.split('|');
+    }
+    
+    // Fallback to the original logic if no description in database
+    if (plan.price === 1) {
+      return [
+        'Add 1 website to track',
+        'Basic keyword tracking',
+        'Essential ranking data',
+        'Email support'
+      ];
+    }
+    
+    return [
+      `Add up to ${plan.price === 1 ? '1' : plan.price < 10 ? '5' : 'unlimited'} websites`,
+      'Advanced keyword tracking',
+      'Detailed analytics',
+      'Priority support',
+      'Custom reports'
+    ];
+  };
+
   const getPlanTitle = (plan: PricingPlan) => {
     return language === 'fr' && plan.title_fr ? plan.title_fr : plan.title;
+  };
+
+  const getPaymentFrequency = (plan: PricingPlan) => {
+    // €1 plan shows "one-time", basic plan shows "/3 months", premium shows "/year"
+    if (plan.price === 1) {
+      return t('pricingPage', 'oneTime');
+    } else if (plan.price < 10) { // Basic plans are under €10
+      return language === 'fr' ? '/3 mois' : '/3 months';
+    } else { // Premium plans are €10 and above
+      return language === 'fr' ? '/an' : '/year';
+    }
   };
 
   const getPlanDescription = (plan: PricingPlan) => {
@@ -155,36 +194,21 @@ const Pricing = () => {
                       )}
                       
                       <CardHeader className="text-center">
-                        <CardTitle className="text-xl gradient-text">{getPlanTitle(plan)}</CardTitle>
+                        <CardTitle className="text-2xl gradient-text">{getPlanTitle(plan)}</CardTitle>
                         <CardDescription>
-                          <span className="text-3xl font-bold gradient-text">€{plan.price}</span>
-                          <span className="text-muted-foreground">{t('pricing', 'monthly')}</span>
+                          <span className="text-4xl font-bold text-rank-teal gradient-text">€{plan.price}</span>
+                          <span className="text-gray-500 ml-2">{getPaymentFrequency(plan)}</span>
                         </CardDescription>
-                        {getPlanDescription(plan) && (
-                          <p className="text-sm text-muted-foreground mt-2">{getPlanDescription(plan)}</p>
-                        )}
                       </CardHeader>
                       
                       <CardContent>
-                        <ul className="space-y-3 mb-6">
-                          <li className="flex items-center">
-                            <Check className="w-4 h-4 text-green-500 mr-2" />
-                            <span className="text-sm">
-                              {websitesAllowed === 999 ? 'Unlimited' : websitesAllowed} website{websitesAllowed !== 1 ? 's' : ''}
-                            </span>
-                          </li>
-                          <li className="flex items-center">
-                            <Check className="w-4 h-4 text-green-500 mr-2" />
-                            <span className="text-sm">Keyword tracking</span>
-                          </li>
-                          <li className="flex items-center">
-                            <Check className="w-4 h-4 text-green-500 mr-2" />
-                            <span className="text-sm">Analytics dashboard</span>
-                          </li>
-                          <li className="flex items-center">
-                            <Check className="w-4 h-4 text-green-500 mr-2" />
-                            <span className="text-sm">24/7 Support</span>
-                          </li>
+                        <ul className="space-y-3">
+                          {getFeatures(plan).map((feature, index) => (
+                            <li key={index} className="flex items-center">
+                              <Check className="h-5 w-5 text-rank-teal mr-3" />
+                              <span>{feature}</span>
+                            </li>
+                          ))}
                         </ul>
                         
                         <Button 
