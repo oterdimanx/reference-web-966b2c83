@@ -82,12 +82,12 @@ const PricingPage = () => {
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">{t('pricing', 'title')}</h1>
-          <p className="text-xl text-muted-foreground mb-6">{t('pricing', 'subtitle')}</p>
+          <h1 className="text-4xl font-bold mb-4">{t('pricingPage', 'title')}</h1>
+          <p className="text-xl text-muted-foreground mb-6">{t('pricingPage', 'subtitle')}</p>
           
           <div className="text-center mb-8">
-            <p className="text-lg mb-2">{t('pricing', 'startMessage')}</p>
-            <span className="text-3xl font-bold text-primary">{t('pricing', 'startAmount')}</span>
+            <p className="text-lg mb-2">{t('pricingPage', 'startMessage')}</p>
+            <span className="text-3xl font-bold text-primary">{t('pricingPage', 'startAmount')}</span>
           </div>
         </div>
 
@@ -101,7 +101,7 @@ const PricingPage = () => {
         {/* Show regular pricing for new users or users without subscription */}
         {(!user || !hasSubscription) && (
           <>
-            <h2 className="text-2xl font-bold text-center mb-8">{t('pricing', 'choosePlan')}</h2>
+            <h2 className="text-2xl font-bold text-center mb-8">{t('pricingPage', 'choosePlan')}</h2>
             
             {isLoading ? (
               <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
@@ -121,8 +121,8 @@ const PricingPage = () => {
               <Card className="max-w-md mx-auto">
                 <CardContent className="pt-6">
                   <div className="text-center">
-                    <h3 className="text-lg font-semibold mb-2">{t('pricing', 'noPricingPlans')}</h3>
-                    <p className="text-muted-foreground">{t('pricing', 'contactSupport')}</p>
+                    <h3 className="text-lg font-semibold mb-2">{t('pricingPage', 'noPricingPlans')}</h3>
+                    <p className="text-muted-foreground">{t('pricingPage', 'contactSupport')}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -139,7 +139,7 @@ const PricingPage = () => {
                         <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                           <Badge className="bg-primary text-primary-foreground px-3 py-1">
                             <Star className="w-3 h-3 mr-1" />
-                            {t('pricing', 'mostPopular')}
+                            {t('pricingPage', 'mostPopular')}
                           </Badge>
                         </div>
                       )}
@@ -148,7 +148,7 @@ const PricingPage = () => {
                         <CardTitle className="text-xl">{plan.title}</CardTitle>
                         <CardDescription>
                           <span className="text-3xl font-bold">€{plan.price}</span>
-                          <span className="text-muted-foreground">{t('pricing', 'monthly')}</span>
+                          <span className="text-muted-foreground">{t('pricingPage', 'monthly')}</span>
                         </CardDescription>
                       </CardHeader>
                       
@@ -181,7 +181,7 @@ const PricingPage = () => {
                           size="lg"
                           variant={isPopular ? "default" : "outline"}
                         >
-                          {selectedPlan === plan.id ? 'Processing...' : t('pricing', 'getStarted')}
+                          {selectedPlan === plan.id ? 'Processing...' : t('pricingPage', 'getStarted')}
                         </Button>
                       </CardContent>
                     </Card>
