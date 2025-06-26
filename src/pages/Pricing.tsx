@@ -1,13 +1,13 @@
-
 import { Header } from '@/components/Layout/Header';
 import { Footer } from '@/components/Layout/Footer';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Link } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Check, Star } from 'lucide-react';
 import { useSubscriptionManager } from '@/hooks/useSubscriptionManager';
@@ -26,7 +26,7 @@ interface PricingPlan {
   title_fr?: string;
 }
 
-const PricingPage = () => {
+const Pricing = () => {
   const { t, language } = useLanguage();
   const { user } = useAuth();
   const { saveUserSubscription } = useSubscriptionManager();
@@ -92,15 +92,16 @@ const PricingPage = () => {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4 gradient-text">{t('pricing', 'title')}</h1>
-          <p className="text-xl text-muted-foreground mb-6">{t('pricing', 'subtitle')}</p>
-          
-          <div className="text-center mb-8 chrome-card p-6 rounded-lg">
-            <p className="text-lg mb-2">{t('pricing', 'startMessage')}</p>
-            <span className="text-3xl font-bold text-primary gradient-text">{t('pricing', 'startAmount')}</span>
+      <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold mb-4 gradient-text">
+              {t('pricingPage', 'title')} <span className="text-rank-teal">{t('pricingPage', 'choosePlan')}</span>
+            </h1>
+            <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
+              {t('pricingPage', 'subtitle')}
+            </p>
           </div>
-        </div>
+        
 
         {/* Show upgrade section for existing users */}
         {user && hasSubscription && (
@@ -204,10 +205,11 @@ const PricingPage = () => {
             )}
           </>
         )}
+        </div>
       </main>
       <Footer />
     </div>
   );
 };
 
-export default PricingPage;
+export default Pricing;
