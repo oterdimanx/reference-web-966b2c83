@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider, AdminRedirectProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "next-themes";
+import { SecurityHeaders } from "@/components/Security/SecurityHeaders";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
@@ -42,6 +43,7 @@ const App = () => (
       themes={['light', 'dark', 'system']}
     >
       <TooltipProvider>
+        <SecurityHeaders />
         <BrowserRouter>
           <AuthProvider>
             <LanguageProvider>

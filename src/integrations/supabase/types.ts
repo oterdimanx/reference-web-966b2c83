@@ -364,6 +364,39 @@ export type Database = {
         }
         Relationships: []
       }
+      security_audit_log: {
+        Row: {
+          created_at: string
+          details: Json | null
+          event_type: string
+          id: string
+          ip_address: unknown | null
+          target_user_id: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          details?: Json | null
+          event_type: string
+          id?: string
+          ip_address?: unknown | null
+          target_user_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          details?: Json | null
+          event_type?: string
+          id?: string
+          ip_address?: unknown | null
+          target_user_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_preferences: {
         Row: {
           created_at: string
@@ -545,6 +578,24 @@ export type Database = {
     Functions: {
       has_role: {
         Args: { user_id: string; role: Database["public"]["Enums"]["app_role"] }
+        Returns: boolean
+      }
+      log_security_event: {
+        Args: {
+          event_type: string
+          target_user_id?: string
+          details?: Json
+          ip_address?: unknown
+          user_agent?: string
+        }
+        Returns: undefined
+      }
+      validate_domain: {
+        Args: { domain_text: string }
+        Returns: boolean
+      }
+      validate_email: {
+        Args: { email_text: string }
         Returns: boolean
       }
     }

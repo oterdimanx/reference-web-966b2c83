@@ -4,6 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { useRateLimit } from '@/components/Auth/RateLimitGuard';
+import { useSecurityMonitoring } from '@/hooks/useSecurityMonitoring';
 
 interface AuthContextType {
   session: Session | null;
@@ -22,6 +24,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const { checkRateLimit, recordAttempt } = useRateLimit();
+  const { logFailedAuth, logSuccessfulAuth } = useSecurityMonitoring();
 
   useEffect(() => {
     // Set up the auth state listener first
@@ -87,9 +91,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
+      // Check rate limit before attempting sign in
+      if (!checkRateLimit(email, 'login')) {
+        throw new Error('Rate limit exceeded. Please try again later.');
+      }
+
       const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
+      
+      // Record the attempt
+      recordAttempt(email, 'login', !error);
+
+      if (error) {
+        logFailedAuth(email, error.message);
+        throw error;
+      }
+
+      if (user) {
+        logSuccessfulAuth(user.id, 'email_password');
+      }
     } catch (error: any) {
+      logFailedAuth(email, error.message);
       toast.error(error.message || 'Error signing in');
       throw error;
     }
@@ -97,6 +118,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = async (email: string, password: string) => {
     try {
+      // Check rate limit before attempting sign up
+      if (!checkRateLimit(email, 'signup')) {
+        throw new Error('Rate limit exceeded. Please try again later.');
+      }
+
       const { error } = await supabase.auth.signUp({ 
         email, 
         password,
@@ -104,9 +130,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           emailRedirectTo: window.location.origin
         }
       });
-      if (error) throw error;
+
+      // Record the attempt
+      recordAttempt(email, 'signup', !error);
+
+      if (error) {
+        logFailedAuth(email, error.message);
+        throw error;
+      }
+
       toast.success('Sign up successful! Please check your email for verification.');
     } catch (error: any) {
+      logFailedAuth(email, error.message);
       toast.error(error.message || 'Error signing up');
       throw error;
     }
