@@ -43,9 +43,33 @@ export function ImageUpload({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Check file type
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
+    // Enhanced file type validation
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      toast.error('Please select a valid image file (JPEG, PNG, GIF, or WebP)');
+      return;
+    }
+
+    // Enhanced file size validation (max 2MB for security)
+    const maxFileSize = 2 * 1024 * 1024; // 2MB in bytes
+    if (file.size > maxFileSize) {
+      toast.error('File size must be less than 2MB');
+      return;
+    }
+
+    // Validate file name for security
+    const fileName = file.name;
+    const validNamePattern = /^[a-zA-Z0-9._-]+$/;
+    if (!validNamePattern.test(fileName) || fileName.length > 100) {
+      toast.error('Invalid file name. Use only letters, numbers, dots, hyphens, and underscores');
+      return;
+    }
+
+    // Check for potential malicious file extensions
+    const suspiciousExtensions = ['.php', '.exe', '.bat', '.sh', '.cmd', '.scr', '.js', '.vbs'];
+    const lowerFileName = fileName.toLowerCase();
+    if (suspiciousExtensions.some(ext => lowerFileName.includes(ext))) {
+      toast.error('File type not allowed for security reasons');
       return;
     }
 
