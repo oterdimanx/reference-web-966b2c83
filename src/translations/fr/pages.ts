@@ -16,4 +16,12 @@ export const pagesTranslations = {
   whyKeywordResearch: 'Pourquoi la recherche de mots-clés est importante',
   yourWebsiteRankings: 'Classements de votre site web',
   yourKeywords: 'Vos mots-clés',
+  trackKeywordsText: 'Surveillez les performances de vos mots-clés, découvrez de nouvelles opportunités, et optimisez vos résultats de recherche. Connectez-vous pour gérer votre portefeuille de mots-clés.',
+  signInKeywordsManageButton: 'Connectez-vous pour gérer vos mots-clés',
+  findOpportunitiesKeywords: 'Trouvez de nouvelles opportunités',
+  understandIntendKeywords: 'Comprenez les intentions de vos clients',
+  measureSuccessKeywords: 'Mesurez le succès de vos actions',
+  opportunitiesKeywordsText: 'Découvrez des mots-clés moins connus et pertinents qui permettront d\'augmenter votre visibilité.',
+  understandIntentKeywordsText: 'Comprenez ce que vos clients potentiels recherchent afin d\aligner vos contenus sur leurs désirs.',
+  measureSuccessKeywordsText: 'Gardez une trace de la performance de vos mots-clés pour vérifier les stratégies payantes et améliorer le reste du périmètre.',
 };
