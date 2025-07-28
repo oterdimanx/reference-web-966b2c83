@@ -13,14 +13,13 @@ export const GuestView = () => {
           <div className="text-center py-10">
             <h2 className="text-2xl font-semibold mb-4">{t('pages', 'optimizeKeywords')}</h2>
             <p className="mb-6 text-muted-foreground">
-              Track keyword performance, discover new opportunities, and boost your search rankings.
-              Sign in to manage your keyword portfolio.
+              {t('pages', 'trackKeywordsText')}
             </p>
             <Button 
               className="bg-rank-teal hover:bg-rank-teal/90"
               onClick={() => window.location.href = '/auth'}
             >
-              Sign In to Manage Keywords
+              {t('pages', 'signInKeywordsManageButton')}
             </Button>
           </div>
         </CardContent>
@@ -33,21 +32,21 @@ export const GuestView = () => {
         <CardContent>
           <div className="grid md:grid-cols-3 gap-4">
             <div className="p-4">
-              <h3 className="font-semibold mb-2">Find Opportunities</h3>
+              <h3 className="font-semibold mb-2">{t('pages', 'FindOpportunitiesKeywords')}</h3>
               <p className="text-sm text-muted-foreground">
-                Discover high-value keywords with lower competition that can drive targeted traffic.
+                {t('pages', 'opportunitiesKeywordsText')}
               </p>
             </div>
             <div className="p-4">
-              <h3 className="font-semibold mb-2">Understand Intent</h3>
+              <h3 className="font-semibold mb-2">{t('pages', 'UnderstandIntendKeywords')}</h3>
               <p className="text-sm text-muted-foreground">
-                Learn what your potential customers are searching for and align content accordingly.
+                {t('pages', 'understandIntentKeywordsText')}
               </p>
             </div>
             <div className="p-4">
-              <h3 className="font-semibold mb-2">Measure Success</h3>
+              <h3 className="font-semibold mb-2">{t('pages', 'measureSuccessKeywords')}</h3>
               <p className="text-sm text-muted-foreground">
-                Track ranking progress over time to see what's working and what needs improvement.
+                {t('pages', 'measureSuccessKeywordsText')}
               </p>
             </div>
           </div>
