@@ -28,6 +28,9 @@ export function Footer() {
             <Link to="/about" className="text-gray-600 hover:text-rank-blue dark:text-gray-300 dark:hover:text-white text-sm">
               {t('common', 'about')}
             </Link>
+            <Link to="/contact" className="text-gray-600 hover:text-rank-blue dark:text-gray-300 dark:hover:text-white text-sm">
+              Contact
+            </Link>
             <Link to="/privacy" className="text-gray-600 hover:text-rank-blue dark:text-gray-300 dark:hover:text-white text-sm">
               {t('common', 'privacyPolicy')}
             </Link>

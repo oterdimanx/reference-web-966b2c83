@@ -38,6 +38,36 @@ export type Database = {
         }
         Relationships: []
       }
+      contact: {
+        Row: {
+          contact_name: string
+          created_at: string
+          description: string
+          id: string
+          type: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          contact_name: string
+          created_at?: string
+          description: string
+          id?: string
+          type: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          contact_name?: string
+          created_at?: string
+          description?: string
+          id?: string
+          type?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       custom_translations: {
         Row: {
           created_at: string

@@ -29,6 +29,7 @@ import AdminDirectory from "./pages/Admin/Directory";
 import AdminDirectoryCategories from './pages/Admin/DirectoryCategories';
 import AdminRankings from "./pages/Admin/Rankings";
 import Directories from "./pages/Directories";
+import Contact from "./pages/Contact";
 import Sitemap from "./pages/Sitemap";
 import SitemapXml from "./pages/SitemapXml";
 
@@ -58,6 +59,7 @@ const App = () => (
                   <Route path="/privacy" element={<Privacy />} />
                   <Route path="/terms" element={<Terms />} />
                   <Route path="/directories" element={<Directories />} />
+                  <Route path="/contact" element={<Contact />} />
                   <Route path="/rankings" element={<Rankings />} />
                   <Route path="/keywords" element={<Keywords />} />
                   <Route path="/sitemap" element={<Sitemap />} />
