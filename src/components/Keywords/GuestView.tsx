@@ -32,13 +32,13 @@ export const GuestView = () => {
         <CardContent>
           <div className="grid md:grid-cols-3 gap-4">
             <div className="p-4">
-              <h3 className="font-semibold mb-2">{t('pages', 'FindOpportunitiesKeywords')}</h3>
+              <h3 className="font-semibold mb-2">{t('pages', 'findOpportunitiesKeywords')}</h3>
               <p className="text-sm text-muted-foreground">
                 {t('pages', 'opportunitiesKeywordsText')}
               </p>
             </div>
             <div className="p-4">
-              <h3 className="font-semibold mb-2">{t('pages', 'UnderstandIntendKeywords')}</h3>
+              <h3 className="font-semibold mb-2">{t('pages', 'understandIntendKeywords')}</h3>
               <p className="text-sm text-muted-foreground">
                 {t('pages', 'understandIntentKeywordsText')}
               </p>
