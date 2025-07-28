@@ -92,10 +92,9 @@ const Pricing = () => {
     // Fallback to the original logic if no description in database
     if (plan.price === 1) {
       return [
-        'Add 1 website to track',
+        'Add 1 website to our directory',
         'Basic keyword tracking',
         'Essential ranking data',
-        'Email support'
       ];
     }
     
@@ -103,7 +102,7 @@ const Pricing = () => {
       `Add up to ${plan.price === 1 ? '1' : plan.price < 10 ? '5' : 'unlimited'} websites`,
       'Advanced keyword tracking',
       'Detailed analytics',
-      'Priority support',
+      'Email support',
       'Custom reports'
     ];
   };
