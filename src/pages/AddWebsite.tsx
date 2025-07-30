@@ -10,6 +10,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAddWebsiteForm } from '@/hooks/useAddWebsiteForm';
 import { useUserSubscription } from '@/hooks/useUserSubscription';
+import { useWebsiteSubmission } from '@/hooks/useWebsiteSubmission';
 import { useAuth } from '@/contexts/AuthContext';
 import { WebsiteBasicInfo } from '@/components/AddWebsite/WebsiteBasicInfo';
 import { ContactInfo } from '@/components/AddWebsite/ContactInfo';
@@ -32,6 +33,7 @@ const AddWebsite = () => {
   const [isPaymentComplete, setIsPaymentComplete] = useState(false);
   const [validatedFormData, setValidatedFormData] = useState<any>(null);
   const [selectedPlanPrice, setSelectedPlanPrice] = useState<number>(29.99);
+  const [storedSelectedImage, setStoredSelectedImage] = useState<File | null>(null);
   
   // Fetch pricing plans
   const { data: pricingPlans, isLoading: pricingLoading } = useQuery({
@@ -49,6 +51,7 @@ const AddWebsite = () => {
   });
   
   const { form, isSubmitting, selectedImage, setSelectedImage, onSubmit } = useAddWebsiteForm(pricingPlans);
+  const { submitWebsite } = useWebsiteSubmission();
   
   // Show loading state while checking subscription
   if (subscriptionLoading) {
@@ -92,8 +95,9 @@ const AddWebsite = () => {
   }
   
   const handleFormSubmit = (data: any) => {
-    // Store form data and proceed to payment
+    // Store form data and selected image, then proceed to payment
     setValidatedFormData(data);
+    setStoredSelectedImage(selectedImage);
     
     // Find selected plan price
     const selectedPlan = pricingPlans?.find(plan => plan.id === data.pricing_id);
@@ -104,12 +108,18 @@ const AddWebsite = () => {
     setCurrentStep('payment');
   };
 
-  const handlePaymentSuccess = () => {
+  const handlePaymentSuccess = async () => {
     setIsPaymentComplete(true);
     
-    // Now actually submit the data to database
+    // Now actually submit the data to database with the stored image
     if (validatedFormData) {
-      onSubmit(validatedFormData, pricingPlans);
+      try {
+        await submitWebsite(validatedFormData, pricingPlans, storedSelectedImage);
+      } catch (error) {
+        console.error('Error submitting website after payment:', error);
+        // Don't show success page if submission fails
+        return;
+      }
     }
     
     setTimeout(() => {
