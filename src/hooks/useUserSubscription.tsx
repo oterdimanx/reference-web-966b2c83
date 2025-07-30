@@ -17,7 +17,7 @@ interface UserSubscription {
 }
 
 export const useUserSubscription = () => {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   
   const { data: subscription, isLoading } = useQuery({
     queryKey: ['user-subscription', user?.id],
@@ -72,7 +72,7 @@ export const useUserSubscription = () => {
         hasSubscription: true,
         websitesUsed: websiteCount || 0,
         websitesAllowed,
-        canAddWebsite: (websiteCount || 0) < websitesAllowed,
+        canAddWebsite: isAdmin || (websiteCount || 0) < websitesAllowed,
         subscription: {
           ...subData,
           pricing_title: subData.pricing.title,
@@ -90,6 +90,6 @@ export const useUserSubscription = () => {
     hasSubscription: subscription?.hasSubscription || false,
     websitesUsed: subscription?.websitesUsed || 0,
     websitesAllowed: subscription?.websitesAllowed || 0,
-    canAddWebsite: subscription?.canAddWebsite || false
+    canAddWebsite: isAdmin || subscription?.canAddWebsite || false
   };
 };

@@ -10,6 +10,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAddWebsiteForm } from '@/hooks/useAddWebsiteForm';
 import { useUserSubscription } from '@/hooks/useUserSubscription';
+import { useAuth } from '@/contexts/AuthContext';
 import { WebsiteBasicInfo } from '@/components/AddWebsite/WebsiteBasicInfo';
 import { ContactInfo } from '@/components/AddWebsite/ContactInfo';
 import { AdditionalSettings } from '@/components/AddWebsite/AdditionalSettings';
@@ -26,6 +27,7 @@ interface PricingPlan {
 const AddWebsite = () => {
   const { t } = useLanguage();
   const { subscription, isLoading: subscriptionLoading, canAddWebsite, websitesUsed, websitesAllowed } = useUserSubscription();
+  const { isAdmin } = useAuth();
   const [currentStep, setCurrentStep] = useState<'form' | 'payment' | 'success'>('form');
   const [isPaymentComplete, setIsPaymentComplete] = useState(false);
   const [validatedFormData, setValidatedFormData] = useState<any>(null);
@@ -63,8 +65,8 @@ const AddWebsite = () => {
     );
   }
   
-  // Show subscription limit reached message
-  if (!canAddWebsite && subscription?.hasSubscription) {
+  // Show subscription limit reached message (but not for admins)
+  if (!isAdmin && !canAddWebsite && subscription?.hasSubscription) {
     return (
       <div className="flex flex-col min-h-screen">
         <Header />

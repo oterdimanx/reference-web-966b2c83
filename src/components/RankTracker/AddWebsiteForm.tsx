@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useUserSubscription } from '@/hooks/useUserSubscription';
+import { useAuth } from '@/contexts/AuthContext';
 import { AlertCircle } from 'lucide-react';
 
 interface AddWebsiteFormProps {
@@ -20,6 +21,7 @@ export function AddWebsiteForm({ onAddWebsite }: AddWebsiteFormProps) {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { canAddWebsite, websitesUsed, websitesAllowed, subscription, isLoading } = useUserSubscription();
+  const { isAdmin } = useAuth();
   const [domain, setDomain] = useState('');
   const [keywords, setKeywords] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -75,8 +77,8 @@ export function AddWebsiteForm({ onAddWebsite }: AddWebsiteFormProps) {
     }
   };
   
-  // Show subscription status if user has one
-  const showSubscriptionAlert = subscription?.hasSubscription && !canAddWebsite;
+  // Show subscription status if user has one (but not for admins)
+  const showSubscriptionAlert = !isAdmin && subscription?.hasSubscription && !canAddWebsite;
   
   return (
     <Card>
