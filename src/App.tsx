@@ -32,6 +32,7 @@ import Directories from "./pages/Directories";
 import Contact from "./pages/Contact";
 import Sitemap from "./pages/Sitemap";
 import SitemapXml from "./pages/SitemapXml";
+import PaymentSuccess from "./pages/PaymentSuccess";
 
 const queryClient = new QueryClient();
 
@@ -64,6 +65,7 @@ const App = () => (
                   <Route path="/keywords" element={<Keywords />} />
                   <Route path="/sitemap" element={<Sitemap />} />
                   <Route path="/sitemap.xml" element={<SitemapXml />} />
+                  <Route path="/payment-success" element={<PaymentSuccess />} />
                   <Route path="/profile" element={
                     <ProtectedRoute>
                       <Profile />
