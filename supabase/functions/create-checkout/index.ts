@@ -89,8 +89,11 @@ serve(async (req) => {
     
     // Build success URL with upgrade parameters if needed
     let successUrl = `${origin}/payment-success`;
-    if (isUpgrade && upgradeData) {
+    if (isUpgrade) {
       successUrl += `?upgrade=true&pricing_id=${encodeURIComponent(priceId)}`;
+      logStep("Building upgrade success URL", { successUrl });
+    } else {
+      logStep("Building normal success URL", { successUrl });
     }
     
     const session = await stripe.checkout.sessions.create({
