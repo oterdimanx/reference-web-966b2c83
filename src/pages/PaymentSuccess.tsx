@@ -36,7 +36,12 @@ const PaymentSuccess = () => {
           hasStoredData: !!storedData,
           hasStoredImagePath: !!storedImagePath,
           hasStoredPricingPlans: !!storedPricingPlans,
-          storedData: storedData ? JSON.parse(storedData) : null
+          storedData: storedData ? JSON.parse(storedData) : null,
+          actualValues: {
+            isUpgradeFlow,
+            selectedPricing,
+            storedData
+          }
         });
         
         // Handle subscription upgrade (without website submission)
