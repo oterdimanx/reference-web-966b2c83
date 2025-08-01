@@ -17,7 +17,8 @@ export const useWebsiteSubmission = () => {
   const submitWebsite = async (
     data: FormValues, 
     pricingPlans: PricingPlan[] | undefined,
-    selectedImage: File | null
+    selectedImage: File | null,
+    skipPayment: boolean = false
   ) => {
     // Double check for duplicate domain
     const isDuplicate = await checkDuplicateDomain(data.domain);
@@ -65,8 +66,10 @@ export const useWebsiteSubmission = () => {
       throw new Error('Selected pricing plan not found');
     }
     
-    // Save user subscription first
-    await saveUserSubscription(selectedPlan);
+    // Save user subscription only if payment hasn't been processed yet
+    if (!skipPayment) {
+      await saveUserSubscription(selectedPlan);
+    }
     
     // Add the additional fields including image path and all keywords
     const detailedWebsiteData = {

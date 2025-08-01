@@ -34,7 +34,7 @@ const PaymentSuccess = () => {
             // In a real implementation, you might want to store the image differently
           }
           
-          await submitWebsite(formData, pricingPlans, imageFile);
+          await submitWebsite(formData, pricingPlans, imageFile, true);
           
           // Clean up stored data
           sessionStorage.removeItem('websiteFormData');
