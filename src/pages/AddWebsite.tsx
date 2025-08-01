@@ -11,7 +11,9 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAddWebsiteForm } from '@/hooks/useAddWebsiteForm';
 import { useUserSubscription } from '@/hooks/useUserSubscription';
 import { useWebsiteSubmission } from '@/hooks/useWebsiteSubmission';
+import { useSubscriptionManager } from '@/hooks/useSubscriptionManager';
 import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 import { WebsiteBasicInfo } from '@/components/AddWebsite/WebsiteBasicInfo';
 import { ContactInfo } from '@/components/AddWebsite/ContactInfo';
 import { AdditionalSettings } from '@/components/AddWebsite/AdditionalSettings';
@@ -52,6 +54,7 @@ const AddWebsite = () => {
   
   const { form, isSubmitting, selectedImage, setSelectedImage, onSubmit } = useAddWebsiteForm(pricingPlans);
   const { submitWebsite } = useWebsiteSubmission();
+  const { saveUserSubscription } = useSubscriptionManager();
   
   // Show loading state while checking subscription
   if (subscriptionLoading) {
@@ -94,18 +97,34 @@ const AddWebsite = () => {
     );
   }
   
-  const handleFormSubmit = (data: any) => {
-    // Store form data and selected image, then proceed to payment
+  const handleFormSubmit = async (data: any) => {
+    // Store form data and selected image for after payment
     setValidatedFormData(data);
     setStoredSelectedImage(selectedImage);
     
-    // Find selected plan price
+    // Store data in sessionStorage for retrieval after payment
+    sessionStorage.setItem('websiteFormData', JSON.stringify(data));
+    if (pricingPlans) {
+      sessionStorage.setItem('pricingPlans', JSON.stringify(pricingPlans));
+    }
+    if (selectedImage) {
+      // Store image info (in real implementation, you might upload to temp storage)
+      sessionStorage.setItem('websiteImagePath', selectedImage.name);
+    }
+    
+    // Find selected plan and directly proceed to Stripe checkout
     const selectedPlan = pricingPlans?.find(plan => plan.id === data.pricing_id);
     if (selectedPlan) {
       setSelectedPlanPrice(selectedPlan.price);
+      
+      // Directly trigger Stripe checkout via subscription manager
+      try {
+        await saveUserSubscription(selectedPlan);
+      } catch (error) {
+        console.error('Error creating checkout session:', error);
+        toast.error('Failed to create checkout session. Please try again.');
+      }
     }
-    
-    setCurrentStep('payment');
   };
 
   const handlePaymentSuccess = async () => {

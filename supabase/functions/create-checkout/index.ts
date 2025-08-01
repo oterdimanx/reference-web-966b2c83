@@ -104,8 +104,8 @@ serve(async (req) => {
         },
       ],
       mode: "subscription",
-      success_url: `${origin}/pricing?success=true`,
-      cancel_url: `${origin}/pricing?canceled=true`,
+      success_url: `${origin}/payment-success`,
+      cancel_url: `${origin}/add-website?canceled=true`,
       metadata: {
         user_id: user.id,
         pricing_id: priceId,
