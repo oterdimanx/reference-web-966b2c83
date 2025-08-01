@@ -21,9 +21,9 @@ const PaymentSuccess = () => {
   useEffect(() => {
     const processPayment = async () => {
       try {
-        // Check for upgrade flow
-        const isUpgradeFlow = sessionStorage.getItem('isUpgradeFlow');
-        const selectedPricing = sessionStorage.getItem('selectedPricing');
+        // Check for upgrade flow from URL parameters
+        const isUpgradeFlow = searchParams.get('upgrade');
+        const newPricingId = searchParams.get('pricing_id');
         
         // Get stored form data from sessionStorage
         const storedData = sessionStorage.getItem('websiteFormData');
@@ -32,22 +32,21 @@ const PaymentSuccess = () => {
         
         console.log('PaymentSuccess: Processing payment with stored data:', {
           isUpgradeFlow: !!isUpgradeFlow,
-          hasSelectedPricing: !!selectedPricing,
+          hasNewPricingId: !!newPricingId,
           hasStoredData: !!storedData,
           hasStoredImagePath: !!storedImagePath,
           hasStoredPricingPlans: !!storedPricingPlans,
           storedData: storedData ? JSON.parse(storedData) : null,
           actualValues: {
             isUpgradeFlow,
-            selectedPricing,
+            newPricingId,
             storedData
           }
         });
         
         // Handle subscription upgrade (without website submission)
-        if (isUpgradeFlow && selectedPricing && !storedData) {
-          const pricingData = JSON.parse(selectedPricing);
-          console.log('PaymentSuccess: Processing subscription upgrade:', pricingData);
+        if (isUpgradeFlow && newPricingId && !storedData) {
+          console.log('PaymentSuccess: Processing subscription upgrade for pricing:', newPricingId);
           
           if (user?.id) {
             // Cancel old subscription
@@ -70,7 +69,7 @@ const PaymentSuccess = () => {
               .from('user_subscriptions')
               .insert({
                 user_id: user.id,
-                pricing_id: pricingData.id,
+                pricing_id: newPricingId,
                 status: 'active',
                 is_active: true,
                 started_at: new Date().toISOString()
@@ -83,10 +82,6 @@ const PaymentSuccess = () => {
 
             console.log('PaymentSuccess: Subscription upgrade completed successfully');
           }
-          
-          // Clean up upgrade flow data
-          sessionStorage.removeItem('isUpgradeFlow');
-          sessionStorage.removeItem('selectedPricing');
           
           setIsComplete(true);
           toast.success('Subscription upgraded successfully!');

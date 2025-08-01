@@ -54,9 +54,9 @@ serve(async (req) => {
     logStep("User authenticated", { userId: user.id, email: user.email });
 
     // Parse request body
-    const { priceId, isUpgrade = false } = await req.json();
+    const { priceId, isUpgrade = false, upgradeData } = await req.json();
     if (!priceId) throw new Error("Price ID is required");
-    logStep("Request parsed", { priceId, isUpgrade });
+    logStep("Request parsed", { priceId, isUpgrade, upgradeData });
 
     // Initialize Stripe
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
@@ -86,6 +86,13 @@ serve(async (req) => {
 
     // Create checkout session
     const origin = req.headers.get("origin") || "http://localhost:3000";
+    
+    // Build success URL with upgrade parameters if needed
+    let successUrl = `${origin}/payment-success`;
+    if (isUpgrade && upgradeData) {
+      successUrl += `?upgrade=true&pricing_id=${encodeURIComponent(priceId)}`;
+    }
+    
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
@@ -104,7 +111,7 @@ serve(async (req) => {
         },
       ],
       mode: "subscription",
-      success_url: `${origin}/payment-success`,
+      success_url: successUrl,
       cancel_url: `${origin}/add-website?canceled=true`,
       metadata: {
         user_id: user.id,
