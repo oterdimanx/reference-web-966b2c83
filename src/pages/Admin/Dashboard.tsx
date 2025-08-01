@@ -10,6 +10,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AdminStats } from '@/components/Admin/AdminStats';
 import { TranslationManager } from '@/components/Admin/TranslationManager';
+import { useAdminUsers } from '@/hooks/use-admin-users';
 
 const AdminDashboard = () => {
   const { user, loading, isAdmin } = useAuth();
@@ -27,14 +28,8 @@ const AdminDashboard = () => {
     enabled: !!user && isAdmin
   });
   
-  const { data: usersCount } = useQuery({
-    queryKey: ['admin', 'users-count'],
-    queryFn: async () => {
-      const { data } = await supabase.auth.admin.listUsers();
-      return data?.users?.length || 0;
-    },
-    enabled: !!user && isAdmin
-  });
+  const { users } = useAdminUsers(isAdmin);
+  const usersCount = users.length;
   
   // If not logged in or not admin, redirect
   if (!loading && (!user || !isAdmin)) {
