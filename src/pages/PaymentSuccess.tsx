@@ -19,6 +19,8 @@ const PaymentSuccess = () => {
   const { submitWebsite } = useWebsiteSubmission();
 
   useEffect(() => {
+    console.log('PaymentSuccess: Component mounted, current URL:', window.location.href);
+    console.log('PaymentSuccess: Search params:', Object.fromEntries(searchParams.entries()));
     const processPayment = async () => {
       try {
         // Check for upgrade flow from URL parameters
