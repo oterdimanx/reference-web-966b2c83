@@ -20,6 +20,8 @@ export const useWebsiteSubmission = () => {
     selectedImage: File | null,
     skipPayment: boolean = false
   ) => {
+    console.log('submitWebsite called with:', { data, skipPayment, pricingPlans });
+    
     // Double check for duplicate domain
     const isDuplicate = await checkDuplicateDomain(data.domain);
     

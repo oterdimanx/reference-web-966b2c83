@@ -23,6 +23,13 @@ const PaymentSuccess = () => {
         const storedImagePath = sessionStorage.getItem('websiteImagePath');
         const storedPricingPlans = sessionStorage.getItem('pricingPlans');
         
+        console.log('PaymentSuccess: Processing payment with stored data:', {
+          hasStoredData: !!storedData,
+          hasStoredImagePath: !!storedImagePath,
+          hasStoredPricingPlans: !!storedPricingPlans,
+          storedData: storedData ? JSON.parse(storedData) : null
+        });
+        
         if (storedData) {
           const formData = JSON.parse(storedData);
           const pricingPlans = storedPricingPlans ? JSON.parse(storedPricingPlans) : undefined;
@@ -34,7 +41,9 @@ const PaymentSuccess = () => {
             // In a real implementation, you might want to store the image differently
           }
           
+          console.log('PaymentSuccess: About to call submitWebsite');
           await submitWebsite(formData, pricingPlans, imageFile, true);
+          console.log('PaymentSuccess: submitWebsite completed successfully');
           
           // Clean up stored data
           sessionStorage.removeItem('websiteFormData');
@@ -44,11 +53,12 @@ const PaymentSuccess = () => {
           setIsComplete(true);
           toast.success('Website added successfully!');
         } else {
+          console.log('PaymentSuccess: No stored data found in sessionStorage');
           toast.error('No website data found. Please try adding your website again.');
           navigate('/add-website');
         }
       } catch (error) {
-        console.error('Error processing payment success:', error);
+        console.error('PaymentSuccess: Error processing payment success:', error);
         toast.error('Failed to add website. Please contact support.');
       } finally {
         setIsProcessing(false);
