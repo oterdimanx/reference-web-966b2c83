@@ -68,6 +68,10 @@ export const useSubscriptionManager = () => {
         throw new Error('No authenticated user');
       }
       
+      // Store upgrade information in sessionStorage before redirecting
+      sessionStorage.setItem('isUpgradeFlow', 'true');
+      sessionStorage.setItem('selectedPricing', JSON.stringify(newPricingPlan));
+      
       // Redirect to payment for upgrade instead of direct upgrade
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: {
