@@ -15,10 +15,17 @@ interface AdditionalSettingsProps {
   form: UseFormReturn<any>;
   pricingPlans?: PricingPlan[];
   pricingLoading: boolean;
+  userSubscription?: any;
 }
 
-export function AdditionalSettings({ form, pricingPlans, pricingLoading }: AdditionalSettingsProps) {
+export function AdditionalSettings({ form, pricingPlans, pricingLoading, userSubscription }: AdditionalSettingsProps) {
   const { t } = useLanguage();
+
+  // Check if user has basic or premium plan (should not be able to select one-shot)
+  const hasBasicOrPremiumPlan = userSubscription?.subscription?.pricing_title === 'Basic Plan' || 
+                                userSubscription?.subscription?.pricing_title === 'Premium Plan';
+
+  const isOneShot = (plan: PricingPlan) => plan.title === 'One Shot';
 
   return (
     <>
@@ -82,11 +89,19 @@ export function AdditionalSettings({ form, pricingPlans, pricingLoading }: Addit
                 {pricingLoading ? (
                   <SelectItem value="loading" disabled>{t('addWebsiteForm', 'loadingPlans')}</SelectItem>
                 ) : pricingPlans && pricingPlans.length > 0 ? (
-                  pricingPlans.map((plan) => (
-                    <SelectItem key={plan.id} value={plan.id}>
-                      {plan.title} - ${plan.price.toFixed(2)}/month
-                    </SelectItem>
-                  ))
+                  pricingPlans.map((plan) => {
+                    const isDisabled = hasBasicOrPremiumPlan && isOneShot(plan);
+                    return (
+                      <SelectItem 
+                        key={plan.id} 
+                        value={plan.id}
+                        disabled={isDisabled}
+                      >
+                        {plan.title} - ${plan.price.toFixed(2)}/month
+                        {isDisabled && ' (Not available for your current plan)'}
+                      </SelectItem>
+                    );
+                  })
                 ) : (
                   <SelectItem value="none" disabled>{t('addWebsiteForm', 'noPlansAvailable')}</SelectItem>
                 )}

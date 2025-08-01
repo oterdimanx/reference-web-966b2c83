@@ -251,7 +251,8 @@ const AddWebsite = () => {
                   <AdditionalSettings 
                     form={form} 
                     pricingPlans={pricingPlans} 
-                    pricingLoading={pricingLoading} 
+                    pricingLoading={pricingLoading}
+                    userSubscription={subscription}
                   />
                   
                   <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
