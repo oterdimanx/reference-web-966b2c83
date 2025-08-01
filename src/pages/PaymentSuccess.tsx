@@ -34,20 +34,18 @@ const PaymentSuccess = () => {
         
         console.log('PaymentSuccess: Processing payment with stored data:', {
           isUpgradeFlow: !!isUpgradeFlow,
+          isUpgradeFlowValue: isUpgradeFlow,
           hasNewPricingId: !!newPricingId,
+          newPricingIdValue: newPricingId,
           hasStoredData: !!storedData,
           hasStoredImagePath: !!storedImagePath,
           hasStoredPricingPlans: !!storedPricingPlans,
           storedData: storedData ? JSON.parse(storedData) : null,
-          actualValues: {
-            isUpgradeFlow,
-            newPricingId,
-            storedData
-          }
+          allSearchParams: Object.fromEntries(searchParams.entries())
         });
         
         // Handle subscription upgrade (without website submission)
-        if (isUpgradeFlow && newPricingId && !storedData) {
+        if (isUpgradeFlow === 'true' && newPricingId && !storedData) {
           console.log('PaymentSuccess: Processing subscription upgrade for pricing:', newPricingId);
           
           if (user?.id) {
