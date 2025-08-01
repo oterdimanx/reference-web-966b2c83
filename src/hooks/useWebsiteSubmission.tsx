@@ -7,12 +7,12 @@ import { saveImageToPublic } from '@/utils/imageUtils';
 import { RankingSummary } from '@/lib/mockData';
 import { PricingPlan, FormValues } from '@/types/addWebsiteForm';
 import { useSubscriptionManager } from './useSubscriptionManager';
-import { useDomainValidation } from './useDomainValidation';
+import { useSecureDomainValidation } from './useSecureDomainValidation';
 
 export const useWebsiteSubmission = () => {
   const navigate = useNavigate();
   const { saveUserSubscription } = useSubscriptionManager();
-  const { checkDuplicateDomain } = useDomainValidation();
+  const { checkDuplicateDomain, sanitizeDomain } = useSecureDomainValidation();
 
   const submitWebsite = async (
     data: FormValues, 
@@ -22,8 +22,12 @@ export const useWebsiteSubmission = () => {
   ) => {
     console.log('submitWebsite called with:', { data, skipPayment, pricingPlans });
     
+    // Sanitize the domain (remove protocol, www, etc.)
+    const cleanDomain = sanitizeDomain(data.domain);
+    console.log('Domain sanitization:', { original: data.domain, cleaned: cleanDomain });
+    
     // Double check for duplicate domain
-    const isDuplicate = await checkDuplicateDomain(data.domain);
+    const isDuplicate = await checkDuplicateDomain(cleanDomain);
     
     if (isDuplicate) {
       toast.error(`Website "${data.domain}" already exists in your account.`);
@@ -53,7 +57,7 @@ export const useWebsiteSubmission = () => {
     
     const websiteData: RankingSummary = {
       websiteId: uuidv4(),
-      domain: data.domain,
+      domain: cleanDomain, // Use sanitized domain
       avgPosition: Math.floor(Math.random() * 15) + 1, // Random position between 1-15
       change: Math.floor(Math.random() * 5), // Random change between 0-4
       keywordCount: keywordsArray.length,
