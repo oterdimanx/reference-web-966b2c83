@@ -110,7 +110,7 @@ const AddWebsite = () => {
   }
 
   // If user has an active subscription and hasn't reached limit, show simple form
-  if (hasSubscription && canAddWebsite && !isAdmin) {
+  if (hasSubscription && canAddWebsite) {
     return <SimpleWebsiteForm userSubscription={subscription} />;
   }
   
