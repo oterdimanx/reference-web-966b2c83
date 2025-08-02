@@ -57,6 +57,17 @@ const AddWebsite = () => {
   const { submitWebsite } = useWebsiteSubmission();
   const { saveUserSubscription } = useSubscriptionManager();
   
+  // Debug logging
+  console.log('AddWebsite Debug:', {
+    subscriptionLoading,
+    hasSubscription,
+    canAddWebsite,
+    isAdmin,
+    websitesUsed,
+    websitesAllowed,
+    subscription
+  });
+
   // Show loading state while checking subscription
   if (subscriptionLoading) {
     return (
