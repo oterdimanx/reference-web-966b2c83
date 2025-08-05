@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RankingSummary } from '@/lib/mockData';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { WebsiteDetailsCard } from './WebsiteDetailsCard';
 import { ChevronLeft } from 'lucide-react';
@@ -18,6 +18,7 @@ export function WebsiteList({ websites, onSelectWebsite, selectedWebsiteId }: We
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [selectedWebsiteForDetails, setSelectedWebsiteForDetails] = useState<RankingSummary | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useLanguage();
 
   const sortedWebsites = [...websites].sort((a, b) => {
@@ -56,6 +57,12 @@ export function WebsiteList({ websites, onSelectWebsite, selectedWebsiteId }: We
   const handleBackToDashboard = () => {
     navigate('/');
   };
+
+  const handleViewAll = () => {
+    navigate('/all-websites');
+  };
+
+  const isOnAllWebsitesPage = location.pathname === '/all-websites';
 
   const handleRowClick = (website: RankingSummary) => {
     setSelectedWebsiteForDetails(website);
@@ -166,10 +173,16 @@ export function WebsiteList({ websites, onSelectWebsite, selectedWebsiteId }: We
           </div>
           
           <div className="mt-4 flex justify-end">
-            <Button variant="outline" size="sm" onClick={handleBackToDashboard}>
-              <ChevronLeft className="mr-2 h-4 w-4" />
-              {t('allWebsitesPage', 'backToDashboard')}
-            </Button>
+            {isOnAllWebsitesPage ? (
+              <Button variant="outline" size="sm" onClick={handleBackToDashboard}>
+                <ChevronLeft className="mr-2 h-4 w-4" />
+                {t('allWebsitesPage', 'backToDashboard')}
+              </Button>
+            ) : (
+              <Button variant="outline" size="sm" onClick={handleViewAll}>
+                {t('allWebsitesPage', 'viewAll')}
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
