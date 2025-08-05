@@ -1,9 +1,11 @@
 
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Event {
@@ -29,11 +31,12 @@ interface Event {
 
 export function EventAnalytics() {
   const { t } = useLanguage();
+  const [showAllEvents, setShowAllEvents] = useState(false);
 
   const { data: events, isLoading } = useQuery({
-    queryKey: ['admin', 'events'],
+    queryKey: ['admin', 'events', showAllEvents],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('events')
         .select(`
           *,
@@ -41,8 +44,14 @@ export function EventAnalytics() {
             domain
           )
         `)
-        .order('received_at', { ascending: false })
-        .limit(100);
+        .order('received_at', { ascending: false });
+
+      // Apply 7-day filter only when showAllEvents is false
+      if (!showAllEvents) {
+        query = query.gte('received_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
+      }
+
+      const { data, error } = await query.limit(100);
 
       if (error) {
         console.error('Error fetching events:', error);
@@ -54,12 +63,18 @@ export function EventAnalytics() {
   });
 
   const { data: eventStats } = useQuery({
-    queryKey: ['admin', 'event-stats'],
+    queryKey: ['admin', 'event-stats', showAllEvents],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('events')
-        .select('event_type, received_at')
-        .gte('received_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
+        .select('event_type, received_at');
+
+      // Apply 7-day filter only when showAllEvents is false
+      if (!showAllEvents) {
+        query = query.gte('received_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
+      }
+
+      const { data, error } = await query;
 
       if (error) {
         console.error('Error fetching event stats:', error);
@@ -85,10 +100,29 @@ export function EventAnalytics() {
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex gap-2">
+          <Button
+            variant={!showAllEvents ? "default" : "outline"}
+            onClick={() => setShowAllEvents(false)}
+          >
+            Last 7 Days
+          </Button>
+          <Button
+            variant={showAllEvents ? "default" : "outline"}
+            onClick={() => setShowAllEvents(true)}
+          >
+            All Events
+          </Button>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Total Events (7d)</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Events {!showAllEvents ? '(7d)' : '(All)'}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{eventStats?.totalEvents || 0}</div>
@@ -97,7 +131,9 @@ export function EventAnalytics() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Click Events (7d)</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Click Events {!showAllEvents ? '(7d)' : '(All)'}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{eventStats?.clickEvents || 0}</div>
@@ -106,7 +142,9 @@ export function EventAnalytics() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Page Views (7d)</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Page Views {!showAllEvents ? '(7d)' : '(All)'}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{eventStats?.pageviewEvents || 0}</div>
@@ -116,7 +154,9 @@ export function EventAnalytics() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Recent Events</CardTitle>
+          <CardTitle>
+            {showAllEvents ? 'All Events' : 'Recent Events'}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
