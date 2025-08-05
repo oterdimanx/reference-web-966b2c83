@@ -11,6 +11,8 @@ import { ContactInfo } from "./ContactInfo";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2 } from "lucide-react";
+import { Header } from "@/components/Layout/Header";
+import { Footer } from "@/components/Layout/Footer";
 
 interface SimpleWebsiteFormProps {
   userSubscription: any;
@@ -51,76 +53,80 @@ export const SimpleWebsiteForm = ({ userSubscription }: SimpleWebsiteFormProps) 
   const websitesRemaining = userSubscription?.websitesAllowed - userSubscription?.websitesUsed;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <Card className="max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle>{tLocal('forms.addWebsite')}</CardTitle>
-          <CardDescription>
-            {tLocal('forms.websitesRemaining')}: {websitesRemaining} / {userSubscription?.websitesAllowed}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-              <WebsiteBasicInfo 
-                form={form} 
-                onImageSelect={setSelectedImage}
-              />
-              
-              <ContactInfo form={form} />
-              
-              <FormField
-                control={form.control}
-                name="keywords"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{tLocal('forms.keywords')}</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder={tLocal('forms.keywordsPlaceholder')}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+    <>
+      <Header />
+      <div className="container mx-auto px-4 py-8">
+        <Card className="max-w-2xl mx-auto">
+          <CardHeader>
+            <CardTitle>{tLocal('forms.addWebsite')}</CardTitle>
+            <CardDescription>
+              {tLocal('forms.websitesRemaining')}: {websitesRemaining} / {userSubscription?.websitesAllowed}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+                <WebsiteBasicInfo 
+                  form={form} 
+                  onImageSelect={setSelectedImage}
+                />
+                
+                <ContactInfo form={form} />
+                
+                <FormField
+                  control={form.control}
+                  name="keywords"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{tLocal('forms.keywords')}</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder={tLocal('forms.keywordsPlaceholder')}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="reciprocal_link"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{tLocal('forms.reciprocalLink')}</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder={tLocal('forms.reciprocalLinkPlaceholder')}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="reciprocal_link"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{tLocal('forms.reciprocalLink')}</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder={tLocal('forms.reciprocalLinkPlaceholder')}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <Button 
-                type="submit" 
-                className="w-full" 
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {tLocal('forms.submitting')}
-                  </>
-                ) : (
-                  tLocal('forms.addWebsite')
-                )}
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
-    </div>
+                <Button 
+                  type="submit" 
+                  className="w-full" 
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      {tLocal('forms.submitting')}
+                    </>
+                  ) : (
+                    tLocal('forms.addWebsite')
+                  )}
+                </Button>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      </div>
+      <Footer />
+    </>
   );
 };
