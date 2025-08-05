@@ -11,17 +11,50 @@ import { Copy, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export function TrackingScriptGenerator() {
+  const [selectedUserId, setSelectedUserId] = useState<string>('');
   const [selectedWebsiteId, setSelectedWebsiteId] = useState<string>('');
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
 
-  const { data: websites } = useQuery({
-    queryKey: ['websites-for-tracking'],
+  // Fetch all users for admin selection
+  const { data: users } = useQuery({
+    queryKey: ['admin-all-users'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.access_token) {
+        throw new Error('No valid session found');
+      }
+
+      const { data, error } = await supabase.functions.invoke('admin-get-all-users', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      return data?.users || [];
+    }
+  });
+
+  // Fetch websites for the selected user (or all if no user selected)
+  const { data: websites } = useQuery({
+    queryKey: ['websites-for-tracking', selectedUserId],
+    queryFn: async () => {
+      let query = supabase
         .from('websites')
-        .select('id, domain, title')
+        .select('id, domain, title, user_id')
         .order('domain');
+
+      // Filter by user if one is selected
+      if (selectedUserId) {
+        query = query.eq('user_id', selectedUserId);
+      }
+
+      const { data, error } = await query;
 
       if (error) {
         console.error('Error fetching websites:', error);
@@ -29,7 +62,8 @@ export function TrackingScriptGenerator() {
       }
 
       return data;
-    }
+    },
+    enabled: true // Always enabled since admins can see all websites
   });
 
   const handleCopyScript = () => {
@@ -55,12 +89,32 @@ export function TrackingScriptGenerator() {
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
+          <label className="block text-sm font-medium mb-2">Select User</label>
+          <Select value={selectedUserId} onValueChange={(value) => {
+            setSelectedUserId(value);
+            setSelectedWebsiteId(''); // Reset website selection when user changes
+          }}>
+            <SelectTrigger>
+              <SelectValue placeholder="Choose a user (optional - leave empty to see all websites)" />
+            </SelectTrigger>
+            <SelectContent className="bg-background border z-50">
+              <SelectItem value="">All Users</SelectItem>
+              {users?.map((user) => (
+                <SelectItem key={user.id} value={user.id}>
+                  {user.email}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
           <label className="block text-sm font-medium mb-2">Select Website</label>
           <Select value={selectedWebsiteId} onValueChange={setSelectedWebsiteId}>
             <SelectTrigger>
               <SelectValue placeholder="Choose a website to track" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-background border z-50">
               {websites?.map((website) => (
                 <SelectItem key={website.id} value={website.id}>
                   {website.domain} {website.title && `(${website.title})`}
