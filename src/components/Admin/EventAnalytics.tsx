@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Event {
@@ -32,9 +33,11 @@ interface Event {
 export function EventAnalytics() {
   const { t } = useLanguage();
   const [showAllEvents, setShowAllEvents] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 50;
 
   const { data: events, isLoading } = useQuery({
-    queryKey: ['admin', 'events', showAllEvents],
+    queryKey: ['admin', 'events', showAllEvents, currentPage],
     queryFn: async () => {
       let query = supabase
         .from('events')
@@ -49,17 +52,48 @@ export function EventAnalytics() {
       // Apply 7-day filter only when showAllEvents is false
       if (!showAllEvents) {
         query = query.gte('received_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
+        // For 7-day view, keep the original limit of 100
+        const { data, error } = await query.limit(100);
+        
+        if (error) {
+          console.error('Error fetching events:', error);
+          return [];
+        }
+        
+        return data as Event[];
+      } else {
+        // For all events, apply pagination
+        const offset = (currentPage - 1) * pageSize;
+        const { data, error } = await query.range(offset, offset + pageSize - 1);
+        
+        if (error) {
+          console.error('Error fetching events:', error);
+          return [];
+        }
+        
+        return data as Event[];
       }
+    }
+  });
 
-      const { data, error } = await query.limit(100);
+  // Get total count for pagination (only when showing all events)
+  const { data: totalCount } = useQuery({
+    queryKey: ['admin', 'events-count', showAllEvents],
+    queryFn: async () => {
+      if (!showAllEvents) return 0;
+      
+      const { count, error } = await supabase
+        .from('events')
+        .select('*', { count: 'exact', head: true });
 
       if (error) {
-        console.error('Error fetching events:', error);
-        return [];
+        console.error('Error fetching events count:', error);
+        return 0;
       }
 
-      return data as Event[];
-    }
+      return count || 0;
+    },
+    enabled: showAllEvents
   });
 
   const { data: eventStats } = useQuery({
@@ -104,13 +138,19 @@ export function EventAnalytics() {
         <div className="flex gap-2">
           <Button
             variant={!showAllEvents ? "default" : "outline"}
-            onClick={() => setShowAllEvents(false)}
+            onClick={() => {
+              setShowAllEvents(false);
+              setCurrentPage(1);
+            }}
           >
             Last 7 Days
           </Button>
           <Button
             variant={showAllEvents ? "default" : "outline"}
-            onClick={() => setShowAllEvents(true)}
+            onClick={() => {
+              setShowAllEvents(true);
+              setCurrentPage(1);
+            }}
           >
             All Events
           </Button>
@@ -202,6 +242,46 @@ export function EventAnalytics() {
               ))}
             </TableBody>
           </Table>
+          
+          {showAllEvents && totalCount && totalCount > pageSize && (
+            <div className="mt-4 flex justify-center">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                      className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+                  
+                  {Array.from({ length: Math.ceil(totalCount / pageSize) }, (_, i) => i + 1)
+                    .filter(page => {
+                      const start = Math.max(1, currentPage - 2);
+                      const end = Math.min(Math.ceil(totalCount / pageSize), currentPage + 2);
+                      return page >= start && page <= end;
+                    })
+                    .map((page) => (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          onClick={() => setCurrentPage(page)}
+                          isActive={currentPage === page}
+                          className="cursor-pointer"
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                  
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={() => setCurrentPage(Math.min(Math.ceil(totalCount / pageSize), currentPage + 1))}
+                      className={currentPage === Math.ceil(totalCount / pageSize) ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
