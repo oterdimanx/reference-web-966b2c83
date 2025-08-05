@@ -5,6 +5,7 @@ import { RankingSummary } from '@/lib/mockData';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { WebsiteDetailsCard } from './WebsiteDetailsCard';
+import { ChevronLeft } from 'lucide-react';
 
 interface WebsiteListProps {
   websites: RankingSummary[];
@@ -52,8 +53,8 @@ export function WebsiteList({ websites, onSelectWebsite, selectedWebsiteId }: We
       : <span className="ml-1">↓</span>;
   };
 
-  const handleViewAll = () => {
-    navigate('/all-websites');
+  const handleBackToDashboard = () => {
+    navigate('/');
   };
 
   const handleRowClick = (website: RankingSummary) => {
@@ -165,7 +166,10 @@ export function WebsiteList({ websites, onSelectWebsite, selectedWebsiteId }: We
           </div>
           
           <div className="mt-4 flex justify-end">
-            <Button variant="outline" size="sm" onClick={handleViewAll}>{t('allWebsitesPage', 'viewAll')}</Button>
+            <Button variant="outline" size="sm" onClick={handleBackToDashboard}>
+              <ChevronLeft className="mr-2 h-4 w-4" />
+              {t('allWebsitesPage', 'backToDashboard')}
+            </Button>
           </div>
         </CardContent>
       </Card>
