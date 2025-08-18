@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { AlertTriangle, Plus, Trash2, Settings } from 'lucide-react';
+import { AlertTriangle, Plus, Trash2, Settings, Edit3, Check, X } from 'lucide-react';
 import { keywordService } from '@/services/keywordService';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -31,6 +31,8 @@ export function KeywordManagerDialog({ websiteId, websiteDomain, onKeywordsUpdat
   const [newKeywordInput, setNewKeywordInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [removing, setRemoving] = useState<string | null>(null);
+  const [editingKeyword, setEditingKeyword] = useState<string | null>(null);
+  const [editKeywordValue, setEditKeywordValue] = useState('');
   const { toast } = useToast();
 
   const loadKeywords = async () => {
@@ -132,6 +134,44 @@ export function KeywordManagerDialog({ websiteId, websiteDomain, onKeywordsUpdat
     }
   };
 
+  const handleEditKeyword = (keyword: string) => {
+    setEditingKeyword(keyword);
+    setEditKeywordValue(keyword);
+  };
+
+  const handleSaveEditKeyword = async () => {
+    if (!editingKeyword || !editKeywordValue.trim()) return;
+
+    setLoading(true);
+    try {
+      await keywordService.updateKeywordInWebsite(websiteId, editingKeyword, editKeywordValue.trim());
+      await loadKeywords();
+      onKeywordsUpdated();
+      
+      toast({
+        title: "Success",
+        description: `Updated keyword "${editingKeyword}" to "${editKeywordValue.trim()}" successfully`
+      });
+      
+      setEditingKeyword(null);
+      setEditKeywordValue('');
+    } catch (error) {
+      console.error('Error updating keyword:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to update keyword",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancelEditKeyword = () => {
+    setEditingKeyword(null);
+    setEditKeywordValue('');
+  };
+
   const getKeywordBadges = (keywordData: KeywordWithStatus) => {
     const badges = [];
     
@@ -183,7 +223,7 @@ export function KeywordManagerDialog({ websiteId, websiteDomain, onKeywordsUpdat
             <div>
               <h3 className="text-lg font-semibold mb-2">Current Keywords</h3>
               <p className="text-sm text-muted-foreground">
-                Keywords with pending ranking requests cannot be removed
+                Keywords with pending ranking requests cannot be edited or removed
               </p>
             </div>
             
@@ -201,20 +241,66 @@ export function KeywordManagerDialog({ websiteId, websiteDomain, onKeywordsUpdat
                   {currentKeywords.map((keywordData) => (
                     <div key={keywordData.keyword} className="flex items-start justify-between p-3 border rounded-lg">
                       <div className="flex-1 min-w-0">
-                        <div className="font-medium mb-2">{keywordData.keyword}</div>
-                        <div className="flex flex-wrap gap-1">
-                          {getKeywordBadges(keywordData)}
-                        </div>
+                        {editingKeyword === keywordData.keyword ? (
+                          <div className="space-y-2">
+                            <Input
+                              value={editKeywordValue}
+                              onChange={(e) => setEditKeywordValue(e.target.value)}
+                              className="font-medium"
+                              placeholder="Enter keyword"
+                            />
+                            <div className="flex gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={handleSaveEditKeyword}
+                                disabled={loading || !editKeywordValue.trim()}
+                                className="text-green-600 hover:text-green-600 hover:bg-green-50"
+                              >
+                                <Check size={14} />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={handleCancelEditKeyword}
+                                disabled={loading}
+                                className="text-gray-600 hover:text-gray-600 hover:bg-gray-50"
+                              >
+                                <X size={14} />
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="font-medium mb-2">{keywordData.keyword}</div>
+                            <div className="flex flex-wrap gap-1">
+                              {getKeywordBadges(keywordData)}
+                            </div>
+                          </>
+                        )}
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleRemoveKeyword(keywordData.keyword)}
-                        disabled={keywordData.hasRankingRequests || removing === keywordData.keyword}
-                        className="ml-2 text-destructive hover:text-destructive hover:bg-destructive/10"
-                      >
-                        <Trash2 size={16} />
-                      </Button>
+                      {editingKeyword !== keywordData.keyword && (
+                        <div className="flex gap-1 ml-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditKeyword(keywordData.keyword)}
+                            disabled={keywordData.hasRankingRequests || loading}
+                            className="text-blue-600 hover:text-blue-600 hover:bg-blue-50"
+                          >
+                            <Edit3 size={16} />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleRemoveKeyword(keywordData.keyword)}
+                            disabled={keywordData.hasRankingRequests || removing === keywordData.keyword || loading}
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                          >
+                            <Trash2 size={16} />
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

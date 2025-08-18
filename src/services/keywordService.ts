@@ -347,6 +347,65 @@ export const keywordService = {
     }
   },
 
+  async updateKeywordInWebsite(websiteId: string, oldKeyword: string, newKeyword: string): Promise<void> {
+    try {
+      const trimmedOldKeyword = oldKeyword.trim();
+      const trimmedNewKeyword = newKeyword.trim();
+
+      if (!trimmedNewKeyword) {
+        throw new Error('New keyword cannot be empty');
+      }
+
+      if (trimmedOldKeyword === trimmedNewKeyword) {
+        return; // No change needed
+      }
+
+      // Validate that old keyword can be modified (no pending ranking requests)
+      const validation = await this.validateKeywordOperation(websiteId, trimmedOldKeyword, 'remove');
+      if (!validation.isValid) {
+        throw new Error(validation.reason);
+      }
+
+      // Validate that new keyword doesn't already exist
+      const currentKeywords = await this.getWebsiteKeywords(websiteId);
+      if (currentKeywords.includes(trimmedNewKeyword)) {
+        throw new Error('New keyword already exists for this website');
+      }
+
+      // Update keywords string by replacing old with new
+      const updatedKeywords = currentKeywords.map(k => 
+        k === trimmedOldKeyword ? trimmedNewKeyword : k
+      );
+      const keywordsString = updatedKeywords.join(', ');
+
+      // Update the website
+      const { error: updateError } = await supabase
+        .from('websites')
+        .update({ 
+          keywords: keywordsString,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', websiteId);
+
+      if (updateError) throw updateError;
+
+      // Update user preferences to reference the new keyword name
+      const { error: preferencesError } = await supabase
+        .from('user_keyword_preferences')
+        .update({ keyword: trimmedNewKeyword })
+        .eq('website_id', websiteId)
+        .eq('keyword', trimmedOldKeyword);
+
+      if (preferencesError) {
+        console.error('Error updating keyword preferences:', preferencesError);
+        // Don't throw here as the main operation succeeded
+      }
+    } catch (error) {
+      console.error('Error updating keyword in website:', error);
+      throw error;
+    }
+  },
+
   async updateKeywordPreferences(
     userId: string,
     websiteId: string,
