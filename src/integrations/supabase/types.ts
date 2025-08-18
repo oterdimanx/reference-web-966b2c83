@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -317,6 +317,48 @@ export type Database = {
         }
         Relationships: []
       }
+      ranking_requests: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          keyword: string
+          priority: number
+          processed_at: string | null
+          requested_at: string
+          status: string
+          updated_at: string
+          user_id: string
+          website_id: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          keyword: string
+          priority?: number
+          processed_at?: string | null
+          requested_at?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+          website_id: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          keyword?: string
+          priority?: number
+          processed_at?: string | null
+          requested_at?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+          website_id?: string
+        }
+        Relationships: []
+      }
       ranking_snapshots: {
         Row: {
           created_at: string
@@ -424,6 +466,45 @@ export type Database = {
           target_user_id?: string | null
           user_agent?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      user_keyword_preferences: {
+        Row: {
+          created_at: string
+          difficulty_estimate: string | null
+          id: string
+          is_priority: boolean
+          keyword: string
+          notes: string | null
+          updated_at: string
+          user_id: string
+          volume_estimate: string | null
+          website_id: string
+        }
+        Insert: {
+          created_at?: string
+          difficulty_estimate?: string | null
+          id?: string
+          is_priority?: boolean
+          keyword: string
+          notes?: string | null
+          updated_at?: string
+          user_id: string
+          volume_estimate?: string | null
+          website_id: string
+        }
+        Update: {
+          created_at?: string
+          difficulty_estimate?: string | null
+          id?: string
+          is_priority?: boolean
+          keyword?: string
+          notes?: string | null
+          updated_at?: string
+          user_id?: string
+          volume_estimate?: string | null
+          website_id?: string
         }
         Relationships: []
       }
@@ -607,15 +688,15 @@ export type Database = {
     }
     Functions: {
       has_role: {
-        Args: { user_id: string; role: Database["public"]["Enums"]["app_role"] }
+        Args: { role: Database["public"]["Enums"]["app_role"]; user_id: string }
         Returns: boolean
       }
       log_security_event: {
         Args: {
-          event_type: string
-          target_user_id?: string
           details?: Json
+          event_type: string
           ip_address?: unknown
+          target_user_id?: string
           user_agent?: string
         }
         Returns: undefined
