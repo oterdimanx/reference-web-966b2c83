@@ -9,11 +9,19 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
-import { PricingPlan } from '@/types/addWebsiteForm';
+interface PricingPlan {
+  id: string;
+  title: string;
+  price: number;
+  active: boolean;
+  description_en?: string;
+  description_fr?: string;
+  title_fr?: string;
+}
 
 export const SubscriptionUpgrade = () => {
   const { user } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [upgrading, setUpgrading] = useState<string | null>(null);
 
   // Fetch current subscription
@@ -92,6 +100,21 @@ export const SubscriptionUpgrade = () => {
     return 999;
   };
 
+  const getPlanTitle = (plan: PricingPlan) => {
+    return language === 'fr' && plan.title_fr ? plan.title_fr : plan.title;
+  };
+
+  const getPaymentFrequency = (plan: PricingPlan) => {
+    // €1 plan shows "one-time", basic plan shows "/3 months", premium shows "/year"
+    if (plan.price === 1) {
+      return t('pricingPage', 'oneTime');
+    } else if (plan.price < 10) { // Basic plans are under €10
+      return language === 'fr' ? '/3 mois' : '/3 months';
+    } else { // Premium plans are €10 and above
+      return language === 'fr' ? '/an' : '/year';
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -110,7 +133,7 @@ export const SubscriptionUpgrade = () => {
       <Card>
         <CardContent className="pt-6">
           <p className="text-center text-muted-foreground">
-            No upgrade plans available at the moment.
+            {t('pricing', 'noPricingPlans')}
           </p>
         </CardContent>
       </Card>
@@ -120,9 +143,9 @@ export const SubscriptionUpgrade = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-xl font-semibold mb-2">Upgrade Your Plan</h3>
+        <h3 className="text-xl font-semibold mb-2">{t('pricingPage', 'choosePlan')}</h3>
         <p className="text-muted-foreground">
-          Choose a higher plan to track more websites and unlock additional features. You'll be redirected to complete payment.
+          {t('pricingPage', 'subtitle')}
         </p>
       </div>
 
@@ -136,28 +159,31 @@ export const SubscriptionUpgrade = () => {
             <Card key={plan.id} className={isCurrentPlan ? 'border-primary' : ''}>
               <CardHeader>
                 <div className="flex justify-between items-start">
-                  <CardTitle className="text-lg">{plan.title}</CardTitle>
+                  <CardTitle className="text-lg">{getPlanTitle(plan)}</CardTitle>
                   {isCurrentPlan && (
-                    <Badge variant="default">Current Plan</Badge>
+                    <Badge variant="default">{language === 'fr' ? 'Plan Actuel' : 'Current Plan'}</Badge>
                   )}
                 </div>
                 <CardDescription>
                   <span className="text-2xl font-bold">€{plan.price}</span>
-                  <span className="text-muted-foreground">/month</span>
+                  <span className="text-muted-foreground">{getPaymentFrequency(plan)}</span>
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 mb-4">
                   <li className="flex items-center">
                     <span className="text-sm">
-                      {websitesAllowed === 999 ? 'Unlimited' : websitesAllowed} website{websitesAllowed !== 1 ? 's' : ''}
+                      {websitesAllowed === 999 
+                        ? (language === 'fr' ? 'Illimité' : 'Unlimited')
+                        : websitesAllowed
+                      } {language === 'fr' ? 'site' : 'website'}{websitesAllowed !== 1 ? (language === 'fr' ? 's' : 's') : ''}
                     </span>
                   </li>
                   <li className="flex items-center">
-                    <span className="text-sm">Keyword tracking</span>
+                    <span className="text-sm">{language === 'fr' ? 'Suivi des mots-clés' : 'Keyword tracking'}</span>
                   </li>
                   <li className="flex items-center">
-                    <span className="text-sm">Analytics dashboard</span>
+                    <span className="text-sm">{language === 'fr' ? 'Tableau de bord analytique' : 'Analytics dashboard'}</span>
                   </li>
                 </ul>
                 
@@ -167,10 +193,14 @@ export const SubscriptionUpgrade = () => {
                   className="w-full"
                   variant={isCurrentPlan ? "secondary" : "default"}
                 >
-                  {upgrading === plan.id ? 'Redirecting to payment...' : 
-                   isCurrentPlan ? 'Current Plan' :
-                   isDowngrade ? 'Downgrade not available' : 
-                   `Upgrade for €${plan.price}/month`}
+                  {upgrading === plan.id 
+                    ? (language === 'fr' ? 'Redirection vers le paiement...' : 'Redirecting to payment...')
+                    : isCurrentPlan 
+                      ? (language === 'fr' ? 'Plan Actuel' : 'Current Plan')
+                      : isDowngrade 
+                        ? (language === 'fr' ? 'Rétrogradation non disponible' : 'Downgrade not available')
+                        : (language === 'fr' ? `Passer à €${plan.price}${getPaymentFrequency(plan)}` : `Upgrade for €${plan.price}${getPaymentFrequency(plan)}`)
+                  }
                 </Button>
               </CardContent>
             </Card>
