@@ -25,6 +25,16 @@ export const AuthenticatedView = () => {
     }
   }, [user]);
 
+  useEffect(() => {
+    // Auto-select single website
+    if (websites.length === 1) {
+      setSelectedWebsiteId(websites[0].id);
+    } else if (websites.length > 1 && selectedWebsiteId !== 'all') {
+      // Reset to all if multiple websites and not already set
+      setSelectedWebsiteId('all');
+    }
+  }, [websites]);
+
   const loadWebsites = async () => {
     if (!user) return;
     
