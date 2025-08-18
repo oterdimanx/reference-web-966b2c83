@@ -20,77 +20,147 @@ serve(async (req) => {
   }
 
   try {
-    console.log('Starting scheduled ranking updates...');
+    console.log('Starting ranking request processing...');
 
-    // Get all websites that have keywords
-    const { data: websites, error: websitesError } = await supabase
-      .from('websites')
-      .select('id, domain, keywords')
-      .not('keywords', 'is', null)
-      .neq('keywords', '');
+    // Get pending ranking requests ordered by priority and requested_at
+    const { data: pendingRequests, error: requestsError } = await supabase
+      .from('ranking_requests')
+      .select(`
+        id,
+        user_id,
+        website_id,
+        keyword,
+        priority,
+        requested_at,
+        websites!inner(domain, keywords)
+      `)
+      .eq('status', 'pending')
+      .order('priority', { ascending: false })
+      .order('requested_at', { ascending: true })
+      .limit(10); // Process max 10 requests per run to avoid timeout
 
-    if (websitesError) {
-      console.error('Error fetching websites:', websitesError);
+    if (requestsError) {
+      console.error('Error fetching pending requests:', requestsError);
       return new Response(
-        JSON.stringify({ error: 'Failed to fetch websites' }),
+        JSON.stringify({ error: 'Failed to fetch pending requests' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log(`Found ${websites?.length || 0} websites with keywords to check`);
+    console.log(`Found ${pendingRequests?.length || 0} pending ranking requests`);
+
+    if (!pendingRequests || pendingRequests.length === 0) {
+      return new Response(
+        JSON.stringify({
+          success: true,
+          processed: 0,
+          message: 'No pending requests to process'
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     const results = [];
 
-    if (websites && websites.length > 0) {
-      for (const website of websites) {
-        console.log(`Processing website: ${website.domain}`);
+    // Process each ranking request
+    for (const request of pendingRequests) {
+      try {
+        console.log(`Processing request: ${request.keyword} for ${request.websites.domain}`);
         
-        try {
-          // Call the fetch-rankings function for each website
-          const response = await supabase.functions.invoke('fetch-rankings', {
-            body: { websiteId: website.id }
-          });
-
-          if (response.error) {
-            console.error(`Error processing ${website.domain}:`, response.error);
-            results.push({
-              websiteId: website.id,
-              domain: website.domain,
-              success: false,
-              error: response.error.message
-            });
-          } else {
-            console.log(`Successfully processed ${website.domain}`);
-            results.push({
-              websiteId: website.id,
-              domain: website.domain,
-              success: true,
-              data: response.data
-            });
+        // Update status to processing
+        await supabase
+          .from('ranking_requests')
+          .update({ 
+            status: 'processing',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', request.id);
+        
+        // Call the fetch-rankings function for this specific keyword
+        const response = await supabase.functions.invoke('fetch-rankings', {
+          body: { 
+            websiteId: request.website_id,
+            specificKeyword: request.keyword
           }
+        });
 
-          // Add delay between websites to respect API limits
-          await new Promise(resolve => setTimeout(resolve, 2000));
-
-        } catch (error) {
-          console.error(`Exception processing ${website.domain}:`, error);
+        if (response.error) {
+          console.error(`Error processing request ${request.id}:`, response.error);
+          
+          // Update status to failed
+          await supabase
+            .from('ranking_requests')
+            .update({ 
+              status: 'failed',
+              error_message: response.error.message,
+              processed_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', request.id);
+          
           results.push({
-            websiteId: website.id,
-            domain: website.domain,
+            requestId: request.id,
+            keyword: request.keyword,
+            domain: request.websites.domain,
             success: false,
-            error: error.message
+            error: response.error.message
+          });
+        } else {
+          console.log(`Successfully processed request ${request.id}`);
+          
+          // Update status to completed
+          await supabase
+            .from('ranking_requests')
+            .update({ 
+              status: 'completed',
+              processed_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', request.id);
+          
+          results.push({
+            requestId: request.id,
+            keyword: request.keyword,
+            domain: request.websites.domain,
+            success: true,
+            data: response.data
           });
         }
+        
+        // Add delay between requests to respect API limits
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        
+      } catch (error) {
+        console.error(`Unexpected error processing request ${request.id}:`, error);
+        
+        // Update status to failed
+        await supabase
+          .from('ranking_requests')
+          .update({ 
+            status: 'failed',
+            error_message: error.message,
+            processed_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', request.id);
+        
+        results.push({
+          requestId: request.id,
+          keyword: request.keyword,
+          domain: request.websites?.domain || 'unknown',
+          success: false,
+          error: error.message
+        });
       }
     }
 
-    console.log('Scheduled ranking updates completed');
+    console.log('Ranking request processing completed');
 
     return new Response(
-      JSON.stringify({ 
-        success: true, 
-        websitesProcessed: websites?.length || 0,
-        results 
+      JSON.stringify({
+        success: true,
+        processed: pendingRequests.length,
+        results: results
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
