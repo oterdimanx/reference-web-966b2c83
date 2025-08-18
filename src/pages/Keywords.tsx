@@ -5,6 +5,9 @@ import { Footer } from '@/components/Layout/Footer';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { AuthenticatedView } from '@/components/Keywords/AuthenticatedView';
 import { GuestView } from '@/components/Keywords/GuestView';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,6 +15,7 @@ import { supabase } from '@/integrations/supabase/client';
 const KeywordsPage = () => {
   const { user, loading } = useAuth();
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [hasWebsitesWithKeywords, setHasWebsitesWithKeywords] = useState(false);
   const [checkingWebsites, setCheckingWebsites] = useState(true);
 
@@ -48,7 +52,17 @@ const KeywordsPage = () => {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">{t('pages', 'keywords')}</h1>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-3xl font-bold">{t('pages', 'keywords')}</h1>
+          <Button 
+            variant="outline" 
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft size={16} />
+            {t('allWebsitesPage', 'backToDashboard')}
+          </Button>
+        </div>
 
         {loading || checkingWebsites ? (
           // Loading state
