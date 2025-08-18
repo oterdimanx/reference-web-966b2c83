@@ -8,9 +8,9 @@ const TestScheduleRankings = () => {
   const [result, setResult] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const testWithAnonKey = async () => {
+  const testFunction = async () => {
     setIsLoading(true);
-    setResult("Testing with anon key...");
+    setResult("Testing function...");
     
     try {
       const response = await fetch('https://jixmwjplysaqlyzhpcmk.supabase.co/functions/v1/schedule-rankings', {
@@ -23,30 +23,6 @@ const TestScheduleRankings = () => {
       });
       
       const data = await response.json();
-      setResult(`ANON KEY TEST\nResponse Status: ${response.status}\n\n${JSON.stringify(data, null, 2)}`);
-    } catch (error) {
-      setResult(`ANON KEY ERROR: ${(error as Error).message}`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const testWithServiceKey = async () => {
-    setIsLoading(true);
-    setResult("Testing with service role key (same as cron)...");
-    
-    try {
-      // WARNING: This exposes service key in frontend - only for debugging!
-      const response = await fetch('https://jixmwjplysaqlyzhpcmk.supabase.co/functions/v1/schedule-rankings', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppeG13anBseXNhcWx5emhwY21rIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NjQzNzYyNCwiZXhwIjoyMDYyMDEzNjI0fQ.FRJwMOEOsGDvvILOECrPZhJYGdPFrz3VBvgJQn4fh5M'
-        },
-        body: JSON.stringify({})
-      });
-      
-      const data = await response.json();
       setResult(`Response Status: ${response.status}\n\n${JSON.stringify(data, null, 2)}`);
     } catch (error) {
       setResult(`Error: ${(error as Error).message}`);
@@ -54,7 +30,6 @@ const TestScheduleRankings = () => {
       setIsLoading(false);
     }
   };
-
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -64,29 +39,13 @@ const TestScheduleRankings = () => {
             <CardTitle>Test Schedule Rankings Function</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Button 
-                onClick={testWithAnonKey} 
-                disabled={isLoading}
-                className="w-full"
-                variant="outline"
-              >
-                {isLoading ? "Testing..." : "Test with Anon Key (User Level)"}
-              </Button>
-              
-              <Button 
-                onClick={testWithServiceKey} 
-                disabled={isLoading}
-                className="w-full"
-                variant="destructive"
-              >
-                {isLoading ? "Testing..." : "Test with Service Key (Cron Level)"}
-              </Button>
-              
-              <p className="text-sm text-muted-foreground">
-                ⚠️ Service key test simulates exact cron conditions but exposes sensitive key
-              </p>
-            </div>
+            <Button 
+              onClick={testFunction} 
+              disabled={isLoading}
+              className="w-full"
+            >
+              {isLoading ? "Testing..." : "Test Schedule Rankings"}
+            </Button>
             
             {result && (
               <div className="border rounded-lg p-4 bg-muted">
