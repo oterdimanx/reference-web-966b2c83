@@ -33,6 +33,7 @@ import Contact from "./pages/Contact";
 import Sitemap from "./pages/Sitemap";
 import SitemapXml from "./pages/SitemapXml";
 import PaymentSuccess from "./pages/PaymentSuccess";
+import TestScheduleRankings from "./pages/TestScheduleRankings";
 
 const queryClient = new QueryClient();
 
@@ -66,6 +67,7 @@ const App = () => (
                   <Route path="/sitemap" element={<Sitemap />} />
                   <Route path="/sitemap.xml" element={<SitemapXml />} />
                   <Route path="/payment-success" element={<PaymentSuccess />} />
+                  <Route path="/test-schedule-rankings" element={<TestScheduleRankings />} />
                   <Route path="/profile" element={
                     <ProtectedRoute>
                       <Profile />
