@@ -8,6 +8,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Clock, RefreshCw, AlertCircle } from 'lucide-react';
 import { KeywordDifficultyBadge } from './KeywordDifficultyBadge';
 import { KeywordRankingStatus } from './KeywordRankingStatus';
+import { KeywordManagerDialog } from './KeywordManagerDialog';
+import { ExportDialog } from './ExportDialog';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { keywordService, UserKeyword } from '@/services/keywordService';
@@ -171,30 +173,48 @@ export const KeywordTable = ({ selectedWebsiteId }: KeywordTableProps) => {
   return (
     <div>
       <div className="mb-4">
-        <div className="flex items-center gap-2">
-          <div className="relative flex-grow">
-            <Input
-              type="text"
-              placeholder="Search keywords..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pr-10"
-            />
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2 flex-1">
+            <div className="relative flex-grow max-w-md">
+              <Input
+                type="text"
+                placeholder="Search keywords..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pr-10"
+              />
+            </div>
           </div>
-          <Button 
-            className="bg-primary hover:bg-primary/90"
-            onClick={handleRequestAllRankings}
-            disabled={requestingAll || keywords.length === 0}
-          >
-            {requestingAll ? (
-              <>
-                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                Requesting...
-              </>
-            ) : (
-              'Update All Rankings'
+          
+          <div className="flex items-center gap-2">
+            {selectedWebsiteId && (
+              <KeywordManagerDialog
+                websiteId={selectedWebsiteId}
+                websiteDomain={keywords[0]?.website_domain || 'Website'}
+                onKeywordsUpdated={loadKeywords}
+              />
             )}
-          </Button>
+            
+            <ExportDialog 
+              keywords={filteredKeywords}
+              selectedWebsiteId={selectedWebsiteId}
+            />
+            
+            <Button 
+              className="bg-primary hover:bg-primary/90"
+              onClick={handleRequestAllRankings}
+              disabled={requestingAll || keywords.length === 0}
+            >
+              {requestingAll ? (
+                <>
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  Requesting...
+                </>
+              ) : (
+                'Update All Rankings'
+              )}
+            </Button>
+          </div>
         </div>
       </div>
 
