@@ -11,6 +11,12 @@ export interface UserKeyword {
   is_priority: boolean;
   position_change: number | null;
   ranking_url: string | null;
+  preferences?: {
+    tags?: string[];
+    group_name?: string;
+    group_color?: string;
+    notes?: string;
+  };
 }
 
 export interface KeywordWithPreferences extends UserKeyword {
@@ -282,7 +288,7 @@ export const keywordService = {
           // Get user preferences for this keyword
           const { data: preferences } = await supabase
             .from('user_keyword_preferences')
-            .select('difficulty_estimate, volume_estimate, is_priority')
+            .select('difficulty_estimate, volume_estimate, is_priority, tags, group_name, group_color, notes')
             .eq('user_id', userId)
             .eq('website_id', website.id)
             .eq('keyword', keyword)
@@ -306,7 +312,13 @@ export const keywordService = {
             volume_estimate: preferences?.volume_estimate || 'Medium',
             is_priority: preferences?.is_priority || false,
             position_change: positionChange,
-            ranking_url: latestRanking?.url || null
+            ranking_url: latestRanking?.url || null,
+            preferences: preferences ? {
+              tags: preferences.tags || [],
+              group_name: preferences.group_name || undefined,
+              group_color: preferences.group_color || undefined,
+              notes: preferences.notes || undefined
+            } : undefined
           };
         });
       });
@@ -415,6 +427,9 @@ export const keywordService = {
       volume_estimate?: string;
       notes?: string;
       is_priority?: boolean;
+      tags?: string[];
+      group_name?: string;
+      group_color?: string;
     }
   ): Promise<void> {
     try {
@@ -430,6 +445,115 @@ export const keywordService = {
       if (error) throw error;
     } catch (error) {
       console.error('Error updating keyword preferences:', error);
+      throw error;
+    }
+  },
+
+  // Tag management functions
+  async getUserTags(userId: string): Promise<string[]> {
+    try {
+      const { data, error } = await supabase
+        .from('user_keyword_preferences')
+        .select('tags')
+        .eq('user_id', userId)
+        .not('tags', 'is', null);
+
+      if (error) throw error;
+
+      const allTags = new Set<string>();
+      data?.forEach(row => {
+        if (row.tags) {
+          row.tags.forEach((tag: string) => allTags.add(tag));
+        }
+      });
+
+      return Array.from(allTags).sort();
+    } catch (error) {
+      console.error('Error fetching user tags:', error);
+      throw error;
+    }
+  },
+
+  async getUserGroups(userId: string): Promise<{name: string, color?: string}[]> {
+    try {
+      const { data, error } = await supabase
+        .from('user_keyword_preferences')
+        .select('group_name, group_color')
+        .eq('user_id', userId)
+        .not('group_name', 'is', null);
+
+      if (error) throw error;
+
+      const groupsMap = new Map<string, string | undefined>();
+      data?.forEach(row => {
+        if (row.group_name) {
+          groupsMap.set(row.group_name, row.group_color);
+        }
+      });
+
+      return Array.from(groupsMap.entries()).map(([name, color]) => ({
+        name,
+        color
+      })).sort((a, b) => a.name.localeCompare(b.name));
+    } catch (error) {
+      console.error('Error fetching user groups:', error);
+      throw error;
+    }
+  },
+
+  async getKeywordsByGroup(userId: string, groupName: string): Promise<UserKeyword[]> {
+    try {
+      const userKeywords = await keywordService.getUserKeywords(userId);
+      return userKeywords.filter(keyword => keyword.preferences?.group_name === groupName);
+    } catch (error) {
+      console.error('Error fetching keywords by group:', error);
+      throw error;
+    }
+  },
+
+  async getKeywordsByTag(userId: string, tag: string): Promise<UserKeyword[]> {
+    try {
+      const userKeywords = await keywordService.getUserKeywords(userId);
+      return userKeywords.filter(keyword => 
+        keyword.preferences?.tags?.includes(tag)
+      );
+    } catch (error) {
+      console.error('Error fetching keywords by tag:', error);
+      throw error;
+    }
+  },
+
+  async bulkUpdateKeywordGroups(
+    userId: string,
+    updates: { websiteId: string; keyword: string; groupName?: string; groupColor?: string }[]
+  ): Promise<void> {
+    try {
+      const updatePromises = updates.map(({ websiteId, keyword, groupName, groupColor }) =>
+        keywordService.updateKeywordPreferences(userId, websiteId, keyword, {
+          group_name: groupName,
+          group_color: groupColor
+        })
+      );
+
+      await Promise.all(updatePromises);
+    } catch (error) {
+      console.error('Error bulk updating keyword groups:', error);
+      throw error;
+    }
+  },
+
+  async bulkUpdateKeywordTags(
+    userId: string,
+    updates: { websiteId: string; keyword: string; tags: string[] }[]
+  ): Promise<void> {
+    try {
+      const updatePromises = updates.map(({ websiteId, keyword, tags }) =>
+        keywordService.updateKeywordPreferences(userId, websiteId, keyword, { tags })
+      );
+
+      await Promise.all(updatePromises);
+    } catch (error) {
+      console.error('Error bulk updating keyword tags:', error);
       throw error;
     }
   }

@@ -473,10 +473,13 @@ export type Database = {
         Row: {
           created_at: string
           difficulty_estimate: string | null
+          group_color: string | null
+          group_name: string | null
           id: string
           is_priority: boolean
           keyword: string
           notes: string | null
+          tags: string[] | null
           updated_at: string
           user_id: string
           volume_estimate: string | null
@@ -485,10 +488,13 @@ export type Database = {
         Insert: {
           created_at?: string
           difficulty_estimate?: string | null
+          group_color?: string | null
+          group_name?: string | null
           id?: string
           is_priority?: boolean
           keyword: string
           notes?: string | null
+          tags?: string[] | null
           updated_at?: string
           user_id: string
           volume_estimate?: string | null
@@ -497,10 +503,13 @@ export type Database = {
         Update: {
           created_at?: string
           difficulty_estimate?: string | null
+          group_color?: string | null
+          group_name?: string | null
           id?: string
           is_priority?: boolean
           keyword?: string
           notes?: string | null
+          tags?: string[] | null
           updated_at?: string
           user_id?: string
           volume_estimate?: string | null
