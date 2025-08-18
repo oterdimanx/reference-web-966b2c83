@@ -100,6 +100,34 @@ export const SubscriptionUpgrade = () => {
     return 999;
   };
 
+  const getFeatures = (plan: PricingPlan) => {
+    // Get the appropriate description based on language
+    const description = language === 'fr' && plan.description_fr ? plan.description_fr : plan.description_en;
+    
+    // If we have a description from the database, use it
+    if (description) {
+      return description.split('|');
+    }
+    
+    // Fallback to the original logic if no description in database
+    if (plan.price === 1) {
+      return [
+        t('pricing', 'feature1Website'),
+        t('pricing', 'featureKeywordTracking'),
+        t('pricing', 'featureAnalyticsDashboard'),
+      ];
+    }
+    
+    return [
+      `${getWebsitesAllowed(plan.price) === 999 
+        ? t('pricing', 'featureUnlimitedWebsites')
+        : `${getWebsitesAllowed(plan.price)} ${t('pricing', 'featureWebsites')}`
+      }`,
+      t('pricing', 'featureKeywordTracking'),
+      t('pricing', 'featureAnalyticsDashboard'),
+    ];
+  };
+
   const getPlanTitle = (plan: PricingPlan) => {
     return language === 'fr' && plan.title_fr ? plan.title_fr : plan.title;
   };
@@ -171,20 +199,11 @@ export const SubscriptionUpgrade = () => {
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 mb-4">
-                  <li className="flex items-center">
-                    <span className="text-sm">
-                      {websitesAllowed === 999 
-                        ? (language === 'fr' ? 'Illimité' : 'Unlimited')
-                        : websitesAllowed
-                      } {language === 'fr' ? 'site' : 'website'}{websitesAllowed !== 1 ? (language === 'fr' ? 's' : 's') : ''}
-                    </span>
-                  </li>
-                  <li className="flex items-center">
-                    <span className="text-sm">{language === 'fr' ? 'Suivi des mots-clés' : 'Keyword tracking'}</span>
-                  </li>
-                  <li className="flex items-center">
-                    <span className="text-sm">{language === 'fr' ? 'Tableau de bord analytique' : 'Analytics dashboard'}</span>
-                  </li>
+                  {getFeatures(plan).map((feature, index) => (
+                    <li key={index} className="flex items-center">
+                      <span className="text-sm">{feature}</span>
+                    </li>
+                  ))}
                 </ul>
                 
                 <Button
