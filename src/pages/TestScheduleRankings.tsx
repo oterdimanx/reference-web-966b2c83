@@ -43,26 +43,38 @@ const TestScheduleRankings = () => {
   const loadData = async () => {
     setIsLoadingData(true);
     try {
+      // Check authentication status
+      const { data: { user } } = await supabase.auth.getUser();
+      console.log('Current user:', user?.id || 'Not authenticated');
+      
       // Load recent cron execution logs
-      const { data: logs } = await supabase
+      const { data: logs, error: logsError } = await supabase
         .from('cron_execution_logs')
         .select('*')
         .order('execution_time', { ascending: false })
         .limit(10);
       
+      if (logsError) {
+        console.error('Error loading cron logs:', logsError);
+      }
+      
       // Load pending ranking requests with website info
-      const { data: requests } = await supabase
+      const { data: requests, error: requestsError } = await supabase
         .from('ranking_requests')
         .select(`
           id,
           keyword,
           status,
           requested_at,
-          website_id
+          website_id,
+          user_id
         `)
         .in('status', ['pending', 'processing'])
         .order('requested_at', { ascending: false })
         .limit(20);
+      
+      console.log('Ranking requests query result:', { requests, error: requestsError });
+      console.log('Found requests count:', requests?.length || 0);
 
       // Get website domains for the requests
       const enrichedRequests = [];
