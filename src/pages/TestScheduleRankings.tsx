@@ -75,6 +75,18 @@ const TestScheduleRankings = () => {
       
       console.log('Ranking requests query result:', { requests, error: requestsError });
       console.log('Found requests count:', requests?.length || 0);
+      
+      if (requests && requests.length > 0) {
+        console.log('Request user_ids:', requests.map(r => r.user_id));
+      }
+      
+      // Also try to query all requests without RLS filtering (this will fail but show the error)
+      const { data: allRequests, error: allError } = await supabase
+        .from('ranking_requests')
+        .select('id, user_id, keyword, status')
+        .in('status', ['pending', 'processing']);
+        
+      console.log('All requests query (may fail due to RLS):', { allRequests, error: allError });
 
       // Get website domains for the requests
       const enrichedRequests = [];
