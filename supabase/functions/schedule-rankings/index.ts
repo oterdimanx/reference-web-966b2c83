@@ -19,8 +19,44 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const startTime = new Date();
+  let logId: string | null = null;
+
   try {
-    console.log('Starting ranking request processing...');
+    // Parse request body to get source information
+    let requestBody = {};
+    let requestSource = 'manual';
+    
+    try {
+      const body = await req.text();
+      if (body) {
+        requestBody = JSON.parse(body);
+        requestSource = requestBody.triggered_by || 'manual';
+      }
+    } catch (e) {
+      // Ignore JSON parsing errors for empty bodies
+    }
+
+    console.log(`Starting ranking request processing... (source: ${requestSource})`);
+    
+    // Log execution start
+    const { data: logEntry, error: logError } = await supabase
+      .from('cron_execution_logs')
+      .insert({
+        job_name: 'schedule-rankings',
+        status: 'started',
+        request_source: requestSource,
+        execution_time: startTime.toISOString()
+      })
+      .select('id')
+      .single();
+
+    if (logError) {
+      console.error('Failed to log execution start:', logError);
+    } else {
+      logId = logEntry?.id;
+      console.log(`Execution logged with ID: ${logId}`);
+    }
 
     // Get pending ranking requests ordered by priority and requested_at
     const { data: pendingRequests, error: requestsError } = await supabase
@@ -156,19 +192,59 @@ serve(async (req) => {
 
     console.log('Ranking request processing completed');
 
+    // Update execution log with success
+    if (logId) {
+      const endTime = new Date();
+      const executionDuration = Math.floor((endTime.getTime() - startTime.getTime()) / 1000); // seconds
+      
+      await supabase
+        .from('cron_execution_logs')
+        .update({
+          status: 'completed',
+          processed_requests: pendingRequests.length,
+          execution_duration: `${executionDuration} seconds`,
+          response_data: { 
+            processed: pendingRequests.length, 
+            successful: results.filter(r => r.success).length,
+            failed: results.filter(r => !r.success).length
+          }
+        })
+        .eq('id', logId);
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
         processed: pendingRequests.length,
-        results: results
+        results: results,
+        execution_id: logId
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
     console.error('Error in schedule-rankings function:', error);
+    
+    // Update execution log with failure
+    if (logId) {
+      const endTime = new Date();
+      const executionDuration = Math.floor((endTime.getTime() - startTime.getTime()) / 1000); // seconds
+      
+      await supabase
+        .from('cron_execution_logs')
+        .update({
+          status: 'failed',
+          error_message: error.message,
+          execution_duration: `${executionDuration} seconds`
+        })
+        .eq('id', logId);
+    }
+    
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        execution_id: logId 
+      }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
