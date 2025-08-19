@@ -14,4 +14,5 @@ export const adminTranslations = {
   adminTexts: 'Textes administrateur',
   homepageTexts: 'Textes de la page d\'accueil',
   saveTranslations: 'Sauvegarder les traductions françaises',
+  testScheduleRankings: 'Test Planificateur de Classements',
 };

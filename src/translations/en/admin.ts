@@ -14,4 +14,5 @@ export const adminTranslations = {
   adminTexts: 'Admin Texts',
   homepageTexts: 'Homepage Texts',
   saveTranslations: 'Save English Translations',
+  testScheduleRankings: 'Test Schedule Rankings',
 };

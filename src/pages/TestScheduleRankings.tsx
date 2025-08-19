@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,6 +7,9 @@ import { Header } from "@/components/Layout/Header";
 import { Footer } from "@/components/Layout/Footer";
 import { supabase } from "@/integrations/supabase/client";
 import { Play, RefreshCw, AlertTriangle, CheckCircle, Clock } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useAdminStatus } from "@/hooks/use-admin-status";
+import AdminMenu from "@/components/Admin/AdminMenu";
 
 interface CronLog {
   id: string;
@@ -34,11 +38,47 @@ interface EnrichedRequest {
 }
 
 const TestScheduleRankings = () => {
+  const { user, loading } = useAuth();
+  const isAdmin = useAdminStatus(user?.id);
   const [result, setResult] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [cronLogs, setCronLogs] = useState<CronLog[]>([]);
   const [pendingRequests, setPendingRequests] = useState<EnrichedRequest[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
+
+  // Show loading state while checking authentication
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rank-teal"></div>
+      </div>
+    );
+  }
+
+  // Redirect to auth page if not logged in
+  if (!user) {
+    return <Navigate to="/auth" />;
+  }
+
+  // Access denied if not admin
+  if (!isAdmin) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Header />
+        <main className="flex-grow flex items-center justify-center">
+          <Card>
+            <CardHeader>
+              <CardTitle>Access Denied</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>You do not have permission to access this page.</p>
+            </CardContent>
+          </Card>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   const loadData = async () => {
     setIsLoadingData(true);
@@ -191,6 +231,7 @@ const TestScheduleRankings = () => {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8">
+        <AdminMenu />
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Test Controls */}
           <Card>
