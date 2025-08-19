@@ -396,7 +396,15 @@ export type Database = {
           user_id?: string
           website_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_ranking_requests_website_id"
+            columns: ["website_id"]
+            isOneToOne: false
+            referencedRelation: "websites"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ranking_snapshots: {
         Row: {
