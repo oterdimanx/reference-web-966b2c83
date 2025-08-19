@@ -68,6 +68,45 @@ export type Database = {
         }
         Relationships: []
       }
+      cron_execution_logs: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          execution_duration: unknown | null
+          execution_time: string
+          id: string
+          job_name: string
+          processed_requests: number | null
+          request_source: string | null
+          response_data: Json | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          execution_duration?: unknown | null
+          execution_time?: string
+          id?: string
+          job_name: string
+          processed_requests?: number | null
+          request_source?: string | null
+          response_data?: Json | null
+          status: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          execution_duration?: unknown | null
+          execution_time?: string
+          id?: string
+          job_name?: string
+          processed_requests?: number | null
+          request_source?: string | null
+          response_data?: Json | null
+          status?: string
+        }
+        Relationships: []
+      }
       custom_translations: {
         Row: {
           created_at: string
@@ -693,7 +732,18 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      cron_job_health: {
+        Row: {
+          avg_duration_seconds: number | null
+          failed_executions: number | null
+          job_name: string | null
+          last_execution: string | null
+          successful_executions: number | null
+          total_executions: number | null
+          total_processed_requests: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {
