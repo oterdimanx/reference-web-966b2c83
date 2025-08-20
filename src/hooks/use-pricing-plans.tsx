@@ -11,6 +11,8 @@ export interface PricingPlan {
   title_fr: string | null;
   description_fr: string | null;
   description_en: string | null;
+  frequency_en: string | null;
+  frequency_fr: string | null;
   price: number;
   active: boolean;
   created_at: string;
@@ -23,6 +25,8 @@ export const pricingFormSchema = z.object({
   price: z.coerce
     .number({ invalid_type_error: "Price must be a number" })
     .min(0, "Price must be 0 or higher"),
+  frequency_en: z.string().optional(),
+  frequency_fr: z.string().optional(),
   active: z.boolean().default(true)
 });
 
@@ -71,6 +75,8 @@ export const usePricingPlans = (userId: string | undefined, isAdmin: boolean) =>
         .insert({
           title: values.title,
           price: values.price,
+          frequency_en: values.frequency_en || null,
+          frequency_fr: values.frequency_fr || null,
           active: values.active
         })
         .select()
@@ -96,6 +102,8 @@ export const usePricingPlans = (userId: string | undefined, isAdmin: boolean) =>
         .update({
           title: values.title,
           price: values.price,
+          frequency_en: values.frequency_en || null,
+          frequency_fr: values.frequency_fr || null,
           active: values.active
         })
         .eq('id', id)

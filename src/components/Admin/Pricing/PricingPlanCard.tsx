@@ -7,6 +7,7 @@ import { PricingPlan, usePricingPlans } from '@/hooks/use-pricing-plans';
 import PricingPlanEditDialog from './PricingPlanEditDialog';
 import PricingPlanDeleteDialog from './PricingPlanDeleteDialog';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface PricingPlanCardProps {
   plan: PricingPlan;
@@ -16,6 +17,7 @@ const PricingPlanCard = ({ plan }: PricingPlanCardProps) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { user } = useAuth();
+  const { language } = useLanguage();
   const { updatePricingMutation, deletePricingMutation } = usePricingPlans(user?.id, true);
   
   // Check if this specific plan is being processed
@@ -59,7 +61,11 @@ const PricingPlanCard = ({ plan }: PricingPlanCardProps) => {
         </CardHeader>
         <CardContent>
           <p className="text-3xl font-bold">${plan.price.toFixed(2)}</p>
-          <p className="text-sm text-muted-foreground mt-1">per month</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            {language === 'fr' && plan.frequency_fr 
+              ? plan.frequency_fr 
+              : plan.frequency_en || 'per month'}
+          </p>
           
           <div className="mt-4 text-sm">
             <div className="flex justify-between">

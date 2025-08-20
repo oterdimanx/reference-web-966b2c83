@@ -34,6 +34,8 @@ const PricingPlanCreateDialog = ({ isOpen, onOpenChange }: PricingPlanCreateDial
     defaultValues: {
       title: "",
       price: 0,
+      frequency_en: "",
+      frequency_fr: "",
       active: true
     }
   });
@@ -108,6 +110,40 @@ const PricingPlanCreateDialog = ({ isOpen, onOpenChange }: PricingPlanCreateDial
                   </FormControl>
                   <FormDescription>
                     Monthly price in USD
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="frequency_en"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Payment Frequency (English)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., /month, /year" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Payment frequency displayed in English
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="frequency_fr"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Payment Frequency (French)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., /mois, /an" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Payment frequency displayed in French
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

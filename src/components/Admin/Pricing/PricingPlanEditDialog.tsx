@@ -32,6 +32,8 @@ const PricingPlanEditDialog = ({ plan, isOpen, onOpenChange }: PricingPlanEditDi
     defaultValues: {
       title: plan.title,
       price: plan.price,
+      frequency_en: plan.frequency_en || "",
+      frequency_fr: plan.frequency_fr || "",
       active: plan.active
     }
   });
@@ -42,6 +44,8 @@ const PricingPlanEditDialog = ({ plan, isOpen, onOpenChange }: PricingPlanEditDi
       form.reset({
         title: plan.title,
         price: plan.price,
+        frequency_en: plan.frequency_en || "",
+        frequency_fr: plan.frequency_fr || "",
         active: plan.active
       });
     }
@@ -98,6 +102,40 @@ const PricingPlanEditDialog = ({ plan, isOpen, onOpenChange }: PricingPlanEditDi
                   </FormControl>
                   <FormDescription>
                     Monthly price in USD
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="frequency_en"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Payment Frequency (English)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., /month, /year" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Payment frequency displayed in English
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="frequency_fr"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Payment Frequency (French)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., /mois, /an" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Payment frequency displayed in French
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
