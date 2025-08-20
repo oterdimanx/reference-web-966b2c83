@@ -7,6 +7,7 @@ import {
   createDirectoryWebsite, 
   updateDirectoryWebsite, 
   deleteDirectoryWebsite,
+  checkDomainExists,
   DirectoryWebsite,
   Category,
   CreateDirectoryWebsiteData
@@ -52,6 +53,14 @@ export function useDirectoryManagement() {
   const addWebsiteToDirectory = async (formData: CreateDirectoryWebsiteData) => {
     try {
       console.log('Adding website to directory:', formData);
+      
+      // Check if domain already exists
+      const domainExists = await checkDomainExists(formData.domain);
+      if (domainExists) {
+        toast.error('This website is already in the directory');
+        return false;
+      }
+      
       const result = await createDirectoryWebsite(formData);
       if (result) {
         toast.success('Website added to directory');

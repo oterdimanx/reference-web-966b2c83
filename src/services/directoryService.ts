@@ -190,6 +190,26 @@ export const updateDirectoryWebsite = async (id: string, updates: Partial<Direct
   }
 };
 
+export const checkDomainExists = async (domain: string): Promise<boolean> => {
+  try {
+    const { data, error } = await supabase
+      .from('directory_websites')
+      .select('id')
+      .eq('domain', domain.toLowerCase())
+      .limit(1);
+
+    if (error) {
+      console.error('Error checking domain existence:', error);
+      throw error;
+    }
+
+    return (data && data.length > 0);
+  } catch (error) {
+    console.error('Error in checkDomainExists:', error);
+    return false;
+  }
+};
+
 export const deleteDirectoryWebsite = async (id: string): Promise<boolean> => {
   try {
     const { error } = await supabase
