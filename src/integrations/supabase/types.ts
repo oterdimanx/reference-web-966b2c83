@@ -768,6 +768,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      normalize_domain: {
+        Args: { input_domain: string }
+        Returns: string
+      }
       validate_domain: {
         Args: { domain_text: string }
         Returns: boolean
