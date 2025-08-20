@@ -11,6 +11,8 @@ export interface SubscriptionHistory {
   pricing: {
     title: string;
     price: number;
+    frequency_en?: string;
+    frequency_fr?: string;
   };
 }
 
@@ -65,7 +67,9 @@ export const subscriptionService = {
           *,
           pricing (
             title,
-            price
+            price,
+            frequency_en,
+            frequency_fr
           )
         `)
         .eq('user_id', userId)
@@ -82,8 +86,10 @@ export const subscriptionService = {
         started_at: sub.started_at,
         ended_at: sub.ended_at,
         pricing: {
-          title: sub.pricing.title,
-          price: sub.pricing.price
+          title: (sub.pricing as any).title,
+          price: (sub.pricing as any).price,
+          frequency_en: (sub.pricing as any).frequency_en,
+          frequency_fr: (sub.pricing as any).frequency_fr
         }
       }));
     } catch (error) {

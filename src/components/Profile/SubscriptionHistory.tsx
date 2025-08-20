@@ -1,6 +1,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -9,6 +10,7 @@ import { format } from 'date-fns';
 
 export const SubscriptionHistoryCard = () => {
   const { user } = useAuth();
+  const { language } = useLanguage();
 
   const { data: subscriptionHistory, isLoading } = useQuery({
     queryKey: ['subscription-history', user?.id],
@@ -99,7 +101,12 @@ export const SubscriptionHistoryCard = () => {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-semibold">€{subscription.pricing.price}/month</p>
+                  <p className="font-semibold">
+                    €{subscription.pricing.price}
+                    {language === 'fr' && subscription.pricing.frequency_fr 
+                      ? subscription.pricing.frequency_fr 
+                      : subscription.pricing.frequency_en || '/month'}
+                  </p>
                 </div>
               </div>
             ))}
