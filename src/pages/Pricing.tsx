@@ -24,6 +24,8 @@ interface PricingPlan {
   description_en?: string;
   description_fr?: string;
   title_fr?: string;
+  frequency_en?: string;
+  frequency_fr?: string;
 }
 
 const Pricing = () => {
@@ -112,7 +114,13 @@ const Pricing = () => {
   };
 
   const getPaymentFrequency = (plan: PricingPlan) => {
-    // €1 plan shows "one-time", basic plan shows "/3 months", premium shows "/year"
+    // Use database frequency values if available
+    const frequency = language === 'fr' && plan.frequency_fr ? plan.frequency_fr : plan.frequency_en;
+    if (frequency) {
+      return frequency;
+    }
+    
+    // Fallback to original logic if no database values
     if (plan.price === 1) {
       return t('pricingPage', 'oneTime');
     } else if (plan.price < 10) { // Basic plans are under €10
