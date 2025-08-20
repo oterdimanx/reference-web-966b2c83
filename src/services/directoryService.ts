@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { sanitizeDomain } from '@/utils/domainUtils';
 
 export interface DirectoryWebsite {
   id: string;
@@ -117,9 +118,15 @@ export const getCategories = async (): Promise<Category[]> => {
 // Admin functions for managing directory websites
 export const createDirectoryWebsite = async (website: CreateDirectoryWebsiteData): Promise<DirectoryWebsite | null> => {
   try {
+    // Normalize the domain before saving (trigger will also handle this, but being explicit)
+    const normalizedWebsite = {
+      ...website,
+      domain: sanitizeDomain(website.domain)
+    };
+    
     const { data, error } = await supabase
       .from('directory_websites')
-      .insert(website)
+      .insert(normalizedWebsite)
       .select('*')
       .single();
 
@@ -154,9 +161,15 @@ export const createDirectoryWebsite = async (website: CreateDirectoryWebsiteData
 
 export const updateDirectoryWebsite = async (id: string, updates: Partial<DirectoryWebsite>): Promise<DirectoryWebsite | null> => {
   try {
+    // Normalize domain if it's being updated
+    const normalizedUpdates = {
+      ...updates,
+      ...(updates.domain && { domain: sanitizeDomain(updates.domain) })
+    };
+    
     const { data, error } = await supabase
       .from('directory_websites')
-      .update(updates)
+      .update(normalizedUpdates)
       .eq('id', id)
       .select('*')
       .single();
@@ -192,10 +205,13 @@ export const updateDirectoryWebsite = async (id: string, updates: Partial<Direct
 
 export const checkDomainExists = async (domain: string): Promise<boolean> => {
   try {
+    // Use the same domain sanitization logic
+    const normalizedDomain = sanitizeDomain(domain);
+    
     const { data, error } = await supabase
       .from('directory_websites')
       .select('id')
-      .eq('domain', domain.toLowerCase())
+      .eq('domain', normalizedDomain)
       .limit(1);
 
     if (error) {
