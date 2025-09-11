@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Play, RefreshCw, AlertTriangle, CheckCircle, Clock } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminStatus } from "@/hooks/use-admin-status";
-import AdminMenu from "@/components/Admin/AdminMenu";
+
 
 interface CronLog {
   id: string;
@@ -231,7 +231,6 @@ const TestScheduleRankings = () => {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8">
-        <AdminMenu />
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Test Controls */}
           <Card>

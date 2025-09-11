@@ -3,7 +3,7 @@ import { Header } from '@/components/Layout/Header';
 import { Footer } from '@/components/Layout/Footer';
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
-import AdminMenu from '@/components/Admin/AdminMenu';
+
 import { DirectoryManagement } from '@/components/Admin/DirectoryManagement';
 
 const AdminDirectory = () => {
@@ -19,8 +19,6 @@ const AdminDirectory = () => {
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">Directory Management</h1>
-        
-        <AdminMenu />
         
         <DirectoryManagement />
       </main>

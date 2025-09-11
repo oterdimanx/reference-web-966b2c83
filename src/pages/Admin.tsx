@@ -6,7 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Navigate } from 'react-router-dom';
-import AdminMenu from '@/components/Admin/AdminMenu';
+
 import UserTable from '@/components/Admin/UserTable';
 import AddAdminForm from '@/components/Admin/AddAdminForm';
 import { useAdminStatus } from '@/hooks/use-admin-status';
@@ -71,8 +71,6 @@ const AdminPage = () => {
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
-
-        <AdminMenu />
         
         <div className="grid md:grid-cols-2 gap-6">
           <Card>

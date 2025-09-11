@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Navigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import AdminMenu from '@/components/Admin/AdminMenu';
+
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AdminStats } from '@/components/Admin/AdminStats';
@@ -41,8 +41,6 @@ const AdminDashboard = () => {
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">{t('admin', 'dashboard')}</h1>
-        
-        <AdminMenu />
         
         <AdminStats 
           usersCount={usersCount}

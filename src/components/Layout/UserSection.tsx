@@ -46,11 +46,6 @@ export function UserSection() {
         <DropdownMenuItem asChild>
           <Link to="/profile">{t('common', 'profile')}</Link>
         </DropdownMenuItem>
-        {isAdmin && (
-          <DropdownMenuItem asChild>
-            <Link to="/admin/dashboard-rw">{t('common', 'admin')}</Link>
-          </DropdownMenuItem>
-        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => signOut()}>
           {t('common', 'signOut')}
