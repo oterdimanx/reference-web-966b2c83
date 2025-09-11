@@ -296,6 +296,8 @@ export type Database = {
           created_at: string
           description_en: string | null
           description_fr: string | null
+          frequency_en: string | null
+          frequency_fr: string | null
           id: string
           price: number
           title: string
@@ -307,6 +309,8 @@ export type Database = {
           created_at?: string
           description_en?: string | null
           description_fr?: string | null
+          frequency_en?: string | null
+          frequency_fr?: string | null
           id?: string
           price: number
           title: string
@@ -318,6 +322,8 @@ export type Database = {
           created_at?: string
           description_en?: string | null
           description_fr?: string | null
+          frequency_en?: string | null
+          frequency_fr?: string | null
           id?: string
           price?: number
           title?: string
