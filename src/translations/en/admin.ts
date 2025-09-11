@@ -3,7 +3,7 @@ export const adminTranslations = {
   dashboard: 'Dashboard',
   pricing: 'Pricing Plans',
   userManagement: 'User Management',
-  navigationTitle: 'Admin Navigation',
+  navigationTitle: 'Admin',
   totalUsers: 'Total Users',
   totalWebsites: 'Total Websites',
   pricingPlans: 'Pricing Plans',
