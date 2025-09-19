@@ -28,6 +28,7 @@ import AdminAnalytics from "./pages/Admin/Analytics";
 import AdminDirectory from "./pages/Admin/Directory";
 import AdminDirectoryCategories from './pages/Admin/DirectoryCategories';
 import AdminRankings from "./pages/Admin/Rankings";
+import AdminSEO from "./pages/Admin/SEO";
 import Directories from "./pages/Directories";
 import Contact from "./pages/Contact";
 import Sitemap from "./pages/Sitemap";
@@ -120,6 +121,11 @@ const App = () => (
                   <Route path="/admin/directory/categories" element={
                     <ProtectedRoute>
                       <AdminDirectoryCategories />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/admin/seo" element={
+                    <ProtectedRoute>
+                      <AdminSEO />
                     </ProtectedRoute>
                   } />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

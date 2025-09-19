@@ -2,12 +2,14 @@
 import { Header } from '@/components/Layout/Header';
 import { Footer } from '@/components/Layout/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { DynamicHead } from '@/components/SEO/DynamicHead';
 
 const About = () => {
   const { t } = useLanguage();
 
   return (
     <div className="flex flex-col min-h-screen">
+      <DynamicHead pageKey="about" />
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">

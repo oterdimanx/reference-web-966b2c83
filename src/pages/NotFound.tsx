@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Layout/Header";
 import { Footer } from "@/components/Layout/Footer";
+import { DynamicHead } from "@/components/SEO/DynamicHead";
 
 const NotFound = () => {
   const location = useLocation();
@@ -17,6 +18,7 @@ const NotFound = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <DynamicHead pageKey="notfound" />
       <Header />
       <main className="flex-grow flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12">
         <div className="text-center max-w-md px-4">

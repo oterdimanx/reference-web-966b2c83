@@ -290,6 +290,66 @@ export type Database = {
           },
         ]
       }
+      page_metadata: {
+        Row: {
+          author: string | null
+          canonical_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          keywords: string | null
+          language: string
+          og_description: string | null
+          og_image: string | null
+          og_title: string | null
+          page_key: string
+          robots: string | null
+          title: string | null
+          twitter_description: string | null
+          twitter_image: string | null
+          twitter_title: string | null
+          updated_at: string
+        }
+        Insert: {
+          author?: string | null
+          canonical_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          keywords?: string | null
+          language?: string
+          og_description?: string | null
+          og_image?: string | null
+          og_title?: string | null
+          page_key: string
+          robots?: string | null
+          title?: string | null
+          twitter_description?: string | null
+          twitter_image?: string | null
+          twitter_title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          author?: string | null
+          canonical_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          keywords?: string | null
+          language?: string
+          og_description?: string | null
+          og_image?: string | null
+          og_title?: string | null
+          page_key?: string
+          robots?: string | null
+          title?: string | null
+          twitter_description?: string | null
+          twitter_image?: string | null
+          twitter_title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       pricing: {
         Row: {
           active: boolean

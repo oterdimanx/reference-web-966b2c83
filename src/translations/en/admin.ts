@@ -15,4 +15,9 @@ export const adminTranslations = {
   homepageTexts: 'Homepage Texts',
   saveTranslations: 'Save English Translations',
   testScheduleRankings: 'Test Schedule Rankings',
+  categories: 'Categories',
+  directory: 'Directory Management',
+  analytics: 'Analytics',
+  rankings: 'Rankings Management',
+  seoManagement: 'SEO Management',
 };

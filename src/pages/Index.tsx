@@ -6,6 +6,7 @@ import { Footer } from '@/components/Layout/Footer';
 import { DashboardView } from '@/components/Dashboard/DashboardView';
 import { WelcomeAnimation } from '@/components/Layout/WelcomeAnimation';
 import { useFirstVisit } from '@/hooks/useFirstVisit';
+import { DynamicHead } from '@/components/SEO/DynamicHead';
 
 const Index = () => {
   const { isFirstVisit, isLoading } = useFirstVisit();
@@ -36,6 +37,7 @@ const Index = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <DynamicHead pageKey="index" />
       <AnimatePresence>
         {showAnimation && (
           <WelcomeAnimation onComplete={handleAnimationComplete} />

@@ -15,4 +15,9 @@ export const adminTranslations = {
   homepageTexts: 'Textes de la page d\'accueil',
   saveTranslations: 'Sauvegarder les traductions françaises',
   testScheduleRankings: 'Test Planificateur de Classements',
+  categories: 'Catégories',
+  directory: 'Gestion de l\'annuaire',
+  analytics: 'Analytique',
+  rankings: 'Gestion des classements',
+  seoManagement: 'Gestion SEO',
 };
