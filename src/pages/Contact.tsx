@@ -12,6 +12,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Header } from '@/components/Layout/Header';
+import { Footer } from '@/components/Layout/Footer';
+import { DynamicHead } from '@/components/SEO/DynamicHead';
 
 const contactSchema = z.object({
   contactName: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
@@ -75,90 +78,100 @@ export default function Contact() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 py-8">
-      <div className="container mx-auto px-4 max-w-2xl">
-        <Card className="shadow-lg border-0 bg-card/80 backdrop-blur">
-          <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-              Nous contacter
-            </CardTitle>
-            <CardDescription className="text-lg">
-              Vous avez une question ou besoin d'assistance ? N'hésitez pas à nous contacter.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="contactName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nom de contact</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="Votre nom complet" 
-                          {...field} 
-                          className="bg-background/50"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="type"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Type de demande</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+    <div className="flex flex-col min-h-screen">
+      <DynamicHead 
+        pageKey="contact"
+        fallbackTitle="Contact - RankTracker"
+        fallbackDescription="Contactez notre équipe pour toute question ou assistance concernant votre suivi de référencement"
+        fallbackKeywords="contact, support, assistance, ranktracker"
+      />
+      <Header />
+      <main className="flex-grow bg-gradient-to-br from-background to-muted/20 py-8">
+        <div className="container mx-auto px-4 max-w-2xl">
+          <Card className="shadow-lg border-0 bg-card/80 backdrop-blur">
+            <CardHeader className="text-center">
+              <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                Nous contacter
+              </CardTitle>
+              <CardDescription className="text-lg">
+                Vous avez une question ou besoin d'assistance ? N'hésitez pas à nous contacter.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                  <FormField
+                    control={form.control}
+                    name="contactName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nom de contact</FormLabel>
                         <FormControl>
-                          <SelectTrigger className="bg-background/50">
-                            <SelectValue placeholder="Sélectionnez le type de votre demande" />
-                          </SelectTrigger>
+                          <Input 
+                            placeholder="Votre nom complet" 
+                            {...field} 
+                            className="bg-background/50"
+                          />
                         </FormControl>
-                        <SelectContent>
-                          <SelectItem value="mes droits">Mes droits</SelectItem>
-                          <SelectItem value="support">Support technique</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Description</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Décrivez votre demande en détail..."
-                          className="min-h-[120px] bg-background/50"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  <FormField
+                    control={form.control}
+                    name="type"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Type de demande</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="bg-background/50">
+                              <SelectValue placeholder="Sélectionnez le type de votre demande" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="mes droits">Mes droits</SelectItem>
+                            <SelectItem value="support">Support technique</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <Button 
-                  type="submit" 
-                  disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 transition-all duration-200"
-                >
-                  {isSubmitting ? 'Envoi en cours...' : 'Envoyer le message'}
-                </Button>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
-      </div>
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Description</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Décrivez votre demande en détail..."
+                            className="min-h-[120px] bg-background/50"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button 
+                    type="submit" 
+                    disabled={isSubmitting}
+                    className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 transition-all duration-200"
+                  >
+                    {isSubmitting ? 'Envoi en cours...' : 'Envoyer le message'}
+                  </Button>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+      <Footer />
     </div>
   );
 }
