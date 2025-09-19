@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { DynamicHead } from '@/components/SEO/DynamicHead';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -136,6 +137,12 @@ const Pricing = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <DynamicHead 
+        pageKey="pricing"
+        fallbackTitle="Pricing Plans - SEO Rank Tracker"
+        fallbackDescription="Choose the perfect SEO tracking plan for your needs. Affordable pricing starting from €1 for website ranking monitoring."
+        fallbackKeywords="seo pricing, rank tracker plans, website monitoring pricing, seo tools subscription"
+      />
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8">
       <div className="max-w-6xl mx-auto">

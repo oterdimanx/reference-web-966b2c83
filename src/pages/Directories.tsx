@@ -7,6 +7,7 @@ import { DirectoryFilters } from '@/components/Directory/DirectoryFilters';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getDirectoryWebsites, getCategories, DirectoryWebsite, Category } from '@/services/directoryService';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { DynamicHead } from '@/components/SEO/DynamicHead';
 
 const Directories = () => {
   const { t } = useLanguage();
@@ -63,6 +64,12 @@ const Directories = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <DynamicHead 
+        pageKey="directories"
+        fallbackTitle="Website Directory - Discover Quality Websites"
+        fallbackDescription="Explore our curated directory of websites organized by categories. Find quality sites for SEO tracking and analysis."
+        fallbackKeywords="website directory, seo websites, website categories, site discovery"
+      />
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="mb-8">

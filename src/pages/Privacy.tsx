@@ -2,12 +2,19 @@
 import { Header } from '@/components/Layout/Header';
 import { Footer } from '@/components/Layout/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { DynamicHead } from '@/components/SEO/DynamicHead';
 
 const Privacy = () => {
   const { t } = useLanguage();
   
   return (
     <div className="flex flex-col min-h-screen">
+      <DynamicHead 
+        pageKey="privacy"
+        fallbackTitle="Privacy Policy - Data Protection & GDPR Compliance"
+        fallbackDescription="Learn how we collect, use, and protect your personal data. Our comprehensive privacy policy ensures GDPR compliance and transparency."
+        fallbackKeywords="privacy policy, data protection, gdpr compliance, personal data, privacy rights"
+      />
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">

@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '@/contexts/AuthContext';
+import { DynamicHead } from '@/components/SEO/DynamicHead';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -62,7 +63,14 @@ const Auth = () => {
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50 dark:bg-gray-900 p-4">
+    <>
+      <DynamicHead 
+        pageKey="auth"
+        fallbackTitle="Login & Sign Up - Access Your SEO Dashboard"
+        fallbackDescription="Sign in to your SEO rank tracker account or create a new account to start monitoring your website rankings."
+        fallbackKeywords="login, sign up, user authentication, seo dashboard access, account creation"
+      />
+      <div className="flex justify-center items-center min-h-screen bg-gray-50 dark:bg-gray-900 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-2xl font-bold">Reference-Web</CardTitle>
@@ -120,7 +128,8 @@ const Auth = () => {
           </div>
         </CardFooter>
       </Card>
-    </div>
+      </div>
+    </>
   );
 };
 

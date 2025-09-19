@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import { generateSitemap, getStaticUrls, SitemapUrl } from '@/utils/sitemapGenerator';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
+import { Header } from '@/components/Layout/Header';
+import { Footer } from '@/components/Layout/Footer';
+import { DynamicHead } from '@/components/SEO/DynamicHead';
 
 const Sitemap = () => {
   const [sitemapXml, setSitemapXml] = useState<string>('');
@@ -59,9 +62,17 @@ const Sitemap = () => {
   }, [sitemapXml]);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
+    <div className="flex flex-col min-h-screen">
+      <DynamicHead 
+        pageKey="sitemap"
+        fallbackTitle="XML Sitemap - Website Structure & Pages"
+        fallbackDescription="View our complete XML sitemap containing all pages available to search engines for better SEO indexing."
+        fallbackKeywords="xml sitemap, seo sitemap, website structure, search engine indexing"
+      />
+      <Header />
+      <main className="flex-grow bg-gray-50 dark:bg-gray-900">
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold mb-6 text-center">Sitemap</h1>
           
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
@@ -96,8 +107,10 @@ const Sitemap = () => {
               </a>
             </div>
           </div>
+          </div>
         </div>
-      </div>
+      </main>
+      <Footer />
     </div>
   );
 };
