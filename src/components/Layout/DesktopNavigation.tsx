@@ -10,7 +10,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
-import { Home, DollarSign, Settings, ArrowLeftCircle, BarChart3, Globe, Tags, TrendingUp, Activity } from 'lucide-react';
+import { Home, DollarSign, Settings, ArrowLeftCircle, BarChart3, Globe, Tags, TrendingUp, Activity, Search } from 'lucide-react';
 
 export function DesktopNavigation() {
   const { user, isAdmin } = useAuth();
@@ -161,6 +161,17 @@ export function DesktopNavigation() {
                   >
                     <Settings className="mr-2 h-4 w-4" />
                     {t('admin', 'userManagement')}
+                  </Link>
+                  <Link
+                    to="/admin/seo"
+                    className={`flex items-center px-4 py-2 text-sm rounded ${
+                      isActive('/admin/seo') 
+                        ? 'bg-rank-teal text-white' 
+                        : 'text-gray-600 hover:text-rank-teal hover:bg-gray-100 dark:text-gray-300 dark:hover:text-rank-teal dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    <Search className="mr-2 h-4 w-4" />
+                    {t('admin', 'seoManagement')}
                   </Link>
                   <div className="border-t border-gray-200 dark:border-gray-600 my-2"></div>
                   <Link
