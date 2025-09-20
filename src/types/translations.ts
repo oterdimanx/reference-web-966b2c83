@@ -283,4 +283,24 @@ export interface Translations {
     tip3: string;
     tip4: string;
   };
+  contactPage: {
+    title: string;
+    description: string;
+    contactNameLabel: string;
+    contactNamePlaceholder: string;
+    requestTypeLabel: string;
+    requestTypePlaceholder: string;
+    rightsOption: string;
+    supportOption: string;
+    descriptionLabel: string;
+    descriptionPlaceholder: string;
+    submitButton: string;
+    submittingButton: string;
+    nameValidation: string;
+    typeValidation: string;
+    descriptionValidation: string;
+    rateLimitMessage: string;
+    successMessage: string;
+    errorMessage: string;
+  };
 }
