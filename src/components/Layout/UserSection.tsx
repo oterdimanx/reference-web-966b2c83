@@ -66,7 +66,7 @@ export function UserSection() {
               <DropdownMenuPortal>
                 <DropdownMenuSubContent>
                   <DropdownMenuItem asChild>
-                    <Link to="/admin" className="flex items-center w-full">
+                    <Link to="/admin/dashboard-rw" className="flex items-center w-full">
                       <BarChart className="mr-2 h-4 w-4" />
                       {t('admin', 'dashboard')}
                     </Link>
