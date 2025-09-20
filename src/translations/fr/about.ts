@@ -9,5 +9,5 @@ export const aboutTranslations = {
   technologyTitle: 'Notre Technologie',
   technologyText: 'Nous utilisons une technologie de pointe pour collecter et analyser les données des moteurs de recherche, fournissant des informations précises et à jour sur les performances de votre site web.',
   contactTitle: 'Contactez-nous',
-  contactText: 'Vous avez des questions ou des commentaires ? Nous aimerions avoir de vos nouvelles ! Contactez notre équipe de support sur notre page ',
+  contactText: 'Vous avez des questions ou des commentaires ? Nous aimerions avoir de vos nouvelles ! Contactez notre équipe de support à support@reference-web.com.',
 };
