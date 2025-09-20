@@ -9,7 +9,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { EventsByCountry } from '@/services/worldViewService';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-const geoUrl = "https://raw.githubusercontent.com/deldersveld/topojson/master/world-countries.json";
+const geoUrl = "https://unpkg.com/world-atlas@2.0.2/countries-110m.json";
 
 interface WorldMapProps {
   eventsByCountry: EventsByCountry[];
