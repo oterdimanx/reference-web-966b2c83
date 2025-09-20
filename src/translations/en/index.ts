@@ -12,6 +12,7 @@ import { formsTranslations } from './forms';
 import { pricingTranslations } from './pricing';
 import { legalTranslations } from './legal';
 import { quickTipsTranslations } from './quickTips';
+import { contactTranslations } from './contact';
 
 export const enTranslations: Translations = {
   common: commonTranslations,
@@ -27,4 +28,5 @@ export const enTranslations: Translations = {
   pricing: pricingTranslations,
   legalPages: legalTranslations,
   quickTips: quickTipsTranslations,
+  contactPage: contactTranslations,
 };
