@@ -167,7 +167,10 @@ export class WorldViewService {
   static async hasUserEvents(userId: string): Promise<boolean> {
     const { data, error } = await supabase
       .from('events')
-      .select('id')
+      .select(`
+        id,
+        websites!inner(user_id)
+      `)
       .eq('websites.user_id', userId)
       .limit(1);
 
