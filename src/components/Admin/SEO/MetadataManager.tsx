@@ -3,9 +3,10 @@ import { useAllPageMetadata } from '@/hooks/usePageMetadata';
 import { MetadataTable } from './MetadataTable';
 import { MetadataForm } from './MetadataForm';
 import { Button } from '@/components/ui/button';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, Languages } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { PageMetadata } from '@/hooks/usePageMetadata';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -15,12 +16,17 @@ export const MetadataManager = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingMetadata, setEditingMetadata] = useState<PageMetadata | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [languageFilter, setLanguageFilter] = useState<string>('all');
 
-  const filteredMetadata = allMetadata.filter(metadata =>
-    metadata.page_key.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    metadata.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    metadata.description?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredMetadata = allMetadata.filter(metadata => {
+    const matchesSearch = metadata.page_key.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      metadata.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      metadata.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesLanguage = languageFilter === 'all' || metadata.language === languageFilter;
+    
+    return matchesSearch && matchesLanguage;
+  });
 
   const handleEdit = (metadata: PageMetadata) => {
     setEditingMetadata(metadata);
@@ -51,14 +57,29 @@ export const MetadataManager = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between gap-4">
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Search pages..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9"
-              />
+            <div className="flex items-center gap-4">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Search pages..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Languages className="h-4 w-4 text-muted-foreground" />
+                <ToggleGroup 
+                  type="single" 
+                  value={languageFilter} 
+                  onValueChange={(value) => value && setLanguageFilter(value)}
+                  className="border rounded-md"
+                >
+                  <ToggleGroupItem value="all" className="px-3 py-1">All</ToggleGroupItem>
+                  <ToggleGroupItem value="en" className="px-3 py-1">EN</ToggleGroupItem>
+                  <ToggleGroupItem value="fr" className="px-3 py-1">FR</ToggleGroupItem>
+                </ToggleGroup>
+              </div>
             </div>
             <Button onClick={handleCreate} className="flex items-center gap-2">
               <Plus className="h-4 w-4" />
