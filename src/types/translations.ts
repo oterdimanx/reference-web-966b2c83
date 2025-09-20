@@ -303,4 +303,43 @@ export interface Translations {
     successMessage: string;
     errorMessage: string;
   };
+  worldViewPage: {
+    title: string;
+    description: string;
+    noData: string;
+    noDataDescription: string;
+    loading: string;
+    error: string;
+    filters: {
+      allTime: string;
+      dateRange: string;
+      from: string;
+      to: string;
+      apply: string;
+      eventTypes: string;
+      allEvents: string;
+      pageviews: string;
+      clicks: string;
+    };
+    stats: {
+      totalEvents: string;
+      countries: string;
+      topCountry: string;
+      noCountryData: string;
+    };
+    map: {
+      tooltip: {
+        country: string;
+        events: string;
+        pageviews: string;
+        clicks: string;
+      };
+    };
+    legend: {
+      title: string;
+      low: string;
+      medium: string;
+      high: string;
+    };
+  };
 }

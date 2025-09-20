@@ -13,6 +13,7 @@ import { pricingTranslations } from './pricing';
 import { legalTranslations } from './legal';
 import { quickTipsTranslations } from './quickTips';
 import { contactTranslations } from './contact';
+import { worldViewPage } from './worldView';
 
 export const frTranslations: Translations = {
   common: commonTranslations,
@@ -29,4 +30,5 @@ export const frTranslations: Translations = {
   legalPages: legalTranslations,
   quickTips: quickTipsTranslations,
   contactPage: contactTranslations,
+  worldViewPage: worldViewPage,
 };

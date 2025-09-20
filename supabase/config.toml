@@ -9,3 +9,6 @@ verify_jwt = false
 
 [functions.schedule-rankings]
 verify_jwt = false
+
+[functions.get-country-from-ip]
+verify_jwt = false
