@@ -9,5 +9,5 @@ export const aboutTranslations = {
   technologyTitle: 'Our Technology',
   technologyText: 'We use cutting-edge technology to gather and analyze data from search engines, providing accurate and up-to-date information about your website\'s performance.',
   contactTitle: 'Contact Us',
-  contactText: 'Have questions or feedback? We\'d love to hear from you! Contact our support team at support@reference-web.com.',
+  contactText: 'Have questions or feedback? We\'d love to hear from you! Contact our support team through our dedicated page : ',
 };
