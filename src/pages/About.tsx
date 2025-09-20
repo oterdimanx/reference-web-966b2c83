@@ -3,6 +3,7 @@ import { Header } from '@/components/Layout/Header';
 import { Footer } from '@/components/Layout/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DynamicHead } from '@/components/SEO/DynamicHead';
+import { Link } from 'react-router-dom';
 
 const About = () => {
   const { t } = useLanguage();
