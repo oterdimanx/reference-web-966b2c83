@@ -38,6 +38,12 @@ const About = () => {
             <h2 className="text-2xl font-semibold mt-8 mb-4">{t('aboutPage', 'contactTitle')}</h2>
             <p className="mb-4">
               {t('aboutPage', 'contactText')}
+            <Link
+              to="/contact"
+              className="block px-4 py-2 text-sm text-gray-600 hover:text-rank-teal hover:bg-gray-100 dark:text-gray-300 dark:hover:text-rank-teal dark:hover:bg-gray-700 rounded"
+              >
+              Contact
+            </Link>
             </p>
           </div>
         </div>
