@@ -12,6 +12,7 @@ interface IPLocationResult {
   lat: number;
   lon: number;
   status: string;
+  message?: string;
 }
 
 interface CountryData {
@@ -69,8 +70,33 @@ serve(async (req) => {
           await new Promise(resolve => setTimeout(resolve, 1500)); // 1.5 second delay
         }
 
-        const response = await fetch(`http://ip-api.com/json/${ip}?fields=status,country,countryCode,lat,lon`);
-        const data: IPLocationResult = await response.json();
+        const response = await fetch(`http://ip-api.com/json/${ip}?fields=status,message,country,countryCode,lat,lon`, {
+          timeout: 10000, // 10 second timeout
+        });
+        
+        if (!response.ok) {
+          console.log(`HTTP error for IP ${ip}: ${response.status}`);
+          results[ip] = null;
+          continue;
+        }
+        
+        const text = await response.text();
+        
+        // Check if response is empty
+        if (!text || text.trim() === '') {
+          console.log(`Empty response for IP ${ip}`);
+          results[ip] = null;
+          continue;
+        }
+        
+        let data: IPLocationResult;
+        try {
+          data = JSON.parse(text);
+        } catch (parseError) {
+          console.log(`JSON parse error for IP ${ip}: ${parseError.message}`);
+          results[ip] = null;
+          continue;
+        }
         
         if (data.status === 'success') {
           const countryData: CountryData = {
@@ -85,7 +111,7 @@ serve(async (req) => {
           
           console.log(`Successfully resolved ${ip} to ${data.country} (${data.countryCode})`);
         } else {
-          console.log(`Failed to resolve ${ip}: ${data.status}`);
+          console.log(`Failed to resolve ${ip}: ${data.message || data.status || 'Unknown error'}`);
           results[ip] = null;
         }
       } catch (error) {
