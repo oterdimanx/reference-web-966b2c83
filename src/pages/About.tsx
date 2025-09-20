@@ -39,7 +39,7 @@ const About = () => {
             <h2 className="text-2xl font-semibold mt-8 mb-4">{t('aboutPage', 'contactTitle')}</h2>
             <p className="mb-4">
               {t('aboutPage', 'contactText')}
-              <Link to="/contact" className="text-2xl font-semibold mt-8 mb-4 text-black-600 hover:text-rank-gray dark:text-gray-300 dark:hover:text-white">
+              <Link to="/contact" className="hover:text-rank-blue dark:text-gray-300 dark:hover:text-white">
                 Contact.
               </Link>
             </p>
