@@ -1,7 +1,7 @@
 
 export const aboutTranslations = {
   title: 'À propos de Reference-Web',
-  intro: 'Reference-Web.com est une plateforme de classement SEO et de surveillance de sites web conçue pour aider les entreprises et les particuliers à suivre leur présence en ligne et à améliorer leurs classements dans les moteurs de recherche. Nous offrons également un service permettant aux \'utilisateurs d\'inscrire leur site à notre annuaire.',
+  intro: 'Reference-Web.com est une plateforme de classement SEO et de surveillance de sites web conçue pour aider les entreprises et les particuliers à suivre leur présence en ligne et à améliorer leurs classements dans les moteurs de recherche. Nous offrons également un service permettant aux utilisateurs d\'inscrire leur site à notre annuaire.',
   missionTitle: 'Notre Mission',
   missionText: 'Notre mission est de fournir des informations accessibles et exploitables sur les performances des sites web, en aidant nos utilisateurs à prendre des décisions basées sur les données pour améliorer leur visibilité en ligne. Nous avons également pour vocation de conseiller entreprises et particuliers dans la conception et la mise en oeuvre de sites, applications, ou dans la mise en place de stratégies permettant l\'amélioration de la visibilité et de la protection en ligne.',
   teamTitle: 'L\'Équipe',
