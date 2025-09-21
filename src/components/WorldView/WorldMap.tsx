@@ -30,14 +30,18 @@ export function WorldMap({ eventsByCountry }: WorldMapProps) {
     const map = new Map<string, EventsByCountry>();
     eventsByCountry.forEach(country => {
       // Try both ISO codes (some data sources use different formats)
-      map.set(country.countryCode.toLowerCase(), country);
-      map.set(country.countryCode.toUpperCase(), country);
+      if (country.countryCode) {
+        map.set(country.countryCode.toLowerCase(), country);
+        map.set(country.countryCode.toUpperCase(), country);
+      }
     });
     return map;
   }, [eventsByCountry]);
 
   // Calculate color intensity based on event count
-  const getCountryColor = (countryCode: string) => {
+  const getCountryColor = (countryCode: string | undefined) => {
+    if (!countryCode) return "hsl(var(--muted))";
+    
     const countryData = countryDataMap.get(countryCode) || countryDataMap.get(countryCode.toLowerCase()) || countryDataMap.get(countryCode.toUpperCase());
     
     if (!countryData) {
