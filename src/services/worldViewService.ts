@@ -82,16 +82,46 @@ export class WorldViewService {
     // Remove duplicates
     const uniqueIPs = [...new Set(ipAddresses)];
     
-    const { data, error } = await supabase.functions.invoke('get-country-from-ip', {
-      body: { ipAddresses: uniqueIPs }
-    });
+    // Cap the number of IPs to process to avoid timeouts
+    const MAX_IPS = 300;
+    const processedIPs = uniqueIPs.length > MAX_IPS ? uniqueIPs.slice(0, MAX_IPS) : uniqueIPs;
+    
+    if (uniqueIPs.length > MAX_IPS) {
+      console.log(`Limiting IP processing to ${MAX_IPS} out of ${uniqueIPs.length} unique IPs`);
+    }
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('get-country-from-ip', {
+        body: { ipAddresses: processedIPs }
+      });
 
-    if (error) {
-      console.error('Error converting IPs to countries:', error);
+      if (error) {
+        console.error('Error converting IPs to countries:', error);
+        throw error;
+      }
+
+      return data.results;
+    } catch (error) {
+      // Retry once for FunctionsFetchError
+      if (error.message?.includes('FunctionsFetchError')) {
+        console.log('Retrying IP conversion after FunctionsFetchError...');
+        try {
+          const { data, error: retryError } = await supabase.functions.invoke('get-country-from-ip', {
+            body: { ipAddresses: processedIPs }
+          });
+
+          if (retryError) {
+            throw new Error(`Failed to convert IPs to countries on retry: ${retryError.message}`);
+          }
+
+          return data.results;
+        } catch (retryError) {
+          console.error('Retry failed:', retryError);
+          throw retryError;
+        }
+      }
       throw error;
     }
-
-    return data.results;
   }
 
   static async getWorldViewData(
