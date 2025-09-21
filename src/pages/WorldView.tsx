@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Header } from '@/components/Layout/Header';
+import { Footer } from '@/components/Layout/Footer';
 import { WorldViewService, WorldViewData } from '@/services/worldViewService';
 import { WorldMap } from '@/components/WorldView/WorldMap';
 import { EventsLegend } from '@/components/WorldView/EventsLegend';
@@ -9,6 +11,7 @@ import { WorldViewStats } from '@/components/WorldView/WorldViewStats';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, Globe } from 'lucide-react';
+import { DynamicHead } from '@/components/SEO/DynamicHead';
 
 export function WorldView() {
   const { user } = useAuth();
@@ -90,20 +93,28 @@ export function WorldView() {
   // Show no data message if user has no events
   if (!loading && !hasEvents) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="text-center py-12">
-          <Globe className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h1 className="text-2xl font-bold mb-2">{t('worldViewPage', 'noData')}</h1>
-          <p className="text-muted-foreground max-w-md mx-auto">
-            {t('worldViewPage', 'noDataDescription')}
-          </p>
-        </div>
+      <div className="flex flex-col min-h-screen">
+        <DynamicHead pageKey="worldView" />
+        <Header />
+        <main className="flex-grow container mx-auto p-6">
+          <div className="text-center py-12">
+            <Globe className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h1 className="text-2xl font-bold mb-2">{t('worldViewPage', 'noData')}</h1>
+            <p className="text-muted-foreground max-w-md mx-auto">
+              {t('worldViewPage', 'noDataDescription')}
+            </p>
+          </div>
+        </main>
+        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="flex flex-col min-h-screen">
+      <DynamicHead pageKey="worldView" />
+      <Header />
+      <main className="flex-grow container mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="text-center">
         <h1 className="text-3xl font-bold mb-2">{t('worldViewPage', 'title')}</h1>
@@ -167,6 +178,8 @@ export function WorldView() {
           )}
         </>
       )}
+      </main>
+      <Footer />
     </div>
   );
 }

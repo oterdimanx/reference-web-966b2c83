@@ -50,12 +50,15 @@ export function WorldMap({ eventsByCountry }: WorldMapProps) {
 
     const eventCount = countryData.totalEvents;
     
-    if (eventCount <= 10) {
-      return "hsl(var(--primary) / 0.3)"; // Light blue
+    // More visible colors even for low event counts
+    if (eventCount >= 1 && eventCount <= 5) {
+      return "hsl(var(--primary) / 0.5)"; // Medium visibility for very low counts
+    } else if (eventCount <= 15) {
+      return "hsl(var(--primary) / 0.7)"; // Higher visibility for low counts
     } else if (eventCount <= 50) {
-      return "hsl(var(--primary) / 0.6)"; // Medium blue
+      return "hsl(var(--primary) / 0.85)"; // Strong visibility for medium counts
     } else {
-      return "hsl(var(--primary))"; // Dark blue
+      return "hsl(var(--primary))"; // Full intensity for high counts
     }
   };
 
@@ -80,7 +83,7 @@ export function WorldMap({ eventsByCountry }: WorldMapProps) {
     <div className="relative w-full h-full">
       <ComposableMap
         projectionConfig={{
-          scale: 147,
+          scale: 200,
         }}
         className="w-full h-full"
       >
