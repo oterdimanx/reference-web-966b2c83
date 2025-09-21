@@ -196,9 +196,6 @@ export function DesktopNavigation() {
           <Link to="/add-website" className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal">
             {t('common', 'addWebsite')}
           </Link>
-          <Link to="/worldview" className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal">
-            {t('worldViewPage', 'title')}
-          </Link>
         </>
       )}
     </nav>

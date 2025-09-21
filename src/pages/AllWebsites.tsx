@@ -6,7 +6,7 @@ import { WebsiteList } from '@/components/RankTracker/WebsiteList';
 import { RankingSummary } from '@/lib/mockData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { getUserWebsites } from '@/services/websiteService';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -41,14 +41,24 @@ const AllWebsites = () => {
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold">{t('allWebsitesPage', 'title')}</h1>
-          <Button 
-            variant="outline" 
-            onClick={() => navigate('/')}
-            className="flex items-center gap-2"
-          >
-            <ArrowLeft size={16} />
-            {t('allWebsitesPage', 'backToDashboard')}
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button 
+              variant="outline" 
+              onClick={() => navigate('/worldview')}
+              className="flex items-center gap-2"
+            >
+              <Globe size={16} />
+              {t('worldViewPage', 'title')}
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => navigate('/')}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft size={16} />
+              {t('allWebsitesPage', 'backToDashboard')}
+            </Button>
+          </div>
         </div>
         
         <Card>

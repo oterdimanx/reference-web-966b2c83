@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { LanguageSwitch } from '@/components/Layout/LanguageSwitch';
 import { ThemeToggle } from '@/components/Layout/ThemeToggle';
+import { WorldViewButton } from '@/components/Layout/WorldViewButton';
 import { LogoSection } from '@/components/Layout/LogoSection';
 import { MobileMenu } from '@/components/Layout/MobileMenu';
 import { DesktopNavigation } from '@/components/Layout/DesktopNavigation';
@@ -40,6 +41,7 @@ export function Header() {
             <div className="flex items-center space-x-4">
               <ThemeToggle />
               <LanguageSwitch />
+              <WorldViewButton />
               <UserSection />
             </div>
           </div>
