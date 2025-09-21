@@ -3,7 +3,7 @@ export const worldViewPage = {
   description: "Visualisez d'où viennent les visiteurs de votre site web dans le monde",
   noData: "Aucune Donnée d'Événement Disponible",
   noDataDescription: "Vous devez avoir des sites web avec des événements suivis pour voir cette page d'analytics.",
-  loading: "Chargement des analytics mondiales...",
+  loading: "Cartographie de votre portée mondiale...",
   error: "Erreur lors du chargement des données de vue mondiale",
   filters: {
     allTime: "Tout le Temps",

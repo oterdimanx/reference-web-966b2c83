@@ -9,7 +9,8 @@ import { EventsLegend } from '@/components/WorldView/EventsLegend';
 import { DateRangeFilter } from '@/components/WorldView/DateRangeFilter';
 import { WebsiteFilter } from '@/components/WorldView/WebsiteFilter';
 import { WorldViewStats } from '@/components/WorldView/WorldViewStats';
-import { Skeleton } from '@/components/ui/skeleton';
+import { useHasWebsiteEvents } from '@/hooks/useHasWebsiteEvents';
+import { PropellerSpinner } from '@/components/ui/propeller-spinner';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, Globe } from 'lucide-react';
 import { DynamicHead } from '@/components/SEO/DynamicHead';
@@ -147,13 +148,11 @@ export function WorldView() {
 
       {/* Loading State */}
       {loading && (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Skeleton className="h-24" />
-            <Skeleton className="h-24" />
-            <Skeleton className="h-24" />
-          </div>
-          <Skeleton className="h-96" />
+        <div className="flex flex-col items-center justify-center py-16">
+          <PropellerSpinner 
+            size="xl" 
+            message={t('worldViewPage', 'loading')}
+          />
         </div>
       )}
 
