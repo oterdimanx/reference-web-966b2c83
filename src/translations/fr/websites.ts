@@ -11,4 +11,7 @@ export const websitesTranslations = {
   noWebsitesFound: 'Aucun site web trouvé. Ajoutez un site web pour commencer le suivi.',
   viewAll: 'Voir tout',
   trackedWebsites: 'Sites web suivis',
+  setupTracking: 'Configurer le suivi',
+  generateTrackingScript: 'Générer le script de suivi',
+  noEventsDetected: 'Aucun événement détecté pour le moment',
 };

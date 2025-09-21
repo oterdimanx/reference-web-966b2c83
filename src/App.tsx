@@ -36,6 +36,7 @@ import SitemapXml from "./pages/SitemapXml";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import TestScheduleRankings from "./pages/TestScheduleRankings";
 import { WorldView } from "./pages/WorldView";
+import TrackingScript from "./pages/TrackingScript";
 
 const queryClient = new QueryClient();
 
@@ -77,6 +78,11 @@ const App = () => (
                   <Route path="/worldview" element={
                     <ProtectedRoute>
                       <WorldView />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/tracking-script" element={
+                    <ProtectedRoute>
+                      <TrackingScript />
                     </ProtectedRoute>
                   } />
                   <Route path="/profile" element={

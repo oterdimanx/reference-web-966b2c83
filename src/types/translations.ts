@@ -138,6 +138,9 @@ export interface Translations {
     noWebsitesFound: string;
     viewAll: string;
     trackedWebsites: string;
+    setupTracking: string;
+    generateTrackingScript: string;
+    noEventsDetected: string;
   };
   addWebsiteForm: {
     pageTitle: string;
@@ -341,5 +344,25 @@ export interface Translations {
       medium: string;
       high: string;
     };
+  };
+  trackingScriptPage: {
+    title: string;
+    description: string;
+    instructions: string;
+    backToWebsites: string;
+    generateScript: string;
+    selectWebsite: string;
+    chooseWebsite: string;
+    trackingScript: string;
+    copy: string;
+    copied: string;
+    scriptCopied: string;
+    scriptCopiedDescription: string;
+    scriptInstructions: string;
+    selectWebsitePlaceholder: string;
+    loadingWebsites: string;
+    noWebsitesFound: string;
+    addWebsite: string;
+    afterSetup: string;
   };
 }

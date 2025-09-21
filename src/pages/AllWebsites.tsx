@@ -6,10 +6,11 @@ import { WebsiteList } from '@/components/RankTracker/WebsiteList';
 import { RankingSummary } from '@/lib/mockData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Globe } from 'lucide-react';
+import { ArrowLeft, Globe, Code } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { getUserWebsites } from '@/services/websiteService';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useHasWebsiteEvents } from '@/hooks/useHasWebsiteEvents';
 
 const AllWebsites = () => {
   const [selectedWebsiteId, setSelectedWebsiteId] = useState<string | undefined>(undefined);
@@ -17,6 +18,7 @@ const AllWebsites = () => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { hasEvents, isLoading: eventsLoading } = useHasWebsiteEvents();
 
   // Fetch websites from Supabase
   useEffect(() => {
@@ -42,14 +44,25 @@ const AllWebsites = () => {
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold">{t('allWebsitesPage', 'title')}</h1>
           <div className="flex items-center gap-3">
-            <Button 
-              variant="outline" 
-              onClick={() => navigate('/worldview')}
-              className="flex items-center gap-2"
-            >
-              <Globe size={16} />
-              {t('worldViewPage', 'title')}
-            </Button>
+            {!eventsLoading && hasEvents ? (
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/worldview')}
+                className="flex items-center gap-2"
+              >
+                <Globe size={16} />
+                {t('worldViewPage', 'title')}
+              </Button>
+            ) : (
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/tracking-script')}
+                className="flex items-center gap-2"
+              >
+                <Code size={16} />
+                {t('allWebsitesPage', 'setupTracking')}
+              </Button>
+            )}
             <Button 
               variant="outline" 
               onClick={() => navigate('/')}

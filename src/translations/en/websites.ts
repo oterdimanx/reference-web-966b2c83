@@ -11,4 +11,7 @@ export const websitesTranslations = {
   noWebsitesFound: 'No websites found. Add a website to start tracking.',
   viewAll: 'View All',
   trackedWebsites: 'Tracked Websites',
+  setupTracking: 'Setup Tracking',
+  generateTrackingScript: 'Generate Tracking Script',
+  noEventsDetected: 'No events detected yet',
 };
