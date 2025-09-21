@@ -38,7 +38,7 @@ export const SimpleWebsiteForm = ({ userSubscription }: SimpleWebsiteFormProps) 
   };
   const { user } = useAuth();
   const { submitWebsite, isSubmitting } = useSimpleWebsiteSubmission();
-  const { form, selectedImage, setSelectedImage, onSubmit } = useAddWebsiteForm();
+  const { form, selectedImage, setSelectedImage, onSubmit } = useAddWebsiteForm(undefined, true);
 
   const handleSubmit = async (data: any) => {
     try {

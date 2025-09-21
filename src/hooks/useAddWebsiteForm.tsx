@@ -5,9 +5,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useWebsiteSubmission } from './useWebsiteSubmission';
-import { createFormSchema, FormValues, PricingPlan } from '@/types/addWebsiteForm';
+import { createFormSchema, createSimpleFormSchema, FormValues, SimpleFormValues, PricingPlan } from '@/types/addWebsiteForm';
 
-export function useAddWebsiteForm(pricingPlans?: PricingPlan[]) {
+export function useAddWebsiteForm(pricingPlans?: PricingPlan[], isSimpleForm: boolean = false) {
   const { user } = useAuth();
   const { t } = useLanguage();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -42,9 +42,9 @@ export function useAddWebsiteForm(pricingPlans?: PricingPlan[]) {
   };
   
   // Form validation schema with translated messages
-  const formSchema = createFormSchema(t);
+  const formSchema = isSimpleForm ? createSimpleFormSchema(t) : createFormSchema(t);
   
-  const form = useForm<FormValues>({
+  const form = useForm<SimpleFormValues | FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: '',
@@ -56,13 +56,13 @@ export function useAddWebsiteForm(pricingPlans?: PricingPlan[]) {
       phone_number: '',
       reciprocal_link: '',
       keywords: keywordsParam,
-      pricing_id: getDefaultPricingId()
+      ...(isSimpleForm ? {} : { pricing_id: getDefaultPricingId() })
     }
   });
   
   // Update form when pricing plans are loaded
   useState(() => {
-    if (pricingPlans && pricingPlans.length > 0) {
+    if (!isSimpleForm && pricingPlans && pricingPlans.length > 0) {
       const defaultPricingId = getDefaultPricingId();
       if (defaultPricingId && !form.getValues('pricing_id')) {
         form.setValue('pricing_id', defaultPricingId);
@@ -70,7 +70,7 @@ export function useAddWebsiteForm(pricingPlans?: PricingPlan[]) {
     }
   });
   
-  const onSubmit = async (data: FormValues, pricingPlans?: PricingPlan[]) => {
+  const onSubmit = async (data: SimpleFormValues | FormValues, pricingPlans?: PricingPlan[]) => {
     setIsSubmitting(true);
     
     try {
