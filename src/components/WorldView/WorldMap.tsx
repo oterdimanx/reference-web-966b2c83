@@ -149,45 +149,70 @@ export function WorldMap({ eventsByCountry }: WorldMapProps) {
 
   // Enhanced country matching function
   const findCountryData = (geoProperties: any): EventsByCountry | null => {
-    // Try all possible country code properties from geography data
+    // Try all possible country code properties from geography data (support both UPPERCASE and lowercase keys)
     const possibleCodes = [
+      // Uppercase variants
       geoProperties.ISO_A2,
       geoProperties.ISO_A3,
       geoProperties.ADM0_A3,
       geoProperties.BRK_A3,
       geoProperties.ADM0_ISO,
+      // Lowercase variants (world-atlas v2 often uses these)
+      geoProperties.iso_a2,
+      geoProperties.iso_a3,
+      geoProperties.adm0_a3,
+      geoProperties.brk_a3,
+      geoProperties.adm0_iso,
+      // Lower/upper transforms
       geoProperties.ISO_A2?.toLowerCase(),
       geoProperties.ISO_A3?.toLowerCase(),
       geoProperties.ADM0_A3?.toLowerCase(),
       geoProperties.BRK_A3?.toLowerCase(),
+      geoProperties.iso_a2?.toLowerCase(),
+      geoProperties.iso_a3?.toLowerCase(),
+      geoProperties.adm0_a3?.toLowerCase(),
+      geoProperties.brk_a3?.toLowerCase(),
       geoProperties.ISO_A2?.toUpperCase(),
       geoProperties.ISO_A3?.toUpperCase(),
       geoProperties.ADM0_A3?.toUpperCase(),
       geoProperties.BRK_A3?.toUpperCase(),
+      geoProperties.iso_a2?.toUpperCase(),
+      geoProperties.iso_a3?.toUpperCase(),
+      geoProperties.adm0_a3?.toUpperCase(),
+      geoProperties.brk_a3?.toUpperCase(),
+      // Mapping fallbacks
       COUNTRY_CODE_MAPPINGS[geoProperties.ISO_A2] || '',
       COUNTRY_CODE_MAPPINGS[geoProperties.ISO_A3] || '',
       COUNTRY_CODE_MAPPINGS[geoProperties.ADM0_A3] || '',
+      COUNTRY_CODE_MAPPINGS[geoProperties.iso_a2] || '',
+      COUNTRY_CODE_MAPPINGS[geoProperties.iso_a3] || '',
+      COUNTRY_CODE_MAPPINGS[geoProperties.adm0_a3] || '',
     ].filter(Boolean);
 
-    // Try multiple name properties for fallback matching
+    // Try multiple name properties for fallback matching (support lowercase keys)
     const nameProperties = [
       geoProperties.NAME,
       geoProperties.NAME_EN,
       geoProperties.ADMIN,
       geoProperties.NAME_LONG,
       geoProperties.FORMAL_EN,
+      geoProperties.name,
+      geoProperties.name_en,
+      geoProperties.admin,
+      geoProperties.name_long,
+      geoProperties.formal_en,
     ].filter(Boolean);
 
-    nameProperties.forEach(name => {
+    nameProperties.forEach((name: string) => {
       possibleCodes.push(
-        name.toLowerCase(),
-        COUNTRY_NAME_TO_CODE[name] || ''
+        String(name).toLowerCase(),
+        COUNTRY_NAME_TO_CODE[name] || COUNTRY_NAME_TO_CODE[String(name)] || ''
       );
     });
 
     // Debug logging for specific countries we expect
     const isExpectedCountry = nameProperties.some(name => 
-      name && ['United States', 'France', 'Germany', 'Canada'].includes(name)
+      name && ['United States', 'France', 'Germany', 'Canada'].includes(name as string)
     );
     
     if (isExpectedCountry) {
@@ -230,8 +255,8 @@ export function WorldMap({ eventsByCountry }: WorldMapProps) {
     const countryData = findCountryData(geoProperties);
     
     // Debug logging for color calculation
-    const countryCode = geoProperties.ISO_A2 || geoProperties.ISO_A3 || geoProperties.ADM0_A3 || 'unknown';
-    const countryName = geoProperties.NAME || geoProperties.NAME_EN || geoProperties.ADMIN || 'unknown';
+    const countryCode = geoProperties.ISO_A2 || geoProperties.ISO_A3 || geoProperties.ADM0_A3 || geoProperties.iso_a2 || geoProperties.iso_a3 || geoProperties.adm0_a3 || 'unknown';
+    const countryName = geoProperties.NAME || geoProperties.NAME_EN || geoProperties.ADMIN || geoProperties.name || geoProperties.name_en || geoProperties.admin || 'unknown';
     
     if (!countryData) {
       // Log specific countries that we expect to find
