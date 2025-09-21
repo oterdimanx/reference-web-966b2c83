@@ -40,14 +40,23 @@ export const SimpleWebsiteForm = ({ userSubscription }: SimpleWebsiteFormProps) 
   const { submitWebsite, isSubmitting } = useSimpleWebsiteSubmission();
   const { form, selectedImage, setSelectedImage, onSubmit } = useAddWebsiteForm(undefined, true);
 
-  const handleSubmit = async (data: any) => {
+  const handleSubmitValid = async (data: any) => {
+    console.log('Form validation passed, submitting data:', data);
     try {
       await submitWebsite(data, selectedImage);
-      toast.success(tLocal('forms.websiteAdded'));
+      // Success toast is handled in useSimpleWebsiteSubmission
     } catch (error) {
       console.error('Error submitting website:', error);
-      toast.error(tLocal('forms.submissionError'));
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      toast.error(`Failed to add website: ${errorMessage}`);
     }
+  };
+
+  const handleSubmitInvalid = (errors: any) => {
+    console.log('Form validation failed:', errors);
+    const firstError = Object.values(errors)[0] as any;
+    const errorMessage = firstError?.message || 'Please fill in all required fields correctly';
+    toast.error(`Validation Error: ${errorMessage}`);
   };
 
   const websitesRemaining = userSubscription?.websitesAllowed - userSubscription?.websitesUsed;
@@ -65,7 +74,7 @@ export const SimpleWebsiteForm = ({ userSubscription }: SimpleWebsiteFormProps) 
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+              <form onSubmit={form.handleSubmit(handleSubmitValid, handleSubmitInvalid)} className="space-y-6">
                 <WebsiteBasicInfo 
                   form={form} 
                   onImageSelect={setSelectedImage}
