@@ -1,5 +1,5 @@
 export const worldViewPage = {
-  title: "Vue Mondiale",
+  title: "Données Géographiques",
   description: "Visualisez d'où viennent les visiteurs de votre site web dans le monde",
   noData: "Aucune Donnée d'Événement Disponible",
   noDataDescription: "Vous devez avoir des sites web avec des événements suivis pour voir cette page d'analytics.",
