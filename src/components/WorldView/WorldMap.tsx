@@ -35,9 +35,48 @@ const COUNTRY_NAME_TO_CODE: Record<string, string> = {
   'India': 'IN',
   'Brazil': 'BR',
   'Russia': 'RU',
+  'Russian Federation': 'RU',
   'South Korea': 'KR',
+  'Korea, Republic of': 'KR',
   'Italy': 'IT',
   'Spain': 'ES',
+  'Netherlands': 'NL',
+  'Sweden': 'SE',
+  'Norway': 'NO',
+  'Denmark': 'DK',
+  'Finland': 'FI',
+  'Poland': 'PL',
+  'Belgium': 'BE',
+  'Switzerland': 'CH',
+  'Austria': 'AT',
+  'Portugal': 'PT',
+  'Ireland': 'IE',
+  'Mexico': 'MX',
+  'Argentina': 'AR',
+  'Chile': 'CL',
+  'Colombia': 'CO',
+  'Peru': 'PE',
+  'Venezuela': 'VE',
+  'South Africa': 'ZA',
+  'Egypt': 'EG',
+  'Nigeria': 'NG',
+  'Kenya': 'KE',
+  'Morocco': 'MA',
+  'Turkey': 'TR',
+  'Israel': 'IL',
+  'Saudi Arabia': 'SA',
+  'United Arab Emirates': 'AE',
+  'Iran': 'IR',
+  'Iraq': 'IQ',
+  'Pakistan': 'PK',
+  'Bangladesh': 'BD',
+  'Thailand': 'TH',
+  'Vietnam': 'VN',
+  'Singapore': 'SG',
+  'Malaysia': 'MY',
+  'Indonesia': 'ID',
+  'Philippines': 'PH',
+  'New Zealand': 'NZ',
 };
 
 interface WorldMapProps {
@@ -110,31 +149,61 @@ export function WorldMap({ eventsByCountry }: WorldMapProps) {
 
   // Enhanced country matching function
   const findCountryData = (geoProperties: any): EventsByCountry | null => {
+    // Try all possible country code properties from geography data
     const possibleCodes = [
       geoProperties.ISO_A2,
       geoProperties.ISO_A3,
       geoProperties.ADM0_A3,
+      geoProperties.BRK_A3,
+      geoProperties.ADM0_ISO,
       geoProperties.ISO_A2?.toLowerCase(),
       geoProperties.ISO_A3?.toLowerCase(),
       geoProperties.ADM0_A3?.toLowerCase(),
+      geoProperties.BRK_A3?.toLowerCase(),
       geoProperties.ISO_A2?.toUpperCase(),
       geoProperties.ISO_A3?.toUpperCase(),
       geoProperties.ADM0_A3?.toUpperCase(),
+      geoProperties.BRK_A3?.toUpperCase(),
       COUNTRY_CODE_MAPPINGS[geoProperties.ISO_A2] || '',
       COUNTRY_CODE_MAPPINGS[geoProperties.ISO_A3] || '',
+      COUNTRY_CODE_MAPPINGS[geoProperties.ADM0_A3] || '',
     ].filter(Boolean);
 
-    // Try country name matching as fallback
-    if (geoProperties.NAME) {
+    // Try multiple name properties for fallback matching
+    const nameProperties = [
+      geoProperties.NAME,
+      geoProperties.NAME_EN,
+      geoProperties.ADMIN,
+      geoProperties.NAME_LONG,
+      geoProperties.FORMAL_EN,
+    ].filter(Boolean);
+
+    nameProperties.forEach(name => {
       possibleCodes.push(
-        geoProperties.NAME.toLowerCase(),
-        COUNTRY_NAME_TO_CODE[geoProperties.NAME] || ''
+        name.toLowerCase(),
+        COUNTRY_NAME_TO_CODE[name] || ''
       );
+    });
+
+    // Debug logging for specific countries we expect
+    const isExpectedCountry = nameProperties.some(name => 
+      name && ['United States', 'France', 'Germany', 'Canada'].includes(name)
+    );
+    
+    if (isExpectedCountry) {
+      console.log(`🌍 Trying to match expected country:`, {
+        names: nameProperties,
+        codes: possibleCodes.slice(0, 10), // First 10 codes to avoid spam
+        allGeoProps: Object.keys(geoProperties).slice(0, 15)
+      });
     }
 
     for (const code of possibleCodes) {
       const countryData = countryDataMap.get(code);
       if (countryData) {
+        if (isExpectedCountry) {
+          console.log(`🌍 ✅ Successfully matched ${nameProperties[0]} with code: ${code}`);
+        }
         return countryData;
       }
     }
@@ -144,16 +213,39 @@ export function WorldMap({ eventsByCountry }: WorldMapProps) {
 
   // Calculate color intensity based on event count
   const getCountryColor = (geoProperties: any) => {
+    // Enhanced debug logging to see what properties are actually available
+    const availableProps = Object.keys(geoProperties).slice(0, 10); // First 10 properties
+    if (Math.random() < 0.005) { // Very occasional logging
+      console.log('🌍 Geography properties sample:', {
+        available: availableProps,
+        ISO_A2: geoProperties.ISO_A2,
+        ISO_A3: geoProperties.ISO_A3,
+        ADM0_A3: geoProperties.ADM0_A3,
+        NAME: geoProperties.NAME,
+        NAME_EN: geoProperties.NAME_EN,
+        ADMIN: geoProperties.ADMIN
+      });
+    }
+
     const countryData = findCountryData(geoProperties);
     
     // Debug logging for color calculation
-    const countryCode = geoProperties.ISO_A2 || geoProperties.ISO_A3 || 'unknown';
-    const countryName = geoProperties.NAME || 'unknown';
+    const countryCode = geoProperties.ISO_A2 || geoProperties.ISO_A3 || geoProperties.ADM0_A3 || 'unknown';
+    const countryName = geoProperties.NAME || geoProperties.NAME_EN || geoProperties.ADMIN || 'unknown';
     
     if (!countryData) {
-      // Only log for first few to avoid spam
-      if (Math.random() < 0.01) {
-        console.log(`🌍 No data for country: ${countryName} (${countryCode})`);
+      // Log specific countries that we expect to find
+      const expectedCountries = ['United States', 'US', 'USA', 'France', 'FR'];
+      if (expectedCountries.some(expected => 
+        countryName.toLowerCase().includes(expected.toLowerCase()) || 
+        countryCode.toLowerCase().includes(expected.toLowerCase())
+      )) {
+        console.log(`🌍 ❌ Expected country not found: ${countryName} (${countryCode})`, {
+          allProps: Object.keys(geoProperties),
+          ISO_A2: geoProperties.ISO_A2,
+          ISO_A3: geoProperties.ISO_A3,
+          ADM0_A3: geoProperties.ADM0_A3
+        });
       }
       return "hsl(var(--muted))";
     }
