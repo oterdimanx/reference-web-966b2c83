@@ -22,6 +22,12 @@ export const worldViewPage = {
     topCountry: "Premier Pays",
     noCountryData: "Aucune donnée de pays disponible"
   },
+  filter: {
+    websites: 'Filtre par site web',
+    allWebsites: 'Tous les sites web',
+    filterActive: 'Filtre actif - affichage des données pour le site sélectionné uniquement',
+    loadingWebsites: 'Chargement des sites web...',
+  },
   map: {
     tooltip: {
       country: "Pays",

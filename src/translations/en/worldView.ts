@@ -22,6 +22,12 @@ export const worldViewPage = {
     topCountry: "Top Country",
     noCountryData: "No country data available"
   },
+  filter: {
+    websites: 'Website Filter',
+    allWebsites: 'All Websites',
+    filterActive: 'Filter is active - showing data for selected website only',
+    loadingWebsites: 'Loading websites...',
+  },
   map: {
     tooltip: {
       country: "Country",

@@ -7,6 +7,7 @@ import { WorldViewService, WorldViewData } from '@/services/worldViewService';
 import { WorldMap } from '@/components/WorldView/WorldMap';
 import { EventsLegend } from '@/components/WorldView/EventsLegend';
 import { DateRangeFilter } from '@/components/WorldView/DateRangeFilter';
+import { WebsiteFilter } from '@/components/WorldView/WebsiteFilter';
 import { WorldViewStats } from '@/components/WorldView/WorldViewStats';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -21,6 +22,7 @@ export function WorldView() {
   const [error, setError] = useState<string | null>(null);
   const [hasEvents, setHasEvents] = useState<boolean>(false);
   const [isAllTime, setIsAllTime] = useState(true);
+  const [selectedWebsiteId, setSelectedWebsiteId] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState<{ start: Date | null; end: Date | null }>({
     start: null,
     end: null
@@ -40,7 +42,7 @@ export function WorldView() {
           return;
         }
 
-        // Load initial data (all time)
+        // Load initial data (all time, all websites)
         await loadWorldViewData();
       } catch (err) {
         console.error('Error checking user events:', err);
@@ -52,7 +54,7 @@ export function WorldView() {
     checkUserEvents();
   }, [user?.id]);
 
-  const loadWorldViewData = async (startDate?: Date, endDate?: Date) => {
+  const loadWorldViewData = async (startDate?: Date, endDate?: Date, websiteId?: string) => {
     if (!user?.id) return;
 
     setLoading(true);
@@ -62,7 +64,8 @@ export function WorldView() {
       const data = await WorldViewService.getWorldViewData(
         user.id,
         startDate || undefined,
-        endDate || undefined
+        endDate || undefined,
+        websiteId || undefined
       );
       setWorldViewData(data);
     } catch (err) {
@@ -77,7 +80,7 @@ export function WorldView() {
     setDateRange({ start: startDate, end: endDate });
     
     if (startDate && endDate) {
-      await loadWorldViewData(startDate, endDate);
+      await loadWorldViewData(startDate, endDate, selectedWebsiteId || undefined);
     }
   };
 
@@ -86,7 +89,18 @@ export function WorldView() {
     
     if (allTime) {
       setDateRange({ start: null, end: null });
-      await loadWorldViewData();
+      await loadWorldViewData(undefined, undefined, selectedWebsiteId || undefined);
+    }
+  };
+
+  const handleWebsiteChange = async (websiteId: string | null) => {
+    setSelectedWebsiteId(websiteId);
+    
+    // Reload data with new website filter
+    if (isAllTime) {
+      await loadWorldViewData(undefined, undefined, websiteId || undefined);
+    } else {
+      await loadWorldViewData(dateRange.start || undefined, dateRange.end || undefined, websiteId || undefined);
     }
   };
 
@@ -152,6 +166,10 @@ export function WorldView() {
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* Sidebar */}
             <div className="space-y-4">
+              <WebsiteFilter
+                selectedWebsiteId={selectedWebsiteId}
+                onWebsiteChange={handleWebsiteChange}
+              />
               <DateRangeFilter
                 onDateRangeChange={handleDateRangeChange}
                 isAllTime={isAllTime}

@@ -25,7 +25,8 @@ export class WorldViewService {
   static async getUserEvents(
     userId: string, 
     startDate?: Date, 
-    endDate?: Date
+    endDate?: Date,
+    websiteId?: string
   ): Promise<{ ip: string; eventType: string; count: number }[]> {
     let query = supabase
       .from('events')
@@ -36,6 +37,11 @@ export class WorldViewService {
       `)
       .eq('websites.user_id', userId)
       .not('ip_address', 'is', null);
+
+    // Add website filter if specified
+    if (websiteId) {
+      query = query.eq('website_id', websiteId);
+    }
 
     if (startDate) {
       query = query.gte('client_timestamp', startDate.toISOString());
@@ -127,10 +133,11 @@ export class WorldViewService {
   static async getWorldViewData(
     userId: string,
     startDate?: Date,
-    endDate?: Date
+    endDate?: Date,
+    websiteId?: string
   ): Promise<WorldViewData> {
     // Get user events
-    const events = await this.getUserEvents(userId, startDate, endDate);
+    const events = await this.getUserEvents(userId, startDate, endDate, websiteId);
     
     if (events.length === 0) {
       return {
