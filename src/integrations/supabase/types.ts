@@ -477,8 +477,12 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          is_priority_keyword: boolean | null
           keyword: string
+          last_deep_search_at: string | null
           position: number | null
+          ranking_confidence: string | null
+          search_depth: number | null
           search_engine: string
           snapshot_date: string
           title: string | null
@@ -490,8 +494,12 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          is_priority_keyword?: boolean | null
           keyword: string
+          last_deep_search_at?: string | null
           position?: number | null
+          ranking_confidence?: string | null
+          search_depth?: number | null
           search_engine?: string
           snapshot_date?: string
           title?: string | null
@@ -503,8 +511,12 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          is_priority_keyword?: boolean | null
           keyword?: string
+          last_deep_search_at?: string | null
           position?: number | null
+          ranking_confidence?: string | null
+          search_depth?: number | null
           search_engine?: string
           snapshot_date?: string
           title?: string | null
@@ -582,15 +594,41 @@ export type Database = {
         }
         Relationships: []
       }
+      system_settings: {
+        Row: {
+          created_at: string
+          id: string
+          setting_key: string
+          setting_value: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          setting_key: string
+          setting_value: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          setting_key?: string
+          setting_value?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_keyword_preferences: {
         Row: {
           created_at: string
+          deep_search_enabled: boolean | null
           difficulty_estimate: string | null
           group_color: string | null
           group_name: string | null
           id: string
           is_priority: boolean
           keyword: string
+          last_deep_search_at: string | null
           notes: string | null
           tags: string[] | null
           updated_at: string
@@ -600,12 +638,14 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          deep_search_enabled?: boolean | null
           difficulty_estimate?: string | null
           group_color?: string | null
           group_name?: string | null
           id?: string
           is_priority?: boolean
           keyword: string
+          last_deep_search_at?: string | null
           notes?: string | null
           tags?: string[] | null
           updated_at?: string
@@ -615,12 +655,14 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          deep_search_enabled?: boolean | null
           difficulty_estimate?: string | null
           group_color?: string | null
           group_name?: string | null
           id?: string
           is_priority?: boolean
           keyword?: string
+          last_deep_search_at?: string | null
           notes?: string | null
           tags?: string[] | null
           updated_at?: string

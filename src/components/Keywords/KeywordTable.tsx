@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Clock, RefreshCw, AlertCircle, Filter } from 'lucide-react';
 import { KeywordDifficultyBadge } from './KeywordDifficultyBadge';
 import { KeywordRankingStatus } from './KeywordRankingStatus';
+import { EnhancedKeywordRankingStatus } from './EnhancedKeywordRankingStatus';
 import { KeywordGroupBadge } from './KeywordGroupBadge';
 import { KeywordTagBadge } from './KeywordTagBadge';
 import { KeywordManagerDialog } from './KeywordManagerDialog';
