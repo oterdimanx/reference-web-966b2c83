@@ -587,6 +587,44 @@ const bulkUpdateKeywordTags = async (
   }
 };
 
+// Bulk update keyword volumes
+const bulkUpdateKeywordVolumes = async (
+  userId: string,
+  updates: { websiteId: string; keyword: string; volume: string }[]
+): Promise<void> => {
+  try {
+    const updatePromises = updates.map(({ websiteId, keyword, volume }) =>
+      updateKeywordPreferences(userId, websiteId, keyword, { 
+        volume_estimate: volume
+      })
+    );
+
+    await Promise.all(updatePromises);
+  } catch (error) {
+    console.error('Error bulk updating keyword volumes:', error);
+    throw error;
+  }
+};
+
+// Bulk update keyword difficulties
+const bulkUpdateKeywordDifficulties = async (
+  userId: string,
+  updates: { websiteId: string; keyword: string; difficulty: string }[]
+): Promise<void> => {
+  try {
+    const updatePromises = updates.map(({ websiteId, keyword, difficulty }) =>
+      updateKeywordPreferences(userId, websiteId, keyword, { 
+        difficulty_estimate: difficulty
+      })
+    );
+
+    await Promise.all(updatePromises);
+  } catch (error) {
+    console.error('Error bulk updating keyword difficulties:', error);
+    throw error;
+  }
+};
+
 // Enhanced tag management functions
 const renameUserTag = async (userId: string, oldTag: string, newTag: string): Promise<void> => {
   try {
@@ -811,6 +849,8 @@ export const keywordService = {
   getKeywordsByTag,
   bulkUpdateKeywordGroups,
   bulkUpdateKeywordTags,
+  bulkUpdateKeywordVolumes,
+  bulkUpdateKeywordDifficulties,
   // Enhanced management functions
   renameUserTag,
   deleteUserTag,

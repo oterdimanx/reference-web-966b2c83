@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
-import { X, Tag, Users, Palette } from "lucide-react";
+import { X, Tag, Users, Palette, BarChart3, TrendingUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface BulkActionToolbarProps {
@@ -13,6 +13,8 @@ interface BulkActionToolbarProps {
   onDeselectAll: () => void;
   onBulkAssignGroup: (groupName: string, groupColor?: string) => void;
   onBulkAssignTags: (tags: string[]) => void;
+  onBulkAssignVolume: (volume: string) => void;
+  onBulkAssignDifficulty: (difficulty: string) => void;
   onCreateGroup: (groupName: string, groupColor: string) => void;
   className?: string;
 }
@@ -24,6 +26,8 @@ export const BulkActionToolbar = ({
   onDeselectAll,
   onBulkAssignGroup,
   onBulkAssignTags,
+  onBulkAssignVolume,
+  onBulkAssignDifficulty,
   onCreateGroup,
   className
 }: BulkActionToolbarProps) => {
@@ -88,7 +92,7 @@ export const BulkActionToolbar = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Group Assignment */}
         <div>
           <label className="text-sm font-medium mb-2 flex items-center gap-2">
@@ -248,6 +252,64 @@ export const BulkActionToolbar = ({
             )}
           </div>
         </div>
+      </div>
+
+      {/* Volume Assignment */}
+      <div>
+        <label className="text-sm font-medium mb-2 flex items-center gap-2">
+          <BarChart3 size={14} />
+          Assign Volume
+        </label>
+        <Select onValueChange={(value) => onBulkAssignVolume(value)}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select volume..." />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="0-100">0-100</SelectItem>
+            <SelectItem value="100-1K">100-1K</SelectItem>
+            <SelectItem value="1K-10K">1K-10K</SelectItem>
+            <SelectItem value="10K+">10K+</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Difficulty Assignment */}
+      <div>
+        <label className="text-sm font-medium mb-2 flex items-center gap-2">
+          <TrendingUp size={14} />
+          Assign Difficulty
+        </label>
+        <Select onValueChange={(value) => onBulkAssignDifficulty(value)}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select difficulty..." />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Low">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded bg-green-500"></div>
+                Low
+              </div>
+            </SelectItem>
+            <SelectItem value="Medium">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded bg-yellow-500"></div>
+                Medium
+              </div>
+            </SelectItem>
+            <SelectItem value="High">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded bg-orange-500"></div>
+                High
+              </div>
+            </SelectItem>
+            <SelectItem value="Very High">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded bg-red-500"></div>
+                Very High
+              </div>
+            </SelectItem>
+          </SelectContent>
+        </Select>
       </div>
     </Card>
   );

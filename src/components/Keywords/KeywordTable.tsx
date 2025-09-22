@@ -8,6 +8,8 @@ import { SubmarineLoading } from '@/components/ui/submarine-loading';
 import { Clock, RefreshCw, AlertCircle, Filter } from 'lucide-react';
 import { KeywordDifficultyBadge } from './KeywordDifficultyBadge';
 import { KeywordRankingStatus } from './KeywordRankingStatus';
+import { VolumeSelector } from './VolumeSelector';
+import { DifficultySelector } from './DifficultySelector';
 import { EnhancedKeywordRankingStatus } from './EnhancedKeywordRankingStatus';
 import { KeywordGroupBadge } from './KeywordGroupBadge';
 import { KeywordTagBadge } from './KeywordTagBadge';
@@ -288,6 +290,58 @@ export const KeywordTable = ({ selectedWebsiteId }: KeywordTableProps) => {
     setAvailableGroups(prev => [...prev, { name: groupName, color: groupColor }]);
   };
 
+  const handleBulkAssignVolume = async (volume: string) => {
+    if (!user || selectedKeywords.size === 0) return;
+
+    try {
+      const updates = Array.from(selectedKeywords).map(selectionKey => {
+        const [websiteId, keyword] = selectionKey.split('|');
+        return { websiteId, keyword, volume };
+      });
+
+      await keywordService.bulkUpdateKeywordVolumes(user.id, updates);
+      setSelectedKeywords(new Set());
+      loadKeywords();
+      toast({
+        title: "Volume Updated",
+        description: `Updated volume for ${updates.length} keyword${updates.length > 1 ? 's' : ''}.`
+      });
+    } catch (error) {
+      console.error('Error bulk updating volumes:', error);
+      toast({
+        title: "Error updating volume",
+        description: "Failed to update volume. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleBulkAssignDifficulty = async (difficulty: string) => {
+    if (!user || selectedKeywords.size === 0) return;
+
+    try {
+      const updates = Array.from(selectedKeywords).map(selectionKey => {
+        const [websiteId, keyword] = selectionKey.split('|');
+        return { websiteId, keyword, difficulty };
+      });
+
+      await keywordService.bulkUpdateKeywordDifficulties(user.id, updates);
+      setSelectedKeywords(new Set());
+      loadKeywords();
+      toast({
+        title: "Difficulty Updated",
+        description: `Updated difficulty for ${updates.length} keyword${updates.length > 1 ? 's' : ''}.`
+      });
+    } catch (error) {
+      console.error('Error bulk updating difficulties:', error);
+      toast({
+        title: "Error updating difficulty",
+        description: "Failed to update difficulty. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const allSelected = filteredKeywords.length > 0 && selectedKeywords.size === filteredKeywords.length;
   const someSelected = selectedKeywords.size > 0 && selectedKeywords.size < filteredKeywords.length;
 
@@ -390,6 +444,8 @@ export const KeywordTable = ({ selectedWebsiteId }: KeywordTableProps) => {
         onDeselectAll={() => setSelectedKeywords(new Set())}
         onBulkAssignGroup={handleBulkAssignGroup}
         onBulkAssignTags={handleBulkAssignTags}
+        onBulkAssignVolume={handleBulkAssignVolume}
+        onBulkAssignDifficulty={handleBulkAssignDifficulty}
         onCreateGroup={handleCreateGroup}
       />
 
@@ -455,10 +511,22 @@ export const KeywordTable = ({ selectedWebsiteId }: KeywordTableProps) => {
                     </div>
                   </td>
                   <td className="py-3 px-4 text-center">
-                    {keyword.volume_estimate || 'Unknown'}
+                    <VolumeSelector
+                      value={keyword.volume_estimate}
+                      websiteId={keyword.website_id}
+                      keyword={keyword.keyword}
+                      userId={user?.id || ''}
+                      onUpdate={() => loadKeywords()}
+                    />
                   </td>
                   <td className="py-3 px-4 text-center">
-                    <KeywordDifficultyBadge difficulty={keyword.difficulty_estimate || 'Unknown'} />
+                    <DifficultySelector
+                      value={keyword.difficulty_estimate}
+                      websiteId={keyword.website_id}
+                      keyword={keyword.keyword}
+                      userId={user?.id || ''}
+                      onUpdate={() => loadKeywords()}
+                    />
                   </td>
                   <td className="py-3 px-4 text-center">
                     <KeywordRankingStatus ranking={keyword.latest_position} />
