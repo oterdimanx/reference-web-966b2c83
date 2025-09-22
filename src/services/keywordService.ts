@@ -297,23 +297,31 @@ const getUserKeywords = async (userId: string): Promise<UserKeyword[]> => {
       const keywords = website.keywords.split(',').map(k => k.trim()).filter(Boolean);
 
       for (const keyword of keywords) {
-        const { data: latestRanking } = await supabase
+        const { data: latestRanking, error: latestError } = await supabase
           .from('ranking_snapshots')
           .select('position, created_at, ranking_confidence')
           .eq('website_id', website.id)
           .eq('keyword', keyword)
           .order('created_at', { ascending: false })
           .limit(1)
-          .single();
+          .maybeSingle();
 
-        const { data: previousRanking } = await supabase
+        if (latestError) {
+          console.error('Error fetching latest ranking for keyword:', keyword, latestError);
+        }
+
+        const { data: previousRanking, error: previousError } = await supabase
           .from('ranking_snapshots')
           .select('position')
           .eq('website_id', website.id)
           .eq('keyword', keyword)
           .order('created_at', { ascending: false })
           .range(1, 1)
-          .single();
+          .maybeSingle();
+
+        if (previousError) {
+          console.error('Error fetching previous ranking for keyword:', keyword, previousError);
+        }
 
         const { data: preferences } = await supabase
           .from('user_keyword_preferences')
