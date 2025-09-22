@@ -297,30 +297,64 @@ const getUserKeywords = async (userId: string): Promise<UserKeyword[]> => {
       const keywords = website.keywords.split(',').map(k => k.trim()).filter(Boolean);
 
       for (const keyword of keywords) {
-        const { data: latestRanking, error: latestError } = await supabase
+        // First try to get Google rankings
+        let { data: latestRanking } = await supabase
           .from('ranking_snapshots')
-          .select('position, created_at, ranking_confidence')
+          .select('position, created_at, ranking_confidence, search_engine')
           .eq('website_id', website.id)
           .eq('keyword', keyword)
+          .eq('search_engine', 'google')
           .order('created_at', { ascending: false })
           .limit(1)
           .maybeSingle();
 
-        if (latestError) {
-          console.error('Error fetching latest ranking for keyword:', keyword, latestError);
+        // If no Google ranking or Google ranking is null, fallback to any engine with non-null position
+        if (!latestRanking || latestRanking.position === null) {
+          console.log(`No Google ranking for ${keyword}, trying fallback...`);
+          const { data: fallbackRanking } = await supabase
+            .from('ranking_snapshots')
+            .select('position, created_at, ranking_confidence, search_engine')
+            .eq('website_id', website.id)
+            .eq('keyword', keyword)
+            .not('position', 'is', null)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          
+          if (fallbackRanking) {
+            console.log(`Found fallback ranking for ${keyword}:`, fallbackRanking);
+            latestRanking = fallbackRanking;
+          }
+        } else {
+          console.log(`Found Google ranking for ${keyword}:`, latestRanking);
         }
 
-        const { data: previousRanking, error: previousError } = await supabase
+        // Get previous ranking (Google first, then fallback)
+        let { data: previousRanking } = await supabase
           .from('ranking_snapshots')
-          .select('position')
+          .select('position, search_engine')
           .eq('website_id', website.id)
           .eq('keyword', keyword)
+          .eq('search_engine', 'google')
           .order('created_at', { ascending: false })
           .range(1, 1)
           .maybeSingle();
 
-        if (previousError) {
-          console.error('Error fetching previous ranking for keyword:', keyword, previousError);
+        // Fallback for previous ranking if needed
+        if (!previousRanking || previousRanking.position === null) {
+          const { data: fallbackPreviousRanking } = await supabase
+            .from('ranking_snapshots')
+            .select('position, search_engine')
+            .eq('website_id', website.id)
+            .eq('keyword', keyword)
+            .not('position', 'is', null)
+            .order('created_at', { ascending: false })
+            .range(1, 1)
+            .maybeSingle();
+          
+          if (fallbackPreviousRanking) {
+            previousRanking = fallbackPreviousRanking;
+          }
         }
 
         const { data: preferences } = await supabase
