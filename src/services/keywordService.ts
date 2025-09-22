@@ -4,569 +4,764 @@ export interface UserKeyword {
   keyword: string;
   website_id: string;
   website_domain: string;
+  website_title: string | null;
   latest_position: number | null;
+  current_position: number | null;
+  previous_position: number | null;
+  position_change: number;
+  last_updated: string | null;
   latest_ranking_date: string | null;
+  ranking_confidence: string;
+  ranking_url?: string;
+  
+  // User preferences
+  preferences?: {
+    difficulty_estimate: string | null;
+    volume_estimate: string | null;
+    notes: string | null;
+    is_priority: boolean;
+    tags: string[];
+    group_name: string | null;
+    group_color: string | null;
+  };
   difficulty_estimate: string | null;
   volume_estimate: string | null;
+  notes: string | null;
   is_priority: boolean;
-  position_change: number | null;
-  ranking_url: string | null;
-  preferences?: {
-    tags?: string[];
-    group_name?: string;
-    group_color?: string;
-    notes?: string;
-  };
+  tags: string[];
+  group_name: string | null;
+  group_color: string | null;
 }
 
-export interface KeywordWithPreferences extends UserKeyword {
+interface KeywordWithPreferences extends UserKeyword {
   notes: string | null;
 }
 
-export const keywordService = {
-  async checkKeywordInRankingRequests(websiteId: string, keyword: string): Promise<boolean> {
-    try {
-      const { data, error } = await supabase
-        .from('ranking_requests')
-        .select('id')
-        .eq('website_id', websiteId)
-        .eq('keyword', keyword)
-        .in('status', ['pending', 'processing'])
-        .limit(1);
-
-      if (error) throw error;
-      return (data && data.length > 0);
-    } catch (error) {
-      console.error('Error checking keyword in ranking requests:', error);
-      throw error;
-    }
-  },
-
-  async getKeywordDependencies(websiteId: string, keyword: string): Promise<{
-    hasRankingRequests: boolean;
-    rankingRequestsCount: number;
-    rankingSnapshotsCount: number;
-    hasUserPreferences: boolean;
-  }> {
-    try {
-      // Check ranking requests
-      const { data: rankingRequests, error: requestsError } = await supabase
-        .from('ranking_requests')
-        .select('id, status')
-        .eq('website_id', websiteId)
-        .eq('keyword', keyword);
-
-      if (requestsError) throw requestsError;
-
-      // Check ranking snapshots
-      const { data: snapshots, error: snapshotsError } = await supabase
-        .from('ranking_snapshots')
-        .select('id')
-        .eq('website_id', websiteId)
-        .eq('keyword', keyword);
-
-      if (snapshotsError) throw snapshotsError;
-
-      // Check user preferences
-      const { data: preferences, error: preferencesError } = await supabase
-        .from('user_keyword_preferences')
-        .select('id')
-        .eq('website_id', websiteId)
-        .eq('keyword', keyword);
-
-      if (preferencesError) throw preferencesError;
-
-      const pendingRequests = rankingRequests?.filter(req => 
-        req.status === 'pending' || req.status === 'processing'
-      ) || [];
-
-      return {
-        hasRankingRequests: pendingRequests.length > 0,
-        rankingRequestsCount: rankingRequests?.length || 0,
-        rankingSnapshotsCount: snapshots?.length || 0,
-        hasUserPreferences: preferences && preferences.length > 0
-      };
-    } catch (error) {
-      console.error('Error getting keyword dependencies:', error);
-      throw error;
-    }
-  },
-
-  async validateKeywordOperation(websiteId: string, keyword: string, operation: 'add' | 'remove'): Promise<{
-    isValid: boolean;
-    reason?: string;
-    dependencies?: any;
-  }> {
-    try {
-      if (operation === 'remove') {
-        const dependencies = await this.getKeywordDependencies(websiteId, keyword);
-        
-        if (dependencies.hasRankingRequests) {
-          return {
-            isValid: false,
-            reason: 'Cannot remove keyword with pending or processing ranking requests',
-            dependencies
-          };
-        }
-      }
-
-      // Additional validation for 'add' operation
-      if (operation === 'add') {
-        const currentKeywords = await this.getWebsiteKeywords(websiteId);
-        if (currentKeywords.includes(keyword.trim())) {
-          return {
-            isValid: false,
-            reason: 'Keyword already exists for this website'
-          };
-        }
-      }
-
-      return { isValid: true };
-    } catch (error) {
-      console.error('Error validating keyword operation:', error);
-      return {
-        isValid: false,
-        reason: 'Error validating operation'
-      };
-    }
-  },
-
-  async getWebsiteKeywords(websiteId: string): Promise<string[]> {
-    try {
-      const { data: website, error } = await supabase
-        .from('websites')
-        .select('keywords')
-        .eq('id', websiteId)
-        .maybeSingle();
-
-      if (error) throw error;
-      
-      if (!website?.keywords) return [];
-      
-      return website.keywords
-        .split(',')
-        .map(keyword => keyword.trim())
-        .filter(keyword => keyword.length > 0);
-    } catch (error) {
-      console.error('Error getting website keywords:', error);
-      throw error;
-    }
-  },
-
-  async addKeywordToWebsite(websiteId: string, keyword: string): Promise<void> {
-    try {
-      const trimmedKeyword = keyword.trim();
-      if (!trimmedKeyword) {
-        throw new Error('Keyword cannot be empty');
-      }
-
-      // Validate the operation
-      const validation = await this.validateKeywordOperation(websiteId, trimmedKeyword, 'add');
-      if (!validation.isValid) {
-        throw new Error(validation.reason);
-      }
-
-      // Get current keywords
-      const currentKeywords = await this.getWebsiteKeywords(websiteId);
-      
-      // Add the new keyword
-      const updatedKeywords = [...currentKeywords, trimmedKeyword];
-      const keywordsString = updatedKeywords.join(', ');
-
-      // Update the website
-      const { error } = await supabase
-        .from('websites')
-        .update({ 
-          keywords: keywordsString,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', websiteId);
-
-      if (error) throw error;
-    } catch (error) {
-      console.error('Error adding keyword to website:', error);
-      throw error;
-    }
-  },
-
-  async removeKeywordFromWebsite(websiteId: string, keyword: string): Promise<void> {
-    try {
-      const trimmedKeyword = keyword.trim();
-
-      // Validate the operation
-      const validation = await this.validateKeywordOperation(websiteId, trimmedKeyword, 'remove');
-      if (!validation.isValid) {
-        throw new Error(validation.reason);
-      }
-
-      // Get current keywords
-      const currentKeywords = await this.getWebsiteKeywords(websiteId);
-      
-      // Remove the keyword
-      const updatedKeywords = currentKeywords.filter(k => k !== trimmedKeyword);
-      const keywordsString = updatedKeywords.join(', ');
-
-      // Update the website
-      const { error: updateError } = await supabase
-        .from('websites')
-        .update({ 
-          keywords: keywordsString,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', websiteId);
-
-      if (updateError) throw updateError;
-
-      // Clean up related data
-      await this.cleanupKeywordData(websiteId, trimmedKeyword);
-    } catch (error) {
-      console.error('Error removing keyword from website:', error);
-      throw error;
-    }
-  },
-
-  async cleanupKeywordData(websiteId: string, keyword: string): Promise<void> {
-    try {
-      // Remove user preferences for this keyword
-      const { error: preferencesError } = await supabase
-        .from('user_keyword_preferences')
-        .delete()
-        .eq('website_id', websiteId)
-        .eq('keyword', keyword);
-
-      if (preferencesError) {
-        console.error('Error cleaning up keyword preferences:', preferencesError);
-      }
-
-      // Note: We don't delete ranking_snapshots as they are historical data
-      // and should be preserved for analytics purposes
-    } catch (error) {
-      console.error('Error cleaning up keyword data:', error);
-      // Don't throw here as the main operation succeeded
-    }
-  },
-
-  async getUserKeywords(userId: string): Promise<UserKeyword[]> {
-    try {
-      // Get user's websites with their keywords
-      const { data: websites, error: websitesError } = await supabase
-        .from('websites')
-        .select('id, domain, keywords')
-        .eq('user_id', userId)
-        .not('keywords', 'is', null)
-        .not('keywords', 'eq', '');
-
-      if (websitesError) throw websitesError;
-      if (!websites || websites.length === 0) return [];
-
-      // Parse keywords and get latest rankings
-      const keywordPromises = websites.flatMap(website => {
-        if (!website.keywords) return [];
-        
-        const keywords = website.keywords.split(',').map(k => k.trim()).filter(k => k);
-        return keywords.map(async keyword => {
-          // Get latest ranking for this keyword
-          const { data: latestRanking } = await supabase
-            .from('ranking_snapshots')
-            .select('position, snapshot_date, url')
-            .eq('website_id', website.id)
-            .eq('keyword', keyword)
-            .order('snapshot_date', { ascending: false })
-            .limit(1)
-            .maybeSingle();
-
-          // Get previous ranking for change calculation
-          const { data: previousRanking } = await supabase
-            .from('ranking_snapshots')
-            .select('position')
-            .eq('website_id', website.id)
-            .eq('keyword', keyword)
-            .order('snapshot_date', { ascending: false })
-            .range(1, 1)
-            .maybeSingle();
-
-          // Get user preferences for this keyword
-          const { data: preferences } = await supabase
-            .from('user_keyword_preferences')
-            .select('difficulty_estimate, volume_estimate, is_priority, tags, group_name, group_color, notes')
-            .eq('user_id', userId)
-            .eq('website_id', website.id)
-            .eq('keyword', keyword)
-            .maybeSingle();
-
-          const currentPosition = latestRanking?.position || null;
-          const previousPosition = previousRanking?.position || null;
-          let positionChange = null;
-
-          if (currentPosition && previousPosition) {
-            positionChange = previousPosition - currentPosition; // Positive = improvement (lower position number)
-          }
-
-          return {
-            keyword,
-            website_id: website.id,
-            website_domain: website.domain,
-            latest_position: currentPosition,
-            latest_ranking_date: latestRanking?.snapshot_date || null,
-            difficulty_estimate: preferences?.difficulty_estimate || null,
-            volume_estimate: preferences?.volume_estimate || 'Medium',
-            is_priority: preferences?.is_priority || false,
-            position_change: positionChange,
-            ranking_url: latestRanking?.url || null,
-            preferences: preferences ? {
-              tags: preferences.tags || [],
-              group_name: preferences.group_name || undefined,
-              group_color: preferences.group_color || undefined,
-              notes: preferences.notes || undefined
-            } : undefined
-          };
-        });
-      });
-
-      const keywords = await Promise.all(keywordPromises);
-      return keywords.sort((a, b) => {
-        // Priority keywords first, then by latest position (nulls last)
-        if (a.is_priority && !b.is_priority) return -1;
-        if (!a.is_priority && b.is_priority) return 1;
-        if (a.latest_position === null && b.latest_position !== null) return 1;
-        if (a.latest_position !== null && b.latest_position === null) return -1;
-        if (a.latest_position !== null && b.latest_position !== null) {
-          return a.latest_position - b.latest_position;
-        }
-        return a.keyword.localeCompare(b.keyword);
-      });
-    } catch (error) {
-      console.error('Error fetching user keywords:', error);
-      throw error;
-    }
-  },
-
-  async getKeywordHistory(websiteId: string, keyword: string, limit = 30): Promise<any[]> {
-    try {
-      const { data, error } = await supabase
-        .from('ranking_snapshots')
-        .select('position, snapshot_date, search_engine')
-        .eq('website_id', websiteId)
-        .eq('keyword', keyword)
-        .order('snapshot_date', { ascending: true })
-        .limit(limit);
-
-      if (error) throw error;
-      return data || [];
-    } catch (error) {
-      console.error('Error fetching keyword history:', error);
-      throw error;
-    }
-  },
-
-  async updateKeywordInWebsite(websiteId: string, oldKeyword: string, newKeyword: string): Promise<void> {
-    try {
-      const trimmedOldKeyword = oldKeyword.trim();
-      const trimmedNewKeyword = newKeyword.trim();
-
-      if (!trimmedNewKeyword) {
-        throw new Error('New keyword cannot be empty');
-      }
-
-      if (trimmedOldKeyword === trimmedNewKeyword) {
-        return; // No change needed
-      }
-
-      // Validate that old keyword can be modified (no pending ranking requests)
-      const validation = await this.validateKeywordOperation(websiteId, trimmedOldKeyword, 'remove');
-      if (!validation.isValid) {
-        throw new Error(validation.reason);
-      }
-
-      // Validate that new keyword doesn't already exist
-      const currentKeywords = await this.getWebsiteKeywords(websiteId);
-      if (currentKeywords.includes(trimmedNewKeyword)) {
-        throw new Error('New keyword already exists for this website');
-      }
-
-      // Update keywords string by replacing old with new
-      const updatedKeywords = currentKeywords.map(k => 
-        k === trimmedOldKeyword ? trimmedNewKeyword : k
-      );
-      const keywordsString = updatedKeywords.join(', ');
-
-      // Update the website
-      const { error: updateError } = await supabase
-        .from('websites')
-        .update({ 
-          keywords: keywordsString,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', websiteId);
-
-      if (updateError) throw updateError;
-
-      // Update user preferences to reference the new keyword name
-      const { error: preferencesError } = await supabase
-        .from('user_keyword_preferences')
-        .update({ keyword: trimmedNewKeyword })
-        .eq('website_id', websiteId)
-        .eq('keyword', trimmedOldKeyword);
-
-      if (preferencesError) {
-        console.error('Error updating keyword preferences:', preferencesError);
-        // Don't throw here as the main operation succeeded
-      }
-    } catch (error) {
-      console.error('Error updating keyword in website:', error);
-      throw error;
-    }
-  },
-
-  async updateKeywordPreferences(
-    userId: string,
-    websiteId: string,
-    keyword: string,
-    preferences: {
-      difficulty_estimate?: string;
-      volume_estimate?: string;
-      notes?: string;
-      is_priority?: boolean;
-      tags?: string[];
-      group_name?: string;
-      group_color?: string;
-    }
-  ): Promise<void> {
-    try {
-      console.log('Updating keyword preferences:', { userId, websiteId, keyword, preferences });
-      
-      const { error } = await supabase
-        .from('user_keyword_preferences')
-        .upsert({
-          user_id: userId,
-          website_id: websiteId,
-          keyword,
-          ...preferences
-        }, { 
-          onConflict: 'user_id,website_id,keyword'
-        });
-
-      if (error) {
-        console.error('Database error in updateKeywordPreferences:', error);
-        throw error;
-      }
-      
-      console.log('Successfully updated keyword preferences');
-    } catch (error) {
-      console.error('Error updating keyword preferences:', error);
-      throw error;
-    }
-  },
-
-  // Tag management functions
-  async getUserTags(userId: string): Promise<string[]> {
-    try {
-      const { data, error } = await supabase
-        .from('user_keyword_preferences')
-        .select('tags')
-        .eq('user_id', userId)
-        .not('tags', 'is', null);
-
-      if (error) throw error;
-
-      const allTags = new Set<string>();
-      data?.forEach(row => {
-        if (row.tags) {
-          row.tags.forEach((tag: string) => allTags.add(tag));
-        }
-      });
-
-      return Array.from(allTags).sort();
-    } catch (error) {
-      console.error('Error fetching user tags:', error);
-      throw error;
-    }
-  },
-
-  async getUserGroups(userId: string): Promise<{name: string, color?: string}[]> {
-    try {
-      const { data, error } = await supabase
-        .from('user_keyword_preferences')
-        .select('group_name, group_color')
-        .eq('user_id', userId)
-        .not('group_name', 'is', null);
-
-      if (error) throw error;
-
-      const groupsMap = new Map<string, string | undefined>();
-      data?.forEach(row => {
-        if (row.group_name) {
-          groupsMap.set(row.group_name, row.group_color);
-        }
-      });
-
-      return Array.from(groupsMap.entries()).map(([name, color]) => ({
-        name,
-        color
-      })).sort((a, b) => a.name.localeCompare(b.name));
-    } catch (error) {
-      console.error('Error fetching user groups:', error);
-      throw error;
-    }
-  },
-
-  async getKeywordsByGroup(userId: string, groupName: string): Promise<UserKeyword[]> {
-    try {
-      const userKeywords = await keywordService.getUserKeywords(userId);
-      return userKeywords.filter(keyword => keyword.preferences?.group_name === groupName);
-    } catch (error) {
-      console.error('Error fetching keywords by group:', error);
-      throw error;
-    }
-  },
-
-  async getKeywordsByTag(userId: string, tag: string): Promise<UserKeyword[]> {
-    try {
-      const userKeywords = await keywordService.getUserKeywords(userId);
-      return userKeywords.filter(keyword => 
-        keyword.preferences?.tags?.includes(tag)
-      );
-    } catch (error) {
-      console.error('Error fetching keywords by tag:', error);
-      throw error;
-    }
-  },
-
-  async bulkUpdateKeywordGroups(
-    userId: string,
-    updates: { websiteId: string; keyword: string; groupName?: string; groupColor?: string }[]
-  ): Promise<void> {
-    try {
-      const updatePromises = updates.map(({ websiteId, keyword, groupName, groupColor }) =>
-        keywordService.updateKeywordPreferences(userId, websiteId, keyword, {
-          group_name: groupName,
-          group_color: groupColor
-        })
-      );
-
-      await Promise.all(updatePromises);
-    } catch (error) {
-      console.error('Error bulk updating keyword groups:', error);
-      throw error;
-    }
-  },
-
-  async bulkUpdateKeywordTags(
-    userId: string,
-    updates: { websiteId: string; keyword: string; tags: string[] }[]
-  ): Promise<void> {
-    try {
-      console.log('Bulk updating tags for', updates.length, 'keywords:', updates);
-      
-      const updatePromises = updates.map(({ websiteId, keyword, tags }) =>
-        keywordService.updateKeywordPreferences(userId, websiteId, keyword, { tags })
-      );
-
-      await Promise.all(updatePromises);
-      console.log('Successfully bulk updated keyword tags');
-    } catch (error) {
-      console.error('Error bulk updating keyword tags:', error);
-      throw error;
-    }
+// Check if keyword has pending ranking requests
+const checkKeywordInRankingRequests = async (websiteId: string, keyword: string): Promise<boolean> => {
+  try {
+    const { data, error } = await supabase
+      .from('ranking_requests')
+      .select('id')
+      .eq('website_id', websiteId)
+      .eq('keyword', keyword)
+      .in('status', ['pending', 'processing'])
+      .limit(1);
+
+    if (error) throw error;
+    return (data && data.length > 0);
+  } catch (error) {
+    console.error('Error checking keyword in ranking requests:', error);
+    return false;
   }
+};
+
+// Get keyword dependencies
+const getKeywordDependencies = async (websiteId: string, keyword: string): Promise<{
+  hasRankingRequests: boolean;
+  rankingRequestsCount: number;
+  rankingSnapshotsCount: number;
+  hasUserPreferences: boolean;
+}> => {
+  try {
+    const [rankingRequestsData, snapshotsData, preferencesData] = await Promise.all([
+      supabase
+        .from('ranking_requests')
+        .select('id')
+        .eq('website_id', websiteId)
+        .eq('keyword', keyword),
+      supabase
+        .from('ranking_snapshots')
+        .select('id')
+        .eq('website_id', websiteId)
+        .eq('keyword', keyword),
+      supabase
+        .from('user_keyword_preferences')
+        .select('id')
+        .eq('website_id', websiteId)
+        .eq('keyword', keyword)
+        .limit(1)
+    ]);
+
+    return {
+      hasRankingRequests: (rankingRequestsData.data || []).length > 0,
+      rankingRequestsCount: (rankingRequestsData.data || []).length,
+      rankingSnapshotsCount: (snapshotsData.data || []).length,
+      hasUserPreferences: (preferencesData.data || []).length > 0
+    };
+  } catch (error) {
+    console.error('Error getting keyword dependencies:', error);
+    return {
+      hasRankingRequests: false,
+      rankingRequestsCount: 0,
+      rankingSnapshotsCount: 0,
+      hasUserPreferences: false
+    };
+  }
+};
+
+// Validate keyword operation
+const validateKeywordOperation = async (websiteId: string, keyword: string, operation: 'add' | 'remove'): Promise<{
+  isValid: boolean;
+  reason?: string;
+  dependencies?: any;
+}> => {
+  try {
+    if (operation === 'remove') {
+      const hasRankingRequests = await checkKeywordInRankingRequests(websiteId, keyword);
+      if (hasRankingRequests) {
+        return {
+          isValid: false,
+          reason: 'Cannot remove keyword with pending ranking requests'
+        };
+      }
+    }
+
+    const dependencies = await getKeywordDependencies(websiteId, keyword);
+    
+    return {
+      isValid: true,
+      dependencies
+    };
+  } catch (error) {
+    console.error('Error validating keyword operation:', error);
+    return {
+      isValid: false,
+      reason: 'Error validating operation'
+    };
+  }
+};
+
+// Get website keywords
+const getWebsiteKeywords = async (websiteId: string): Promise<string[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('websites')
+      .select('keywords')
+      .eq('id', websiteId)
+      .single();
+
+    if (error) throw error;
+    
+    const keywords = data?.keywords?.split(',').map((k: string) => k.trim()).filter(Boolean) || [];
+    return keywords;
+  } catch (error) {
+    console.error('Error getting website keywords:', error);
+    return [];
+  }
+};
+
+// Add keyword to website
+const addKeywordToWebsite = async (websiteId: string, keyword: string): Promise<void> => {
+  try {
+    const validation = await validateKeywordOperation(websiteId, keyword, 'add');
+    if (!validation.isValid) {
+      throw new Error(validation.reason);
+    }
+
+    const currentKeywords = await getWebsiteKeywords(websiteId);
+    
+    if (currentKeywords.includes(keyword.toLowerCase())) {
+      throw new Error('Keyword already exists for this website');
+    }
+
+    const updatedKeywords = [...currentKeywords, keyword.toLowerCase()];
+    
+    const { error } = await supabase
+      .from('websites')
+      .update({ 
+        keywords: updatedKeywords.join(', '),
+        keyword_count: updatedKeywords.length,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', websiteId);
+
+    if (error) throw error;
+  } catch (error) {
+    console.error('Error adding keyword to website:', error);
+    throw error;
+  }
+};
+
+// Remove keyword from website
+const removeKeywordFromWebsite = async (websiteId: string, keyword: string): Promise<void> => {
+  try {
+    const validation = await validateKeywordOperation(websiteId, keyword, 'remove');
+    if (!validation.isValid) {
+      throw new Error(validation.reason);
+    }
+
+    const currentKeywords = await getWebsiteKeywords(websiteId);
+    const updatedKeywords = currentKeywords.filter(k => k !== keyword.toLowerCase());
+    
+    const { error } = await supabase
+      .from('websites')
+      .update({ 
+        keywords: updatedKeywords.join(', '),
+        keyword_count: updatedKeywords.length,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', websiteId);
+
+    if (error) throw error;
+
+    await cleanupKeywordData(websiteId, keyword);
+  } catch (error) {
+    console.error('Error removing keyword from website:', error);
+    throw error;
+  }
+};
+
+// Update keyword in website
+const updateKeywordInWebsite = async (websiteId: string, oldKeyword: string, newKeyword: string): Promise<void> => {
+  try {
+    const validation = await validateKeywordOperation(websiteId, oldKeyword, 'remove');
+    if (!validation.isValid) {
+      throw new Error(validation.reason);
+    }
+
+    const currentKeywords = await getWebsiteKeywords(websiteId);
+    
+    if (currentKeywords.includes(newKeyword.toLowerCase())) {
+      throw new Error('New keyword already exists for this website');
+    }
+
+    const updatedKeywords = currentKeywords.map(k => 
+      k === oldKeyword.toLowerCase() ? newKeyword.toLowerCase() : k
+    );
+    
+    const { error } = await supabase
+      .from('websites')
+      .update({ 
+        keywords: updatedKeywords.join(', '),
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', websiteId);
+
+    if (error) throw error;
+
+    const { error: preferencesError } = await supabase
+      .from('user_keyword_preferences')
+      .update({ keyword: newKeyword.toLowerCase() })
+      .eq('website_id', websiteId)
+      .eq('keyword', oldKeyword.toLowerCase());
+
+    if (preferencesError) console.error('Error updating preferences:', preferencesError);
+  } catch (error) {
+    console.error('Error updating keyword:', error);
+    throw error;
+  }
+};
+
+// Clean up keyword data
+const cleanupKeywordData = async (websiteId: string, keyword: string): Promise<void> => {
+  try {
+    const { error } = await supabase
+      .from('user_keyword_preferences')
+      .delete()
+      .eq('website_id', websiteId)
+      .eq('keyword', keyword.toLowerCase());
+
+    if (error) console.error('Error cleaning up keyword data:', error);
+  } catch (error) {
+    console.error('Error during cleanup:', error);
+  }
+};
+
+// Get user keywords
+const getUserKeywords = async (userId: string): Promise<UserKeyword[]> => {
+  try {
+    const { data: websites, error: websitesError } = await supabase
+      .from('websites')
+      .select(`
+        id,
+        domain,
+        title,
+        keywords
+      `)
+      .eq('user_id', userId)
+      .not('keywords', 'is', null)
+      .not('keywords', 'eq', '');
+
+    if (websitesError) throw websitesError;
+
+    if (!websites || websites.length === 0) {
+      return [];
+    }
+
+    const allKeywords: UserKeyword[] = [];
+
+    for (const website of websites) {
+      if (!website.keywords) continue;
+
+      const keywords = website.keywords.split(',').map(k => k.trim()).filter(Boolean);
+
+      for (const keyword of keywords) {
+        const { data: latestRanking } = await supabase
+          .from('ranking_snapshots')
+          .select('position, created_at, ranking_confidence')
+          .eq('website_id', website.id)
+          .eq('keyword', keyword)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+
+        const { data: previousRanking } = await supabase
+          .from('ranking_snapshots')
+          .select('position')
+          .eq('website_id', website.id)
+          .eq('keyword', keyword)
+          .order('created_at', { ascending: false })
+          .offset(1)
+          .limit(1)
+          .single();
+
+        const { data: preferences } = await supabase
+          .from('user_keyword_preferences')
+          .select('*')
+          .eq('user_id', userId)
+          .eq('website_id', website.id)
+          .eq('keyword', keyword)
+          .single();
+
+        const userKeyword: UserKeyword = {
+          keyword,
+          website_id: website.id,
+          website_domain: website.domain,
+          website_title: website.title,
+          latest_position: latestRanking?.position || null,
+          current_position: latestRanking?.position || null,
+          previous_position: previousRanking?.position || null,
+          position_change: latestRanking?.position && previousRanking?.position 
+            ? previousRanking.position - latestRanking.position 
+            : 0,
+          last_updated: latestRanking?.created_at || null,
+          latest_ranking_date: latestRanking?.created_at || null,
+          ranking_confidence: latestRanking?.ranking_confidence || 'high',
+          
+          // User preferences (both formats for compatibility)
+          preferences: preferences ? {
+            difficulty_estimate: preferences.difficulty_estimate || null,
+            volume_estimate: preferences.volume_estimate || null,
+            notes: preferences.notes || null,
+            is_priority: preferences.is_priority || false,
+            tags: preferences.tags || [],
+            group_name: preferences.group_name || null,
+            group_color: preferences.group_color || null
+          } : undefined,
+          difficulty_estimate: preferences?.difficulty_estimate || null,
+          volume_estimate: preferences?.volume_estimate || null,
+          notes: preferences?.notes || null,
+          is_priority: preferences?.is_priority || false,
+          tags: preferences?.tags || [],
+          group_name: preferences?.group_name || null,
+          group_color: preferences?.group_color || null
+        };
+
+        allKeywords.push(userKeyword);
+      }
+    }
+
+    return allKeywords.sort((a, b) => {
+      if (a.is_priority && !b.is_priority) return -1;
+      if (!a.is_priority && b.is_priority) return 1;
+      return a.keyword.localeCompare(b.keyword);
+    });
+  } catch (error) {
+    console.error('Error getting user keywords:', error);
+    throw error;
+  }
+};
+
+// Get keyword history
+const getKeywordHistory = async (websiteId: string, keyword: string, limit: number = 30): Promise<any[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('ranking_snapshots')
+      .select('*')
+      .eq('website_id', websiteId)
+      .eq('keyword', keyword)
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.error('Error getting keyword history:', error);
+    return [];
+  }
+};
+
+// Update keyword preferences
+const updateKeywordPreferences = async (
+  userId: string, 
+  websiteId: string, 
+  keyword: string, 
+  preferences: { 
+    difficulty_estimate?: string; 
+    volume_estimate?: string; 
+    notes?: string; 
+    is_priority?: boolean; 
+    tags?: string[]; 
+    group_name?: string; 
+    group_color?: string; 
+  }
+): Promise<void> => {
+  try {
+    console.log('Updating keyword preferences:', { userId, websiteId, keyword, preferences });
+    
+    const { error } = await supabase
+      .from('user_keyword_preferences')
+      .upsert({
+        user_id: userId,
+        website_id: websiteId,
+        keyword,
+        ...preferences
+      }, { 
+        onConflict: 'user_id,website_id,keyword'
+      });
+
+    if (error) {
+      console.error('Database error in updateKeywordPreferences:', error);
+      throw error;
+    }
+    
+    console.log('Successfully updated keyword preferences');
+  } catch (error) {
+    console.error('Error updating keyword preferences:', error);
+    throw error;
+  }
+};
+
+// Get user tags
+const getUserTags = async (userId: string): Promise<string[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('user_keyword_preferences')
+      .select('tags')
+      .eq('user_id', userId)
+      .not('tags', 'is', null);
+
+    if (error) throw error;
+
+    const allTags = new Set<string>();
+    data?.forEach(row => {
+      row.tags?.forEach((tag: string) => allTags.add(tag));
+    });
+
+    return Array.from(allTags).sort();
+  } catch (error) {
+    console.error('Error getting user tags:', error);
+    return [];
+  }
+};
+
+// Get user groups
+const getUserGroups = async (userId: string): Promise<{name: string, color?: string}[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('user_keyword_preferences')
+      .select('group_name, group_color')
+      .eq('user_id', userId)
+      .not('group_name', 'is', null);
+
+    if (error) throw error;
+
+    const groupsMap = new Map();
+    data?.forEach(row => {
+      if (row.group_name && !groupsMap.has(row.group_name)) {
+        groupsMap.set(row.group_name, {
+          name: row.group_name,
+          color: row.group_color
+        });
+      }
+    });
+
+    return Array.from(groupsMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+  } catch (error) {
+    console.error('Error getting user groups:', error);
+    return [];
+  }
+};
+
+// Get keywords by group
+const getKeywordsByGroup = async (userId: string, groupName: string): Promise<UserKeyword[]> => {
+  try {
+    const allKeywords = await getUserKeywords(userId);
+    return allKeywords.filter(keyword => keyword.group_name === groupName);
+  } catch (error) {
+    console.error('Error getting keywords by group:', error);
+    return [];
+  }
+};
+
+// Get keywords by tag
+const getKeywordsByTag = async (userId: string, tag: string): Promise<UserKeyword[]> => {
+  try {
+    const allKeywords = await getUserKeywords(userId);
+    return allKeywords.filter(keyword => keyword.tags?.includes(tag));
+  } catch (error) {
+    console.error('Error getting keywords by tag:', error);
+    return [];
+  }
+};
+
+// Bulk update keyword groups
+const bulkUpdateKeywordGroups = async (
+  userId: string,
+  updates: { websiteId: string; keyword: string; groupName?: string; groupColor?: string }[]
+): Promise<void> => {
+  try {
+    const updatePromises = updates.map(({ websiteId, keyword, groupName, groupColor }) =>
+      updateKeywordPreferences(userId, websiteId, keyword, { 
+        group_name: groupName,
+        group_color: groupColor 
+      })
+    );
+
+    await Promise.all(updatePromises);
+  } catch (error) {
+    console.error('Error bulk updating keyword groups:', error);
+    throw error;
+  }
+};
+
+// Bulk update keyword tags
+const bulkUpdateKeywordTags = async (
+  userId: string,
+  updates: { websiteId: string; keyword: string; tags: string[] }[]
+): Promise<void> => {
+  try {
+    console.log('Bulk updating tags for', updates.length, 'keywords:', updates);
+    
+    const updatePromises = updates.map(({ websiteId, keyword, tags }) =>
+      updateKeywordPreferences(userId, websiteId, keyword, { tags })
+    );
+
+    await Promise.all(updatePromises);
+    console.log('Successfully bulk updated keyword tags');
+  } catch (error) {
+    console.error('Error bulk updating keyword tags:', error);
+    throw error;
+  }
+};
+
+// Enhanced tag management functions
+const renameUserTag = async (userId: string, oldTag: string, newTag: string): Promise<void> => {
+  try {
+    const { data: preferences, error: fetchError } = await supabase
+      .from('user_keyword_preferences')
+      .select('*')
+      .eq('user_id', userId)
+      .contains('tags', [oldTag]);
+
+    if (fetchError) throw fetchError;
+
+    const updatePromises = preferences?.map(pref => {
+      const updatedTags = pref.tags?.map((tag: string) => 
+        tag === oldTag ? newTag : tag
+      ) || [];
+      
+      return supabase
+        .from('user_keyword_preferences')
+        .update({ tags: updatedTags })
+        .eq('id', pref.id);
+    });
+
+    if (updatePromises) {
+      await Promise.all(updatePromises);
+    }
+  } catch (error) {
+    console.error('Error renaming tag:', error);
+    throw error;
+  }
+};
+
+const deleteUserTag = async (userId: string, tagName: string): Promise<void> => {
+  try {
+    const { data: preferences, error: fetchError } = await supabase
+      .from('user_keyword_preferences')
+      .select('*')
+      .eq('user_id', userId)
+      .contains('tags', [tagName]);
+
+    if (fetchError) throw fetchError;
+
+    const updatePromises = preferences?.map(pref => {
+      const updatedTags = pref.tags?.filter((tag: string) => tag !== tagName) || [];
+      
+      return supabase
+        .from('user_keyword_preferences')
+        .update({ tags: updatedTags })
+        .eq('id', pref.id);
+    });
+
+    if (updatePromises) {
+      await Promise.all(updatePromises);
+    }
+  } catch (error) {
+    console.error('Error deleting tag:', error);
+    throw error;
+  }
+};
+
+const mergeUserTags = async (userId: string, sourceTags: string[], targetTag: string): Promise<void> => {
+  try {
+    const { data: preferences, error: fetchError } = await supabase
+      .from('user_keyword_preferences')
+      .select('*')
+      .eq('user_id', userId);
+
+    if (fetchError) throw fetchError;
+
+    const updatePromises = preferences?.map(pref => {
+      if (!pref.tags) return null;
+      
+      const hasSourceTag = sourceTags.some(tag => pref.tags.includes(tag));
+      if (!hasSourceTag) return null;
+
+      const updatedTags = pref.tags
+        .filter((tag: string) => !sourceTags.includes(tag))
+        .concat([targetTag]);
+      
+      return supabase
+        .from('user_keyword_preferences')
+        .update({ tags: [...new Set(updatedTags)] })
+        .eq('id', pref.id);
+    }).filter(Boolean);
+
+    if (updatePromises) {
+      await Promise.all(updatePromises);
+    }
+  } catch (error) {
+    console.error('Error merging tags:', error);
+    throw error;
+  }
+};
+
+// Enhanced group management functions
+const renameUserGroup = async (userId: string, oldName: string, newName: string): Promise<void> => {
+  try {
+    const { error } = await supabase
+      .from('user_keyword_preferences')
+      .update({ group_name: newName })
+      .eq('user_id', userId)
+      .eq('group_name', oldName);
+    
+    if (error) throw error;
+  } catch (error) {
+    console.error('Error renaming group:', error);
+    throw error;
+  }
+};
+
+const deleteUserGroup = async (userId: string, groupName: string): Promise<void> => {
+  try {
+    const { error } = await supabase
+      .from('user_keyword_preferences')
+      .update({ group_name: null, group_color: null })
+      .eq('user_id', userId)
+      .eq('group_name', groupName);
+    
+    if (error) throw error;
+  } catch (error) {
+    console.error('Error deleting group:', error);
+    throw error;
+  }
+};
+
+const mergeUserGroups = async (userId: string, sourceGroups: string[], targetGroup: string, targetColor?: string): Promise<void> => {
+  try {
+    const { error } = await supabase
+      .from('user_keyword_preferences')
+      .update({ 
+        group_name: targetGroup,
+        group_color: targetColor 
+      })
+      .eq('user_id', userId)
+      .in('group_name', sourceGroups);
+    
+    if (error) throw error;
+  } catch (error) {
+    console.error('Error merging groups:', error);
+    throw error;
+  }
+};
+
+// Get keyword counts for tags and groups
+const getTagKeywordCounts = async (userId: string): Promise<{[tag: string]: number}> => {
+  try {
+    const { data, error } = await supabase
+      .from('user_keyword_preferences')
+      .select('tags')
+      .eq('user_id', userId)
+      .not('tags', 'is', null);
+
+    if (error) throw error;
+
+    const tagCounts: {[tag: string]: number} = {};
+    data?.forEach(row => {
+      row.tags?.forEach((tag: string) => {
+        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+      });
+    });
+
+    return tagCounts;
+  } catch (error) {
+    console.error('Error getting tag counts:', error);
+    return {};
+  }
+};
+
+const getGroupKeywordCounts = async (userId: string): Promise<{[group: string]: number}> => {
+  try {
+    const { data, error } = await supabase
+      .from('user_keyword_preferences')
+      .select('group_name')
+      .eq('user_id', userId)
+      .not('group_name', 'is', null);
+
+    if (error) throw error;
+
+    const groupCounts: {[group: string]: number} = {};
+    data?.forEach(row => {
+      if (row.group_name) {
+        groupCounts[row.group_name] = (groupCounts[row.group_name] || 0) + 1;
+      }
+    });
+
+    return groupCounts;
+  } catch (error) {
+    console.error('Error getting group counts:', error);
+    return {};
+  }
+};
+
+export const keywordService = {
+  checkKeywordInRankingRequests,
+  getKeywordDependencies,
+  validateKeywordOperation,
+  getWebsiteKeywords,
+  addKeywordToWebsite,
+  removeKeywordFromWebsite,
+  updateKeywordInWebsite,
+  cleanupKeywordData,
+  getUserKeywords,
+  getKeywordHistory,
+  updateKeywordPreferences,
+  getUserTags,
+  getUserGroups,
+  getKeywordsByGroup,
+  getKeywordsByTag,
+  bulkUpdateKeywordGroups,
+  bulkUpdateKeywordTags,
+  // Enhanced management functions
+  renameUserTag,
+  deleteUserTag,
+  mergeUserTags,
+  renameUserGroup,
+  deleteUserGroup,
+  mergeUserGroups,
+  getTagKeywordCounts,
+  getGroupKeywordCounts
 };

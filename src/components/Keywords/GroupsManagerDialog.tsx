@@ -1,0 +1,464 @@
+import { useState, useEffect } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Folders, Plus, Trash2, Edit3, Check, X, Merge, Palette } from 'lucide-react';
+import { keywordService } from '@/services/keywordService';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+
+interface GroupWithCount {
+  name: string;
+  color?: string;
+  count: number;
+}
+
+const DEFAULT_COLORS = [
+  '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6',
+  '#EC4899', '#06B6D4', '#84CC16', '#F97316', '#6366F1'
+];
+
+export function GroupsManagerDialog() {
+  const [open, setOpen] = useState(false);
+  const [groups, setGroups] = useState<GroupWithCount[]>([]);
+  const [newGroupInput, setNewGroupInput] = useState('');
+  const [newGroupColor, setNewGroupColor] = useState(DEFAULT_COLORS[0]);
+  const [loading, setLoading] = useState(false);
+  const [editingGroup, setEditingGroup] = useState<string | null>(null);
+  const [editGroupValue, setEditGroupValue] = useState('');
+  const [editGroupColor, setEditGroupColor] = useState('');
+  const [deletingGroup, setDeletingGroup] = useState<string | null>(null);
+  const [selectedGroups, setSelectedGroups] = useState<Set<string>>(new Set());
+  const [mergeTarget, setMergeTarget] = useState('');
+  const [mergeTargetColor, setMergeTargetColor] = useState(DEFAULT_COLORS[0]);
+  const [showMergeDialog, setShowMergeDialog] = useState(false);
+  const { toast } = useToast();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (open && user) {
+      loadGroups();
+    }
+  }, [open, user]);
+
+  const loadGroups = async () => {
+    if (!user) return;
+    
+    setLoading(true);
+    try {
+      const [userGroups, groupCounts] = await Promise.all([
+        keywordService.getUserGroups(user.id),
+        keywordService.getGroupKeywordCounts(user.id)
+      ]);
+      
+      const groupsWithCounts = userGroups.map(group => ({
+        name: group.name,
+        color: group.color,
+        count: groupCounts[group.name] || 0
+      })).sort((a, b) => b.count - a.count);
+      
+      setGroups(groupsWithCounts);
+    } catch (error) {
+      console.error('Error loading groups:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load groups",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateGroup = async () => {
+    if (!user || !newGroupInput.trim()) return;
+
+    setLoading(true);
+    try {
+      // Create a dummy keyword preference to establish the group
+      await keywordService.updateKeywordPreferences(user.id, '', '', {
+        group_name: newGroupInput.trim(),
+        group_color: newGroupColor
+      });
+      
+      setNewGroupInput('');
+      setNewGroupColor(DEFAULT_COLORS[0]);
+      await loadGroups();
+      
+      toast({
+        title: "Success",
+        description: `Group "${newGroupInput.trim()}" created successfully`
+      });
+    } catch (error) {
+      console.error('Error creating group:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create group",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRenameGroup = async (oldName: string, newName: string, newColor: string) => {
+    if (!user || !newName.trim()) return;
+
+    setLoading(true);
+    try {
+      await keywordService.renameUserGroup(user.id, oldName, newName.trim());
+      // Update color if changed
+      if (newColor !== editGroupColor) {
+        await keywordService.bulkUpdateKeywordGroups(user.id, [{
+          websiteId: '', // Will be handled by the service
+          keyword: '',
+          groupName: newName.trim(),
+          groupColor: newColor
+        }]);
+      }
+      
+      await loadGroups();
+      setEditingGroup(null);
+      setEditGroupValue('');
+      setEditGroupColor('');
+      
+      toast({
+        title: "Success",
+        description: `Group renamed from "${oldName}" to "${newName.trim()}" successfully`
+      });
+    } catch (error) {
+      console.error('Error renaming group:', error);
+      toast({
+        title: "Error",
+        description: "Failed to rename group",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteGroup = async (groupName: string) => {
+    if (!user) return;
+
+    setLoading(true);
+    try {
+      await keywordService.deleteUserGroup(user.id, groupName);
+      await loadGroups();
+      setDeletingGroup(null);
+      
+      toast({
+        title: "Success",
+        description: `Group "${groupName}" deleted successfully`
+      });
+    } catch (error) {
+      console.error('Error deleting group:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete group",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleMergeGroups = async () => {
+    if (!user || selectedGroups.size === 0 || !mergeTarget.trim()) return;
+
+    setLoading(true);
+    try {
+      await keywordService.mergeUserGroups(user.id, Array.from(selectedGroups), mergeTarget.trim(), mergeTargetColor);
+      await loadGroups();
+      setSelectedGroups(new Set());
+      setMergeTarget('');
+      setMergeTargetColor(DEFAULT_COLORS[0]);
+      setShowMergeDialog(false);
+      
+      toast({
+        title: "Success",
+        description: `${selectedGroups.size} groups merged into "${mergeTarget.trim()}" successfully`
+      });
+    } catch (error) {
+      console.error('Error merging groups:', error);
+      toast({
+        title: "Error",
+        description: "Failed to merge groups",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleGroupSelection = (groupName: string) => {
+    const newSelection = new Set(selectedGroups);
+    if (newSelection.has(groupName)) {
+      newSelection.delete(groupName);
+    } else {
+      newSelection.add(groupName);
+    }
+    setSelectedGroups(newSelection);
+  };
+
+  return (
+    <>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button variant="outline" size="sm">
+            <Folders size={16} className="mr-2" />
+            Manage Groups
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-4xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle>Manage Groups</DialogTitle>
+          </DialogHeader>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+            {/* Current Groups */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold">Your Groups ({groups.length})</h3>
+                {selectedGroups.size > 0 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowMergeDialog(true)}
+                    className="text-blue-600"
+                  >
+                    <Merge size={16} className="mr-1" />
+                    Merge ({selectedGroups.size})
+                  </Button>
+                )}
+              </div>
+              
+              <ScrollArea className="h-[400px] border rounded-md p-4">
+                {loading && groups.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    Loading groups...
+                  </div>
+                ) : groups.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No groups found. Create your first group to get started.
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {groups.map((group) => (
+                      <div key={group.name} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div className="flex items-center gap-3 flex-1">
+                          <input
+                            type="checkbox"
+                            checked={selectedGroups.has(group.name)}
+                            onChange={() => toggleGroupSelection(group.name)}
+                            className="rounded"
+                          />
+                          
+                          {editingGroup === group.name ? (
+                            <div className="flex items-center gap-2 flex-1">
+                              <div 
+                                className="w-4 h-4 rounded border cursor-pointer"
+                                style={{ backgroundColor: editGroupColor }}
+                                onClick={() => {
+                                  const colorIndex = DEFAULT_COLORS.indexOf(editGroupColor);
+                                  const nextIndex = (colorIndex + 1) % DEFAULT_COLORS.length;
+                                  setEditGroupColor(DEFAULT_COLORS[nextIndex]);
+                                }}
+                              />
+                              <Input
+                                value={editGroupValue}
+                                onChange={(e) => setEditGroupValue(e.target.value)}
+                                className="font-medium flex-1"
+                                placeholder="Enter group name"
+                              />
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleRenameGroup(group.name, editGroupValue, editGroupColor)}
+                                disabled={loading || !editGroupValue.trim()}
+                                className="text-green-600 hover:text-green-600"
+                              >
+                                <Check size={14} />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  setEditingGroup(null);
+                                  setEditGroupValue('');
+                                  setEditGroupColor('');
+                                }}
+                                disabled={loading}
+                                className="text-gray-600 hover:text-gray-600"
+                              >
+                                <X size={14} />
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2 flex-1">
+                              <div 
+                                className="w-4 h-4 rounded border"
+                                style={{ backgroundColor: group.color || DEFAULT_COLORS[0] }}
+                              />
+                              <span className="font-medium">{group.name}</span>
+                              <Badge variant="secondary" className="text-xs">
+                                {group.count} keywords
+                              </Badge>
+                            </div>
+                          )}
+                        </div>
+                        
+                        {editingGroup !== group.name && (
+                          <div className="flex gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setEditingGroup(group.name);
+                                setEditGroupValue(group.name);
+                                setEditGroupColor(group.color || DEFAULT_COLORS[0]);
+                              }}
+                              disabled={loading}
+                              className="text-blue-600 hover:text-blue-600"
+                            >
+                              <Edit3 size={16} />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setDeletingGroup(group.name)}
+                              disabled={loading}
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <Trash2 size={16} />
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+            </div>
+
+            {/* Create New Group */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Create New Group</h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="new-group">Group Name</Label>
+                  <Input
+                    id="new-group"
+                    placeholder="Enter group name"
+                    value={newGroupInput}
+                    onChange={(e) => setNewGroupInput(e.target.value)}
+                  />
+                </div>
+                
+                <div>
+                  <Label>Group Color</Label>
+                  <div className="flex gap-2 mt-2">
+                    {DEFAULT_COLORS.map((color) => (
+                      <button
+                        key={color}
+                        className={`w-8 h-8 rounded border-2 ${newGroupColor === color ? 'border-gray-800' : 'border-gray-300'}`}
+                        style={{ backgroundColor: color }}
+                        onClick={() => setNewGroupColor(color)}
+                      />
+                    ))}
+                  </div>
+                </div>
+                
+                <Button
+                  onClick={handleCreateGroup}
+                  disabled={loading || !newGroupInput.trim()}
+                  className="w-full"
+                >
+                  <Plus size={16} className="mr-2" />
+                  Create Group
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deletingGroup} onOpenChange={() => setDeletingGroup(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Group</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete the group "{deletingGroup}"? This will remove the group from all keywords that use it.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => deletingGroup && handleDeleteGroup(deletingGroup)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Merge Groups Dialog */}
+      <AlertDialog open={showMergeDialog} onOpenChange={setShowMergeDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Merge Groups</AlertDialogTitle>
+            <AlertDialogDescription>
+              Merge {selectedGroups.size} selected groups into a single group. All keywords will be updated.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4 space-y-4">
+            <div>
+              <Label htmlFor="merge-target">Target Group Name</Label>
+              <Input
+                id="merge-target"
+                placeholder="Enter target group name"
+                value={mergeTarget}
+                onChange={(e) => setMergeTarget(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label>Target Group Color</Label>
+              <div className="flex gap-2 mt-2">
+                {DEFAULT_COLORS.map((color) => (
+                  <button
+                    key={color}
+                    className={`w-6 h-6 rounded border-2 ${mergeTargetColor === color ? 'border-gray-800' : 'border-gray-300'}`}
+                    style={{ backgroundColor: color }}
+                    onClick={() => setMergeTargetColor(color)}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setMergeTarget('');
+              setMergeTargetColor(DEFAULT_COLORS[0]);
+              setSelectedGroups(new Set());
+            }}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleMergeGroups}
+              disabled={!mergeTarget.trim()}
+            >
+              Merge Groups
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+}

@@ -12,6 +12,8 @@ import { EnhancedKeywordRankingStatus } from './EnhancedKeywordRankingStatus';
 import { KeywordGroupBadge } from './KeywordGroupBadge';
 import { KeywordTagBadge } from './KeywordTagBadge';
 import { KeywordManagerDialog } from './KeywordManagerDialog';
+import { TagsManagerDialog } from './TagsManagerDialog';
+import { GroupsManagerDialog } from './GroupsManagerDialog';
 import { ExportDialog } from './ExportDialog';
 import { KeywordFilterPanel, KeywordFilters } from './KeywordFilterPanel';
 import { BulkActionToolbar } from './BulkActionToolbar';
@@ -352,6 +354,9 @@ export const KeywordTable = ({ selectedWebsiteId }: KeywordTableProps) => {
                   onKeywordsUpdated={loadKeywords}
                 />
               )}
+
+              <TagsManagerDialog />
+              <GroupsManagerDialog />
               
               <ExportDialog 
                 keywords={filteredKeywords}
