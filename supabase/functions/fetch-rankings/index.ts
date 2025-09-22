@@ -49,9 +49,15 @@ async function fetchRankingFromSerpApi(keyword: string, domain: string, searchEn
 
     // Find the domain in the results
     const result = data.organic_results.find(result => {
-      const resultDomain = new URL(result.link).hostname.replace('www.', '');
-      const targetDomain = domain.replace('www.', '');
-      return resultDomain === targetDomain;
+      try {
+        const resultDomain = new URL(result.link).hostname.replace('www.', '');
+        // Properly normalize the target domain by removing protocol and www
+        let normalizedTargetDomain = domain.replace(/^https?:\/\//, '').replace(/^www\./, '');
+        return resultDomain === normalizedTargetDomain;
+      } catch (error) {
+        console.error('Error parsing URL:', result.link, error);
+        return false;
+      }
     });
 
     return result || null;
