@@ -137,7 +137,7 @@ export const keywordService = {
         .from('websites')
         .select('keywords')
         .eq('id', websiteId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       
@@ -273,7 +273,7 @@ export const keywordService = {
             .eq('keyword', keyword)
             .order('snapshot_date', { ascending: false })
             .limit(1)
-            .single();
+            .maybeSingle();
 
           // Get previous ranking for change calculation
           const { data: previousRanking } = await supabase
@@ -283,7 +283,7 @@ export const keywordService = {
             .eq('keyword', keyword)
             .order('snapshot_date', { ascending: false })
             .range(1, 1)
-            .single();
+            .maybeSingle();
 
           // Get user preferences for this keyword
           const { data: preferences } = await supabase
@@ -292,7 +292,7 @@ export const keywordService = {
             .eq('user_id', userId)
             .eq('website_id', website.id)
             .eq('keyword', keyword)
-            .single();
+            .maybeSingle();
 
           const currentPosition = latestRanking?.position || null;
           const previousPosition = previousRanking?.position || null;
