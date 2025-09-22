@@ -103,6 +103,70 @@ export const triggerRankingCheck = async (websiteId: string, specificKeyword?: s
   }
 };
 
+// Transform database ranking snapshots to dashboard chart format
+export const getDashboardRankingData = async (websites: { websiteId: string; domain: string }[]): Promise<import('@/lib/mockData').RankingData[]> => {
+  if (!websites.length) return [];
+  
+  try {
+    // Get all website IDs
+    const websiteIds = websites.map(w => w.websiteId);
+    
+    const { data, error } = await supabase
+      .from('ranking_snapshots')
+      .select('*')
+      .in('website_id', websiteIds)
+      .order('snapshot_date', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching dashboard ranking data:', error);
+      return [];
+    }
+
+    // Group by website and keyword
+    const groupedData: { [key: string]: RankingSnapshot[] } = {};
+    
+    data.forEach(snapshot => {
+      const key = `${snapshot.website_id}-${snapshot.keyword}`;
+      if (!groupedData[key]) {
+        groupedData[key] = [];
+      }
+      groupedData[key].push({
+        id: snapshot.id,
+        websiteId: snapshot.website_id,
+        keyword: snapshot.keyword,
+        searchEngine: snapshot.search_engine,
+        position: snapshot.position,
+        url: snapshot.url,
+        title: snapshot.title,
+        description: snapshot.description,
+        snapshotDate: snapshot.snapshot_date,
+        createdAt: snapshot.created_at,
+      });
+    });
+
+    // Transform to RankingData format
+    return Object.entries(groupedData).map(([key, snapshots]) => {
+      const [websiteId, keyword] = key.split('-');
+      
+      return {
+        websiteId,
+        keyword,
+        rankings: snapshots
+          .filter(s => s.position !== null) // Only include positions that are not null
+          .map(s => ({
+            date: s.snapshotDate,
+            position: s.position!
+          }))
+          .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      };
+    }).filter(data => data.rankings.length > 0); // Only include keywords with actual ranking data
+    
+  } catch (error) {
+    console.error('Exception fetching dashboard ranking data:', error);
+    return [];
+  }
+};
+
 // Get ranking history for a specific keyword
 export const getKeywordRankingHistory = async (websiteId: string, keyword: string, searchEngine: string = 'google'): Promise<RankingSnapshot[]> => {
   try {

@@ -10,13 +10,15 @@ interface MainDashboardContentProps {
   selectedWebsiteId: string;
   onSelectWebsite: (websiteId: string) => void;
   websiteRankingData: any[];
+  isLoadingRankings?: boolean;
 }
 
 export function MainDashboardContent({ 
   websites, 
   selectedWebsiteId, 
   onSelectWebsite, 
-  websiteRankingData 
+  websiteRankingData,
+  isLoadingRankings = false
 }: MainDashboardContentProps) {
   return (
     <div className="lg:col-span-2 space-y-6 animate-fade-in" style={{ animationDelay: '200ms' }}>
@@ -30,7 +32,13 @@ export function MainDashboardContent({
             </Link>
           </Button>
         </div>
-        <RankingChart data={websiteRankingData} />
+        {isLoadingRankings ? (
+          <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+            Loading ranking data...
+          </div>
+        ) : (
+          <RankingChart data={websiteRankingData} />
+        )}
       </div>
       
       {/* Website list */}
