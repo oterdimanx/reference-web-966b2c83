@@ -355,7 +355,7 @@ export const KeywordTable = ({ selectedWebsiteId }: KeywordTableProps) => {
                 />
               )}
 
-              <TagsManagerDialog />
+              <TagsManagerDialog onTagsChanged={loadKeywords} />
               <GroupsManagerDialog onGroupsChanged={loadKeywords} />
               
               <ExportDialog 

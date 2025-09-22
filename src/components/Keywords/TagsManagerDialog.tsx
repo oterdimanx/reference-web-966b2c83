@@ -16,7 +16,11 @@ interface TagWithCount {
   count: number;
 }
 
-export function TagsManagerDialog() {
+interface TagsManagerDialogProps {
+  onTagsChanged?: () => void;
+}
+
+export function TagsManagerDialog({ onTagsChanged }: TagsManagerDialogProps = {}) {
   const [open, setOpen] = useState(false);
   const [tags, setTags] = useState<TagWithCount[]>([]);
   const [loading, setLoading] = useState(false);
@@ -26,14 +30,23 @@ export function TagsManagerDialog() {
   const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
   const [mergeTarget, setMergeTarget] = useState('');
   const [showMergeDialog, setShowMergeDialog] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
 
   useEffect(() => {
     if (open && user) {
+      setHasChanges(false); // Reset changes tracking when dialog opens
       loadTags();
     }
   }, [open, user]);
+
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!newOpen && hasChanges && onTagsChanged) {
+      onTagsChanged(); // Refresh the main listing when closing if changes were made
+    }
+    setOpen(newOpen);
+  };
 
   const loadTags = async () => {
     if (!user) return;
@@ -72,6 +85,7 @@ export function TagsManagerDialog() {
       await loadTags();
       setEditingTag(null);
       setEditTagValue('');
+      setHasChanges(true); // Mark that changes were made
       
       toast({
         title: "Success",
@@ -97,6 +111,7 @@ export function TagsManagerDialog() {
       await keywordService.deleteUserTag(user.id, tagName);
       await loadTags();
       setDeletingTag(null);
+      setHasChanges(true); // Mark that changes were made
       
       toast({
         title: "Success",
@@ -124,6 +139,7 @@ export function TagsManagerDialog() {
       setSelectedTags(new Set());
       setMergeTarget('');
       setShowMergeDialog(false);
+      setHasChanges(true); // Mark that changes were made
       
       toast({
         title: "Success",
@@ -153,7 +169,7 @@ export function TagsManagerDialog() {
 
   return (
     <>
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogTrigger asChild>
           <Button variant="outline" size="sm">
             <Tags size={16} className="mr-2" />
