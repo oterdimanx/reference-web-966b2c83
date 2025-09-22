@@ -17,7 +17,7 @@ import {
   DropdownMenuPortal,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Shield, User, LogOut, Settings, BarChart3, DollarSign, FolderTree, Globe, TrendingUp, Search } from 'lucide-react';
+import { Shield, User, LogOut, Settings, BarChart, DollarSign, FolderTree, Globe, TrendingUp, Trophy, Search } from 'lucide-react';
 
 export function UserSection() {
   const { user, signOut, isAdmin } = useAuth();
@@ -67,7 +67,7 @@ export function UserSection() {
                 <DropdownMenuSubContent>
                   <DropdownMenuItem asChild>
                     <Link to="/admin/dashboard-rw" className="flex items-center w-full">
-                      <BarChart3 className="mr-2 h-4 w-4" />
+                      <BarChart className="mr-2 h-4 w-4" />
                       {t('admin', 'dashboard')}
                     </Link>
                   </DropdownMenuItem>
@@ -91,13 +91,13 @@ export function UserSection() {
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/admin/analytics" className="flex items-center w-full">
-                      <BarChart3 className="mr-2 h-4 w-4" />
+                      <TrendingUp className="mr-2 h-4 w-4" />
                       {t('admin', 'analytics')}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/admin/rankings" className="flex items-center w-full">
-                      <TrendingUp className="mr-2 h-4 w-4" />
+                      <Trophy className="mr-2 h-4 w-4" />
                       {t('admin', 'rankings')}
                     </Link>
                   </DropdownMenuItem>
