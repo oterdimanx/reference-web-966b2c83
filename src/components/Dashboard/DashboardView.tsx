@@ -14,7 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { StatsSection } from './StatsSection';
 import { MainDashboardContent } from './MainDashboardContent';
 import { QuickTipsCard } from './QuickTipsCard';
-import { RankingDebugTest } from '@/components/Debug/RankingDebugTest';
+// import { RankingDebugTest } from '@/components/Debug/RankingDebugTest';
 
 export function DashboardView() {
   const { user } = useAuth();
@@ -117,7 +117,7 @@ export function DashboardView() {
           {/* Right sidebar */}
           <div className="space-y-6 animate-fade-in" style={{ animationDelay: '300ms' }}>
           <AddWebsiteForm onAddWebsite={handleAddWebsite} />
-          <RankingDebugTest />
+          {/* <RankingDebugTest /> */}
           <QuickTipsCard />
           </div>
         </div>
