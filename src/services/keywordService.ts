@@ -312,8 +312,7 @@ const getUserKeywords = async (userId: string): Promise<UserKeyword[]> => {
           .eq('website_id', website.id)
           .eq('keyword', keyword)
           .order('created_at', { ascending: false })
-          .offset(1)
-          .limit(1)
+          .range(1, 1)
           .single();
 
         const { data: preferences } = await supabase
