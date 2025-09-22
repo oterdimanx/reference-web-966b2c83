@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Folders, Plus, Trash2, Edit3, Check, X, Merge, Palette } from 'lucide-react';
+import { Folders, Trash2, Edit3, Check, X, Merge, Palette } from 'lucide-react';
 import { keywordService } from '@/services/keywordService';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -25,8 +25,6 @@ const DEFAULT_COLORS = [
 export function GroupsManagerDialog() {
   const [open, setOpen] = useState(false);
   const [groups, setGroups] = useState<GroupWithCount[]>([]);
-  const [newGroupInput, setNewGroupInput] = useState('');
-  const [newGroupColor, setNewGroupColor] = useState(DEFAULT_COLORS[0]);
   const [loading, setLoading] = useState(false);
   const [editingGroup, setEditingGroup] = useState<string | null>(null);
   const [editGroupValue, setEditGroupValue] = useState('');
@@ -67,37 +65,6 @@ export function GroupsManagerDialog() {
       toast({
         title: "Error",
         description: "Failed to load groups",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCreateGroup = async () => {
-    if (!user || !newGroupInput.trim()) return;
-
-    setLoading(true);
-    try {
-      // Create a dummy keyword preference to establish the group
-      await keywordService.updateKeywordPreferences(user.id, '', '', {
-        group_name: newGroupInput.trim(),
-        group_color: newGroupColor
-      });
-      
-      setNewGroupInput('');
-      setNewGroupColor(DEFAULT_COLORS[0]);
-      await loadGroups();
-      
-      toast({
-        title: "Success",
-        description: `Group "${newGroupInput.trim()}" created successfully`
-      });
-    } catch (error) {
-      console.error('Error creating group:', error);
-      toast({
-        title: "Error",
-        description: "Failed to create group",
         variant: "destructive"
       });
     } finally {
@@ -214,176 +181,134 @@ export function GroupsManagerDialog() {
             Manage Groups
           </Button>
         </DialogTrigger>
-        <DialogContent className="max-w-4xl max-h-[80vh]">
+        <DialogContent className="max-w-2xl max-h-[80vh]">
           <DialogHeader>
             <DialogTitle>Manage Groups</DialogTitle>
           </DialogHeader>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
-            {/* Current Groups */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">Your Groups ({groups.length})</h3>
-                {selectedGroups.size > 0 && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowMergeDialog(true)}
-                    className="text-blue-600"
-                  >
-                    <Merge size={16} className="mr-1" />
-                    Merge ({selectedGroups.size})
-                  </Button>
-                )}
-              </div>
-              
-              <ScrollArea className="h-[400px] border rounded-md p-4">
-                {loading && groups.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    Loading groups...
-                  </div>
-                ) : groups.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    No groups found. Create your first group to get started.
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {groups.map((group) => (
-                      <div key={group.name} className="flex items-center justify-between p-3 border rounded-lg">
-                        <div className="flex items-center gap-3 flex-1">
-                          <input
-                            type="checkbox"
-                            checked={selectedGroups.has(group.name)}
-                            onChange={() => toggleGroupSelection(group.name)}
-                            className="rounded"
-                          />
-                          
-                          {editingGroup === group.name ? (
-                            <div className="flex items-center gap-2 flex-1">
-                              <div 
-                                className="w-4 h-4 rounded border cursor-pointer"
-                                style={{ backgroundColor: editGroupColor }}
-                                onClick={() => {
-                                  const colorIndex = DEFAULT_COLORS.indexOf(editGroupColor);
-                                  const nextIndex = (colorIndex + 1) % DEFAULT_COLORS.length;
-                                  setEditGroupColor(DEFAULT_COLORS[nextIndex]);
-                                }}
-                              />
-                              <Input
-                                value={editGroupValue}
-                                onChange={(e) => setEditGroupValue(e.target.value)}
-                                className="font-medium flex-1"
-                                placeholder="Enter group name"
-                              />
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleRenameGroup(group.name, editGroupValue, editGroupColor)}
-                                disabled={loading || !editGroupValue.trim()}
-                                className="text-green-600 hover:text-green-600"
-                              >
-                                <Check size={14} />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                  setEditingGroup(null);
-                                  setEditGroupValue('');
-                                  setEditGroupColor('');
-                                }}
-                                disabled={loading}
-                                className="text-gray-600 hover:text-gray-600"
-                              >
-                                <X size={14} />
-                              </Button>
-                            </div>
-                          ) : (
-                            <div className="flex items-center gap-2 flex-1">
-                              <div 
-                                className="w-4 h-4 rounded border"
-                                style={{ backgroundColor: group.color || DEFAULT_COLORS[0] }}
-                              />
-                              <span className="font-medium">{group.name}</span>
-                              <Badge variant="secondary" className="text-xs">
-                                {group.count} keywords
-                              </Badge>
-                            </div>
-                          )}
-                        </div>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Your Groups ({groups.length})</h3>
+              {selectedGroups.size > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowMergeDialog(true)}
+                  className="text-blue-600"
+                >
+                  <Merge size={16} className="mr-1" />
+                  Merge ({selectedGroups.size})
+                </Button>
+              )}
+            </div>
+            
+            <ScrollArea className="h-[500px] border rounded-md p-4">
+              {loading && groups.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  Loading groups...
+                </div>
+              ) : groups.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No groups found. Create groups by selecting keywords and using the "Add to Group" action.
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {groups.map((group) => (
+                    <div key={group.name} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center gap-3 flex-1">
+                        <input
+                          type="checkbox"
+                          checked={selectedGroups.has(group.name)}
+                          onChange={() => toggleGroupSelection(group.name)}
+                          className="rounded"
+                        />
                         
-                        {editingGroup !== group.name && (
-                          <div className="flex gap-1">
+                        {editingGroup === group.name ? (
+                          <div className="flex items-center gap-2 flex-1">
+                            <div 
+                              className="w-4 h-4 rounded border cursor-pointer"
+                              style={{ backgroundColor: editGroupColor }}
+                              onClick={() => {
+                                const colorIndex = DEFAULT_COLORS.indexOf(editGroupColor);
+                                const nextIndex = (colorIndex + 1) % DEFAULT_COLORS.length;
+                                setEditGroupColor(DEFAULT_COLORS[nextIndex]);
+                              }}
+                              title="Click to change color"
+                            />
+                            <Input
+                              value={editGroupValue}
+                              onChange={(e) => setEditGroupValue(e.target.value)}
+                              className="font-medium flex-1"
+                              placeholder="Enter group name"
+                            />
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleRenameGroup(group.name, editGroupValue, editGroupColor)}
+                              disabled={loading || !editGroupValue.trim()}
+                              className="text-green-600 hover:text-green-600"
+                            >
+                              <Check size={14} />
+                            </Button>
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => {
-                                setEditingGroup(group.name);
-                                setEditGroupValue(group.name);
-                                setEditGroupColor(group.color || DEFAULT_COLORS[0]);
+                                setEditingGroup(null);
+                                setEditGroupValue('');
+                                setEditGroupColor('');
                               }}
                               disabled={loading}
-                              className="text-blue-600 hover:text-blue-600"
+                              className="text-gray-600 hover:text-gray-600"
                             >
-                              <Edit3 size={16} />
+                              <X size={14} />
                             </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setDeletingGroup(group.name)}
-                              disabled={loading}
-                              className="text-destructive hover:text-destructive"
-                            >
-                              <Trash2 size={16} />
-                            </Button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2 flex-1">
+                            <div 
+                              className="w-4 h-4 rounded border"
+                              style={{ backgroundColor: group.color || DEFAULT_COLORS[0] }}
+                            />
+                            <span className="font-medium">{group.name}</span>
+                            <Badge variant="secondary" className="text-xs">
+                              {group.count} keywords
+                            </Badge>
                           </div>
                         )}
                       </div>
-                    ))}
-                  </div>
-                )}
-              </ScrollArea>
-            </div>
-
-            {/* Create New Group */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Create New Group</h3>
-              
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="new-group">Group Name</Label>
-                  <Input
-                    id="new-group"
-                    placeholder="Enter group name"
-                    value={newGroupInput}
-                    onChange={(e) => setNewGroupInput(e.target.value)}
-                  />
+                      
+                      {editingGroup !== group.name && (
+                        <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setEditingGroup(group.name);
+                              setEditGroupValue(group.name);
+                              setEditGroupColor(group.color || DEFAULT_COLORS[0]);
+                            }}
+                            disabled={loading}
+                            className="text-blue-600 hover:text-blue-600"
+                          >
+                            <Edit3 size={16} />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setDeletingGroup(group.name)}
+                            disabled={loading}
+                            className="text-destructive hover:text-destructive"
+                          >
+                            <Trash2 size={16} />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
-                
-                <div>
-                  <Label>Group Color</Label>
-                  <div className="flex gap-2 mt-2">
-                    {DEFAULT_COLORS.map((color) => (
-                      <button
-                        key={color}
-                        className={`w-8 h-8 rounded border-2 ${newGroupColor === color ? 'border-gray-800' : 'border-gray-300'}`}
-                        style={{ backgroundColor: color }}
-                        onClick={() => setNewGroupColor(color)}
-                      />
-                    ))}
-                  </div>
-                </div>
-                
-                <Button
-                  onClick={handleCreateGroup}
-                  disabled={loading || !newGroupInput.trim()}
-                  className="w-full"
-                >
-                  <Plus size={16} className="mr-2" />
-                  Create Group
-                </Button>
-              </div>
-            </div>
+              )}
+            </ScrollArea>
           </div>
         </DialogContent>
       </Dialog>
