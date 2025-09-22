@@ -433,6 +433,8 @@ export const keywordService = {
     }
   ): Promise<void> {
     try {
+      console.log('Updating keyword preferences:', { userId, websiteId, keyword, preferences });
+      
       const { error } = await supabase
         .from('user_keyword_preferences')
         .upsert({
@@ -440,9 +442,16 @@ export const keywordService = {
           website_id: websiteId,
           keyword,
           ...preferences
+        }, { 
+          onConflict: 'user_id,website_id,keyword'
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database error in updateKeywordPreferences:', error);
+        throw error;
+      }
+      
+      console.log('Successfully updated keyword preferences');
     } catch (error) {
       console.error('Error updating keyword preferences:', error);
       throw error;
@@ -547,11 +556,14 @@ export const keywordService = {
     updates: { websiteId: string; keyword: string; tags: string[] }[]
   ): Promise<void> {
     try {
+      console.log('Bulk updating tags for', updates.length, 'keywords:', updates);
+      
       const updatePromises = updates.map(({ websiteId, keyword, tags }) =>
         keywordService.updateKeywordPreferences(userId, websiteId, keyword, { tags })
       );
 
       await Promise.all(updatePromises);
+      console.log('Successfully bulk updated keyword tags');
     } catch (error) {
       console.error('Error bulk updating keyword tags:', error);
       throw error;
