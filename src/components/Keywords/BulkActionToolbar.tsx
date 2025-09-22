@@ -31,6 +31,8 @@ export const BulkActionToolbar = ({
   const [newGroupName, setNewGroupName] = useState('');
   const [newGroupColor, setNewGroupColor] = useState('#3b82f6');
   const [showCreateGroup, setShowCreateGroup] = useState(false);
+  const [newTagName, setNewTagName] = useState('');
+  const [showCreateTag, setShowCreateTag] = useState(false);
 
   if (selectedKeywords.length === 0) return null;
 
@@ -55,6 +57,15 @@ export const BulkActionToolbar = ({
       onBulkAssignGroup(newGroupName.trim(), newGroupColor);
       setNewGroupName('');
       setShowCreateGroup(false);
+    }
+  };
+
+  const handleCreateTag = () => {
+    if (newTagName.trim()) {
+      const tagName = newTagName.trim();
+      setSelectedTags(prev => [...prev, tagName]);
+      setNewTagName('');
+      setShowCreateTag(false);
     }
   };
 
@@ -161,8 +172,9 @@ export const BulkActionToolbar = ({
             <Tag size={14} />
             Assign Tags
           </label>
-          {availableTags.length > 0 && (
-            <div className="space-y-2">
+          <div className="space-y-2">
+            {/* Existing Tags */}
+            {availableTags.length > 0 && (
               <div className="flex flex-wrap gap-1 max-h-20 overflow-y-auto">
                 {availableTags.map(tag => (
                   <Badge
@@ -175,27 +187,66 @@ export const BulkActionToolbar = ({
                   </Badge>
                 ))}
               </div>
-              {selectedTags.length > 0 && (
-                <div className="flex items-center justify-between">
-                  <div className="flex flex-wrap gap-1">
-                    {selectedTags.map(tag => (
-                      <Badge key={tag} variant="secondary" className="text-xs">
-                        {tag}
-                        <X 
-                          size={12} 
-                          className="ml-1 cursor-pointer" 
-                          onClick={() => handleTagToggle(tag)}
-                        />
-                      </Badge>
-                    ))}
-                  </div>
-                  <Button size="sm" onClick={handleApplyTags} className="h-7">
-                    Apply Tags
+            )}
+            
+            {/* Create New Tag */}
+            <div className="flex gap-2">
+              <Button 
+                size="sm" 
+                variant="outline" 
+                onClick={() => setShowCreateTag(true)}
+                className="h-7 text-xs"
+              >
+                <Tag size={12} className="mr-1" />
+                Create New Tag
+              </Button>
+            </div>
+
+            {showCreateTag && (
+              <div className="p-3 border rounded-lg bg-muted/50 space-y-2">
+                <Input
+                  placeholder="Tag name..."
+                  value={newTagName}
+                  onChange={(e) => setNewTagName(e.target.value)}
+                  className="h-8"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleCreateTag();
+                    }
+                  }}
+                />
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={handleCreateTag} className="h-7">
+                    Create Tag
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => setShowCreateTag(false)} className="h-7">
+                    Cancel
                   </Button>
                 </div>
-              )}
-            </div>
-          )}
+              </div>
+            )}
+
+            {/* Selected Tags and Apply Button */}
+            {selectedTags.length > 0 && (
+              <div className="flex items-center justify-between">
+                <div className="flex flex-wrap gap-1">
+                  {selectedTags.map(tag => (
+                    <Badge key={tag} variant="secondary" className="text-xs">
+                      {tag}
+                      <X 
+                        size={12} 
+                        className="ml-1 cursor-pointer" 
+                        onClick={() => handleTagToggle(tag)}
+                      />
+                    </Badge>
+                  ))}
+                </div>
+                <Button size="sm" onClick={handleApplyTags} className="h-7">
+                  Apply Tags
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </Card>
