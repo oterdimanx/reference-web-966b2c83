@@ -10,6 +10,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AuthenticatedView } from '@/components/Keywords/AuthenticatedView';
 import { GuestView } from '@/components/Keywords/GuestView';
+import { RankingDebugTest } from '@/components/Debug/RankingDebugTest';
 import { supabase } from '@/integrations/supabase/client';
 
 const KeywordsPage = () => {
@@ -71,7 +72,12 @@ const KeywordsPage = () => {
             <Skeleton className="h-64 w-full" />
           </div>
         ) : user && hasWebsitesWithKeywords ? (
-          <AuthenticatedView />
+          <>
+            <AuthenticatedView />
+            <div className="mt-8">
+              <RankingDebugTest />
+            </div>
+          </>
         ) : (
           <GuestView />
         )}
