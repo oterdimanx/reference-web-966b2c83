@@ -29,6 +29,7 @@ export function GroupsManagerDialog() {
   const [editingGroup, setEditingGroup] = useState<string | null>(null);
   const [editGroupValue, setEditGroupValue] = useState('');
   const [editGroupColor, setEditGroupColor] = useState('');
+  const [originalGroupColor, setOriginalGroupColor] = useState('');
   const [deletingGroup, setDeletingGroup] = useState<string | null>(null);
   const [selectedGroups, setSelectedGroups] = useState<Set<string>>(new Set());
   const [mergeTarget, setMergeTarget] = useState('');
@@ -77,31 +78,31 @@ export function GroupsManagerDialog() {
 
     setLoading(true);
     try {
-      await keywordService.renameUserGroup(user.id, oldName, newName.trim());
+      // Rename group if name changed
+      if (oldName !== newName.trim()) {
+        await keywordService.renameUserGroup(user.id, oldName, newName.trim());
+      }
+      
       // Update color if changed
-      if (newColor !== editGroupColor) {
-        await keywordService.bulkUpdateKeywordGroups(user.id, [{
-          websiteId: '', // Will be handled by the service
-          keyword: '',
-          groupName: newName.trim(),
-          groupColor: newColor
-        }]);
+      if (newColor !== originalGroupColor) {
+        await keywordService.updateGroupColor(user.id, newName.trim(), newColor);
       }
       
       await loadGroups();
       setEditingGroup(null);
       setEditGroupValue('');
       setEditGroupColor('');
+      setOriginalGroupColor('');
       
       toast({
         title: "Success",
-        description: `Group renamed from "${oldName}" to "${newName.trim()}" successfully`
+        description: `Group "${newName.trim()}" updated successfully`
       });
     } catch (error) {
-      console.error('Error renaming group:', error);
+      console.error('Error updating group:', error);
       toast({
         title: "Error",
-        description: "Failed to rename group",
+        description: "Failed to update group",
         variant: "destructive"
       });
     } finally {
@@ -225,16 +226,19 @@ export function GroupsManagerDialog() {
                         
                         {editingGroup === group.name ? (
                           <div className="flex items-center gap-2 flex-1">
-                            <div 
-                              className="w-4 h-4 rounded border cursor-pointer"
-                              style={{ backgroundColor: editGroupColor }}
-                              onClick={() => {
-                                const colorIndex = DEFAULT_COLORS.indexOf(editGroupColor);
-                                const nextIndex = (colorIndex + 1) % DEFAULT_COLORS.length;
-                                setEditGroupColor(DEFAULT_COLORS[nextIndex]);
-                              }}
-                              title="Click to change color"
-                            />
+                            <div className="flex flex-col gap-2">
+                              <div className="flex flex-wrap gap-1">
+                                {DEFAULT_COLORS.map((color) => (
+                                  <button
+                                    key={color}
+                                    className={`w-5 h-5 rounded border-2 ${editGroupColor === color ? 'border-gray-800 ring-2 ring-blue-500' : 'border-gray-300'}`}
+                                    style={{ backgroundColor: color }}
+                                    onClick={() => setEditGroupColor(color)}
+                                    title={`Select ${color}`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
                             <Input
                               value={editGroupValue}
                               onChange={(e) => setEditGroupValue(e.target.value)}
@@ -257,6 +261,7 @@ export function GroupsManagerDialog() {
                                 setEditingGroup(null);
                                 setEditGroupValue('');
                                 setEditGroupColor('');
+                                setOriginalGroupColor('');
                               }}
                               disabled={loading}
                               className="text-gray-600 hover:text-gray-600"
@@ -287,6 +292,7 @@ export function GroupsManagerDialog() {
                               setEditingGroup(group.name);
                               setEditGroupValue(group.name);
                               setEditGroupColor(group.color || DEFAULT_COLORS[0]);
+                              setOriginalGroupColor(group.color || DEFAULT_COLORS[0]);
                             }}
                             disabled={loading}
                             className="text-blue-600 hover:text-blue-600"

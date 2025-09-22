@@ -711,6 +711,21 @@ const deleteUserGroup = async (userId: string, groupName: string): Promise<void>
   }
 };
 
+const updateGroupColor = async (userId: string, groupName: string, newColor: string): Promise<void> => {
+  try {
+    const { error } = await supabase
+      .from('user_keyword_preferences')
+      .update({ group_color: newColor })
+      .eq('user_id', userId)
+      .eq('group_name', groupName);
+    
+    if (error) throw error;
+  } catch (error) {
+    console.error('Error updating group color:', error);
+    throw error;
+  }
+};
+
 const mergeUserGroups = async (userId: string, sourceGroups: string[], targetGroup: string, targetColor?: string): Promise<void> => {
   try {
     const { error } = await supabase
@@ -802,6 +817,7 @@ export const keywordService = {
   mergeUserTags,
   renameUserGroup,
   deleteUserGroup,
+  updateGroupColor,
   mergeUserGroups,
   getTagKeywordCounts,
   getGroupKeywordCounts
