@@ -203,6 +203,12 @@ export const KeywordTable = ({ selectedWebsiteId }: KeywordTableProps) => {
 
   const filteredKeywords = keywords.filter(applyFilters);
 
+  const makeSelectionKey = (websiteId: string, keyword: string) => `${websiteId}|${encodeURIComponent(keyword)}`;
+  const parseSelectionKey = (key: string) => {
+    const [websiteId, encodedKeyword] = key.split('|');
+    return { websiteId, keyword: decodeURIComponent(encodedKeyword || '') };
+  };
+
   const handleKeywordSelection = (keywordKey: string, checked: boolean) => {
     setSelectedKeywords(prev => {
       const newSet = new Set(prev);
@@ -217,7 +223,7 @@ export const KeywordTable = ({ selectedWebsiteId }: KeywordTableProps) => {
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      const allKeys = filteredKeywords.map(kw => `${kw.website_id}-${kw.keyword}`);
+      const allKeys = filteredKeywords.map(kw => makeSelectionKey(kw.website_id, kw.keyword));
       setSelectedKeywords(new Set(allKeys));
     } else {
       setSelectedKeywords(new Set());
@@ -229,7 +235,7 @@ export const KeywordTable = ({ selectedWebsiteId }: KeywordTableProps) => {
     
     try {
       const updates = Array.from(selectedKeywords).map(key => {
-        const [websiteId, keyword] = key.split('-', 2);
+        const { websiteId, keyword } = parseSelectionKey(key);
         return { websiteId, keyword, groupName, groupColor };
       });
       
@@ -255,7 +261,7 @@ export const KeywordTable = ({ selectedWebsiteId }: KeywordTableProps) => {
     
     try {
       const updates = Array.from(selectedKeywords).map(key => {
-        const [websiteId, keyword] = key.split('-', 2);
+        const { websiteId, keyword } = parseSelectionKey(key);
         return { websiteId, keyword, tags };
       });
       
@@ -414,16 +420,17 @@ export const KeywordTable = ({ selectedWebsiteId }: KeywordTableProps) => {
           </thead>
           <tbody>
             {filteredKeywords.map((keyword, index) => {
-              const requestKey = `${keyword.website_id}-${keyword.keyword}`;
-              const isPending = pendingRequests.has(requestKey);
-              const isSelected = selectedKeywords.has(requestKey);
+                const requestKey = `${keyword.website_id}-${keyword.keyword}`;
+                const selectionKey = makeSelectionKey(keyword.website_id, keyword.keyword);
+                const isPending = pendingRequests.has(requestKey);
+                const isSelected = selectedKeywords.has(selectionKey);
               
               return (
                 <tr key={index} className="border-b hover:bg-muted/50">
                   <td className="py-3 px-4">
                     <Checkbox
                       checked={isSelected}
-                      onCheckedChange={(checked) => handleKeywordSelection(requestKey, checked as boolean)}
+                      onCheckedChange={(checked) => handleKeywordSelection(selectionKey, checked as boolean)}
                     />
                   </td>
                   <td className="py-3 px-4">
