@@ -122,15 +122,19 @@ export const getDashboardRankingData = async (websites: { websiteId: string; dom
       return [];
     }
 
-    // Group by website and keyword
-    const groupedData: { [key: string]: RankingSnapshot[] } = {};
+    // Group by website then keyword to avoid issues with UUID hyphens
+    const groupedByWebsite: { [websiteId: string]: { [keyword: string]: RankingSnapshot[] } } = {};
     
     data.forEach(snapshot => {
-      const key = `${snapshot.website_id}-${snapshot.keyword}`;
-      if (!groupedData[key]) {
-        groupedData[key] = [];
+      const websiteId = snapshot.website_id as string;
+      const keyword = snapshot.keyword as string;
+      if (!groupedByWebsite[websiteId]) {
+        groupedByWebsite[websiteId] = {};
       }
-      groupedData[key].push({
+      if (!groupedByWebsite[websiteId][keyword]) {
+        groupedByWebsite[websiteId][keyword] = [];
+      }
+      groupedByWebsite[websiteId][keyword].push({
         id: snapshot.id,
         websiteId: snapshot.website_id,
         keyword: snapshot.keyword,
@@ -145,10 +149,8 @@ export const getDashboardRankingData = async (websites: { websiteId: string; dom
     });
 
     // Transform to RankingData format
-    return Object.entries(groupedData).map(([key, snapshots]) => {
-      const [websiteId, keyword] = key.split('-');
-      
-      return {
+    const result = Object.entries(groupedByWebsite).flatMap(([websiteId, keywordsMap]) =>
+      Object.entries(keywordsMap).map(([keyword, snapshots]) => ({
         websiteId,
         keyword,
         rankings: snapshots
@@ -156,10 +158,12 @@ export const getDashboardRankingData = async (websites: { websiteId: string; dom
             date: s.snapshotDate,
             position: s.position ?? 101 // Map null positions to 101 (not in top 100)
           }))
-          .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-      };
-    }).filter(data => data.rankings.length > 0); // Only include keywords with actual ranking data
-    
+          .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
+      }))
+    );
+
+    // Only include keywords with actual ranking data points (including 101)
+    return result.filter(d => d.rankings.length > 0);
   } catch (error) {
     console.error('Exception fetching dashboard ranking data:', error);
     return [];
