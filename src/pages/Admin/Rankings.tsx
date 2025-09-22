@@ -9,7 +9,7 @@ import { useAdminStatus } from '@/hooks/use-admin-status';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { RefreshCw, Globe, Eye } from 'lucide-react';
+import { RefreshCw, Globe, Eye, Crown } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { triggerRankingCheck } from '@/services/rankingService';
@@ -21,6 +21,7 @@ interface Website {
   keywords: string;
   user_id: string;
   created_at: string;
+  owner_email?: string;
 }
 
 const AdminRankingsPage = () => {
@@ -33,20 +34,38 @@ const AdminRankingsPage = () => {
 
   const loadWebsites = async () => {
     try {
-      const { data, error } = await supabase
+      // First get websites
+      const { data: websitesData, error: websitesError } = await supabase
         .from('websites')
         .select('*')
         .not('keywords', 'is', null)
         .neq('keywords', '')
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching websites:', error);
+      if (websitesError) {
+        console.error('Error fetching websites:', websitesError);
         toast.error('Failed to load websites');
         return;
       }
 
-      setWebsites(data || []);
+      // Get profiles for the user IDs
+      const userIds = [...new Set(websitesData?.map(w => w.user_id) || [])];
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, username')
+        .in('id', userIds);
+
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+      }
+
+      // Map websites with owner emails
+      const websitesWithOwner = (websitesData || []).map(website => ({
+        ...website,
+        owner_email: profilesData?.find(p => p.id === website.user_id)?.username || null
+      }));
+
+      setWebsites(websitesWithOwner);
     } catch (error) {
       console.error('Exception fetching websites:', error);
       toast.error('Failed to load websites');
@@ -162,7 +181,15 @@ const AdminRankingsPage = () => {
                   {websites.map((website) => (
                     <div key={website.id} className="flex items-center justify-between p-3 border rounded-lg">
                       <div className="flex-1">
-                        <p className="font-medium">{website.domain}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium">{website.domain}</p>
+                          {website.user_id === user?.id && (
+                            <div className="flex items-center gap-1 px-2 py-1 bg-amber-100 dark:bg-amber-900/20 text-amber-800 dark:text-amber-200 rounded text-xs font-medium">
+                              <Crown className="h-3 w-3" />
+                              Admin
+                            </div>
+                          )}
+                        </div>
                         <p className="text-sm text-muted-foreground">
                           Keywords: {website.keywords.split(',').length} • Added: {new Date(website.created_at).toLocaleDateString()}
                         </p>
@@ -196,7 +223,13 @@ const AdminRankingsPage = () => {
             <CardHeader>
               <CardTitle>Website Details</CardTitle>
               <CardDescription>
-                {selectedWebsite ? `Ranking details for ${selectedWebsite.domain}` : 'Select a website to view ranking details'}
+                {selectedWebsite ? (
+                  selectedWebsite.user_id === user?.id ? (
+                    `Ranking details for ${selectedWebsite.domain}`
+                  ) : (
+                    `Ranking details for ${selectedWebsite.domain}${selectedWebsite.owner_email ? ` owned by ${selectedWebsite.owner_email}` : ''}`
+                  )
+                ) : 'Select a website to view ranking details'}
               </CardDescription>
             </CardHeader>
             <CardContent>
