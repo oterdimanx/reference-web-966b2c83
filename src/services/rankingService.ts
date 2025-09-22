@@ -152,10 +152,9 @@ export const getDashboardRankingData = async (websites: { websiteId: string; dom
         websiteId,
         keyword,
         rankings: snapshots
-          .filter(s => s.position !== null) // Only include positions that are not null
           .map(s => ({
             date: s.snapshotDate,
-            position: s.position!
+            position: s.position ?? 101 // Map null positions to 101 (not in top 100)
           }))
           .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
       };

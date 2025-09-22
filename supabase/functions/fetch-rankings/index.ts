@@ -37,10 +37,23 @@ async function fetchRankingFromSerpApi(keyword: string, domain: string, searchEn
       engine: searchEngine,
       api_key: serpApiKey,
       num: '100', // Get up to 100 results to find the domain
+      gl: 'fr', // France for localized results
+      hl: 'fr', // French language
     });
 
     const response = await fetch(`https://serpapi.com/search?${params}`);
     const data: SerpApiResponse = await response.json();
+
+    console.log(`SerpAPI response for "${keyword}":`, {
+      total_results: data.organic_results?.length || 0,
+      first_few_domains: data.organic_results?.slice(0, 5).map(r => {
+        try {
+          return new URL(r.link).hostname;
+        } catch {
+          return r.link;
+        }
+      }) || []
+    });
 
     if (!data.organic_results) {
       console.log('No organic results found for keyword:', keyword);
@@ -48,17 +61,28 @@ async function fetchRankingFromSerpApi(keyword: string, domain: string, searchEn
     }
 
     // Find the domain in the results
-    const result = data.organic_results.find(result => {
+    const result = data.organic_results.find((result, index) => {
       try {
         const resultDomain = new URL(result.link).hostname.replace('www.', '');
         // Properly normalize the target domain by removing protocol and www
-        let normalizedTargetDomain = domain.replace(/^https?:\/\//, '').replace(/^www\./, '');
-        return resultDomain === normalizedTargetDomain;
+        let normalizedTargetDomain = domain.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/$/, '');
+        
+        const isMatch = resultDomain === normalizedTargetDomain || resultDomain.includes(normalizedTargetDomain);
+        
+        if (isMatch) {
+          console.log(`Found domain match at position ${index + 1}: ${resultDomain} matches ${normalizedTargetDomain}`);
+        }
+        
+        return isMatch;
       } catch (error) {
         console.error('Error parsing URL:', result.link, error);
         return false;
       }
     });
+
+    if (!result) {
+      console.log(`Domain "${domain}" not found in top ${data.organic_results.length} results for "${keyword}"`);
+    }
 
     return result || null;
   } catch (error) {

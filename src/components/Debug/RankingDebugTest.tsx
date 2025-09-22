@@ -4,18 +4,19 @@ import { triggerRankingCheck } from '@/services/rankingService';
 import { useToast } from '@/hooks/use-toast';
 
 export const RankingDebugTest = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingSingle, setIsLoadingSingle] = useState(false);
+  const [isLoadingAll, setIsLoadingAll] = useState(false);
   const { toast } = useToast();
 
-  const handleTriggerRanking = async () => {
-    setIsLoading(true);
+  const handleTriggerSingleRanking = async () => {
+    setIsLoadingSingle(true);
     try {
       // Test with the website ID from the database
       const success = await triggerRankingCheck('b0eb5923-70fe-43b4-b320-14f16d6e528f', '7saveurs');
       
       if (success) {
         toast({
-          title: "Ranking Check Triggered",
+          title: "Single Ranking Check Triggered",
           description: "Check the console logs and database for results.",
         });
       } else {
@@ -33,7 +34,37 @@ export const RankingDebugTest = () => {
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setIsLoadingSingle(false);
+    }
+  };
+
+  const handleTriggerAllRankings = async () => {
+    setIsLoadingAll(true);
+    try {
+      // Trigger ranking check for all keywords (no specific keyword)
+      const success = await triggerRankingCheck('b0eb5923-70fe-43b4-b320-14f16d6e528f');
+      
+      if (success) {
+        toast({
+          title: "All Rankings Check Triggered",
+          description: "Checking all keywords for the website. Check logs for progress.",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to trigger all rankings check. Check console for details.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: "Error",
+        description: "Exception occurred during all rankings check.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingAll(false);
     }
   };
 
@@ -41,15 +72,25 @@ export const RankingDebugTest = () => {
     <div className="p-4 border rounded-lg">
       <h3 className="text-lg font-semibold mb-2">Ranking Debug Test</h3>
       <p className="text-sm text-muted-foreground mb-4">
-        This will trigger a ranking check for the '7saveurs' keyword to test the SerpAPI integration.
+        Test the SerpAPI integration with single keyword or all keywords.
       </p>
-      <Button 
-        onClick={handleTriggerRanking} 
-        disabled={isLoading}
-        className="w-full"
-      >
-        {isLoading ? 'Testing...' : 'Test Ranking Check'}
-      </Button>
+      <div className="space-y-2">
+        <Button 
+          onClick={handleTriggerSingleRanking} 
+          disabled={isLoadingSingle || isLoadingAll}
+          className="w-full"
+          variant="outline"
+        >
+          {isLoadingSingle ? 'Testing Single...' : 'Test Single Keyword (7saveurs)'}
+        </Button>
+        <Button 
+          onClick={handleTriggerAllRankings} 
+          disabled={isLoadingSingle || isLoadingAll}
+          className="w-full"
+        >
+          {isLoadingAll ? 'Testing All...' : 'Test All Keywords'}
+        </Button>
+      </div>
     </div>
   );
 };

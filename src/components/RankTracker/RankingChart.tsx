@@ -91,7 +91,7 @@ export function RankingChart({ data, selectedKeyword }: RankingChartProps) {
                   reversed // Higher position = better ranking (lower number)
                   stroke="#888888"
                   fontSize={12}
-                  domain={[1, 'dataMax']}
+                  domain={[1, 101]}
                   label={{ 
                     value: 'Position', 
                     angle: -90, 
@@ -100,7 +100,7 @@ export function RankingChart({ data, selectedKeyword }: RankingChartProps) {
                   }}
                 />
                 <Tooltip 
-                  formatter={(value: number) => [`Position: ${value}`, '']}
+                  formatter={(value: number) => [value === 101 ? 'Not in top 100 (101)' : `Position: ${value}`, '']}
                   labelFormatter={formatDate}
                 />
                 <Legend />
