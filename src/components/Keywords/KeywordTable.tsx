@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Skeleton } from '@/components/ui/skeleton';
+import { SubmarineLoading } from '@/components/ui/submarine-loading';
 import { Clock, RefreshCw, AlertCircle, Filter } from 'lucide-react';
 import { KeywordDifficultyBadge } from './KeywordDifficultyBadge';
 import { KeywordRankingStatus } from './KeywordRankingStatus';
@@ -293,16 +293,8 @@ export const KeywordTable = ({ selectedWebsiteId }: KeywordTableProps) => {
 
   if (loading) {
     return (
-      <div className="space-y-4">
-        <div className="flex items-center gap-2">
-          <Skeleton className="h-10 flex-grow" />
-          <Skeleton className="h-10 w-32" />
-        </div>
-        <div className="space-y-2">
-          {[...Array(5)].map((_, i) => (
-            <Skeleton key={i} className="h-12 w-full" />
-          ))}
-        </div>
+      <div className="flex items-center justify-center py-16">
+        <SubmarineLoading size="lg" />
       </div>
     );
   }
