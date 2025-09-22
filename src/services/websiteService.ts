@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { RankingSummary } from '@/lib/mockData';
+import { sanitizeDomain } from '@/utils/domainUtils';
 
 // Extended website interface with additional fields
 export interface DetailedWebsite extends RankingSummary {
@@ -22,7 +23,7 @@ export interface DetailedWebsite extends RankingSummary {
 export const mapToDbWebsite = (website: RankingSummary) => {
   return {
     id: website.websiteId,
-    domain: website.domain,
+    domain: sanitizeDomain(website.domain),
     avg_position: website.avgPosition,
     position_change: website.change,
     keyword_count: website.keywordCount,
@@ -35,7 +36,7 @@ export const mapToDbWebsite = (website: RankingSummary) => {
 export const mapToDbDetailedWebsite = (website: DetailedWebsite) => {
   const dbWebsite = {
     id: website.websiteId,
-    domain: website.domain,
+    domain: sanitizeDomain(website.domain),
     avg_position: website.avgPosition,
     position_change: website.change,
     keyword_count: website.keywordCount,

@@ -134,10 +134,22 @@ async function fetchRankingFromSerpApi(keyword: string, domain: string, searchEn
       // Check if domain is found in this batch
       const batchResult = data.organic_results.find((result, index) => {
         try {
-          const resultDomain = new URL(result.link).hostname.replace('www.', '');
-          let normalizedTargetDomain = domain.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/$/, '');
+          // Normalize both domains consistently with sanitizeDomain() logic
+          const resultDomain = new URL(result.link).hostname
+            .toLowerCase()
+            .replace(/^www\./, '')
+            .trim();
+          let normalizedTargetDomain = domain
+            .toLowerCase()
+            .replace(/^https?:\/\//, '')
+            .replace(/^www\./, '')
+            .replace(/\/$/, '')
+            .trim();
           
           const isMatch = resultDomain === normalizedTargetDomain || resultDomain.includes(normalizedTargetDomain);
+          
+          // Debug logging for domain comparison
+          console.log(`Domain comparison: "${resultDomain}" vs "${normalizedTargetDomain}" => ${isMatch ? 'MATCH' : 'no match'}`);
           
           if (isMatch) {
             const globalPosition = start + index + 1;
