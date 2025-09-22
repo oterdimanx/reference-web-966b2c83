@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Tags, Plus, Trash2, Edit3, Check, X, Merge } from 'lucide-react';
+import { Tags, Trash2, Edit3, Check, X, Merge } from 'lucide-react';
 import { keywordService } from '@/services/keywordService';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -19,7 +19,6 @@ interface TagWithCount {
 export function TagsManagerDialog() {
   const [open, setOpen] = useState(false);
   const [tags, setTags] = useState<TagWithCount[]>([]);
-  const [newTagInput, setNewTagInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [editingTag, setEditingTag] = useState<string | null>(null);
   const [editTagValue, setEditTagValue] = useState('');
@@ -57,35 +56,6 @@ export function TagsManagerDialog() {
       toast({
         title: "Error",
         description: "Failed to load tags",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCreateTag = async () => {
-    if (!user || !newTagInput.trim()) return;
-
-    setLoading(true);
-    try {
-      // Create a dummy keyword preference to establish the tag
-      await keywordService.updateKeywordPreferences(user.id, '', '', {
-        tags: [newTagInput.trim()]
-      });
-      
-      setNewTagInput('');
-      await loadTags();
-      
-      toast({
-        title: "Success",
-        description: `Tag "${newTagInput.trim()}" created successfully`
-      });
-    } catch (error) {
-      console.error('Error creating tag:', error);
-      toast({
-        title: "Error",
-        description: "Failed to create tag",
         variant: "destructive"
       });
     } finally {
@@ -195,7 +165,7 @@ export function TagsManagerDialog() {
             <DialogTitle>Manage Tags</DialogTitle>
           </DialogHeader>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+          <div className="space-y-4">
             {/* Current Tags */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -306,31 +276,6 @@ export function TagsManagerDialog() {
               </ScrollArea>
             </div>
 
-            {/* Create New Tag */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Create New Tag</h3>
-              
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="new-tag">Tag Name</Label>
-                  <Input
-                    id="new-tag"
-                    placeholder="Enter tag name"
-                    value={newTagInput}
-                    onChange={(e) => setNewTagInput(e.target.value)}
-                  />
-                </div>
-                
-                <Button
-                  onClick={handleCreateTag}
-                  disabled={loading || !newTagInput.trim()}
-                  className="w-full"
-                >
-                  <Plus size={16} className="mr-2" />
-                  Create Tag
-                </Button>
-              </div>
-            </div>
           </div>
         </DialogContent>
       </Dialog>
