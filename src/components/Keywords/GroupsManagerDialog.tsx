@@ -17,15 +17,20 @@ interface GroupWithCount {
   count: number;
 }
 
+interface GroupsManagerDialogProps {
+  onGroupsChanged?: () => void;
+}
+
 const DEFAULT_COLORS = [
   '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6',
   '#EC4899', '#06B6D4', '#84CC16', '#F97316', '#6366F1'
 ];
 
-export function GroupsManagerDialog() {
+export function GroupsManagerDialog({ onGroupsChanged }: GroupsManagerDialogProps) {
   const [open, setOpen] = useState(false);
   const [groups, setGroups] = useState<GroupWithCount[]>([]);
   const [loading, setLoading] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
   const [editingGroup, setEditingGroup] = useState<string | null>(null);
   const [editGroupValue, setEditGroupValue] = useState('');
   const [editGroupColor, setEditGroupColor] = useState('');
@@ -41,6 +46,7 @@ export function GroupsManagerDialog() {
   useEffect(() => {
     if (open && user) {
       loadGroups();
+      setHasChanges(false);
     }
   }, [open, user]);
 
@@ -94,6 +100,7 @@ export function GroupsManagerDialog() {
       setEditGroupColor('');
       setOriginalGroupColor('');
       
+      setHasChanges(true);
       toast({
         title: "Success",
         description: `Group "${newName.trim()}" updated successfully`
@@ -119,6 +126,7 @@ export function GroupsManagerDialog() {
       await loadGroups();
       setDeletingGroup(null);
       
+      setHasChanges(true);
       toast({
         title: "Success",
         description: `Group "${groupName}" deleted successfully`
@@ -147,6 +155,7 @@ export function GroupsManagerDialog() {
       setMergeTargetColor(DEFAULT_COLORS[0]);
       setShowMergeDialog(false);
       
+      setHasChanges(true);
       toast({
         title: "Success",
         description: `${selectedGroups.size} groups merged into "${mergeTarget.trim()}" successfully`
@@ -173,9 +182,16 @@ export function GroupsManagerDialog() {
     setSelectedGroups(newSelection);
   };
 
+  const handleDialogOpenChange = (newOpen: boolean) => {
+    if (!newOpen && hasChanges && onGroupsChanged) {
+      onGroupsChanged();
+    }
+    setOpen(newOpen);
+  };
+
   return (
     <>
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open} onOpenChange={handleDialogOpenChange}>
         <DialogTrigger asChild>
           <Button variant="outline" size="sm">
             <Folders size={16} className="mr-2" />
