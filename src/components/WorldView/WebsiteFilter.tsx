@@ -110,13 +110,22 @@ export const WebsiteFilter: React.FC<WebsiteFilterProps> = ({
                   </div>
                   {websitesWithoutData.has(website.websiteId) && (
                     <div 
-                      onClick={(e) => {
+                      role="button"
+                      tabIndex={-1}
+                      onPointerDownCapture={(e) => {
                         e.stopPropagation();
                         e.preventDefault();
                       }}
-                      onMouseDown={(e) => {
+                      onPointerUpCapture={(e) => {
                         e.stopPropagation();
                         e.preventDefault();
+                      }}
+                      onClickCapture={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                      }}
+                      onKeyDownCapture={(e) => {
+                        e.stopPropagation();
                       }}
                     >
                       <TrackingScriptPopover
