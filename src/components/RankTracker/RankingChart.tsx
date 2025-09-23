@@ -56,8 +56,20 @@ export function RankingChart({ data, selectedKeyword }: RankingChartProps) {
     });
   }, [data, selectedKeyword]);
   
-  // Colors for the lines
-  const lineColors = ['#3B82F6', '#0D9488', '#059669', '#6366F1', '#8B5CF6'];
+  // Colors for the lines - distinctive palette for better visibility
+  const lineColors = [
+    '#F59E0B', // yellow
+    '#06B6D4', // light blue
+    '#F97316', // orange
+    '#EF4444', // red
+    '#10B981', // green
+    '#8B5CF6', // purple
+    '#A16207', // brown
+    '#1E40AF', // dark blue
+    '#EC4899', // pink
+    '#1E3A8A', // navy blue
+    '#047857'  // dark green
+  ];
   
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
