@@ -67,9 +67,9 @@ export const SimpleWebsiteForm = ({ userSubscription }: SimpleWebsiteFormProps) 
       <div className="container mx-auto px-4 py-8">
         <Card className="max-w-2xl mx-auto">
           <CardHeader>
-            <CardTitle>{tLocal('forms.addWebsite')}</CardTitle>
+            <CardTitle>{t('common', 'addWebsite')}</CardTitle>
             <CardDescription>
-              {tLocal('forms.websitesRemaining')}: {websitesRemaining} / {userSubscription?.websitesAllowed}
+              {t('common', 'websitesRemaining')}: {websitesRemaining} / {userSubscription?.websitesAllowed}
             </CardDescription>
           </CardHeader>
           <CardContent>

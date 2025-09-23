@@ -20,6 +20,7 @@ export const commonTranslations = {
   totalKeywords: 'Total mots-clés',
   averagePosition: 'Position moyenne',
   improvingWebsites: 'Sites en amélioration',
+  websitesRemaining: 'Sites web restants',
   // Dashboard UI
   keywordRankings: 'Classements des mots-clés',
   manageKeywords: 'Gérer les mots-clés',
