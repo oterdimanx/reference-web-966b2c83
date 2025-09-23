@@ -227,7 +227,7 @@ const updateKeywordInWebsite = async (websiteId: string, oldKeyword: string, new
     }
 
     const updatedKeywords = currentKeywords.map(k => 
-      k === oldKeyword.toLowerCase() ? newKeyword.toLowerCase() : k
+      k.toLowerCase() === oldKeyword.toLowerCase() ? newKeyword.toLowerCase() : k
     );
     
     const { error } = await supabase
