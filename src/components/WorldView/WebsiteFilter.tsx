@@ -109,7 +109,16 @@ export const WebsiteFilter: React.FC<WebsiteFilterProps> = ({
                     </div>
                   </div>
                   {websitesWithoutData.has(website.websiteId) && (
-                    <div onClick={(e) => e.stopPropagation()}>
+                    <div 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                      }}
+                      onMouseDown={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                      }}
+                    >
                       <TrackingScriptPopover
                         websiteId={website.websiteId}
                         websiteDomain={website.domain}
