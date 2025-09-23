@@ -12,8 +12,11 @@ import { WorldViewStats } from '@/components/WorldView/WorldViewStats';
 import { useHasWebsiteEvents } from '@/hooks/useHasWebsiteEvents';
 import { PropellerSpinner } from '@/components/ui/propeller-spinner';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle, Globe } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertCircle, Globe, Code } from 'lucide-react';
 import { DynamicHead } from '@/components/SEO/DynamicHead';
+import { UserTrackingScriptGenerator } from '@/components/TrackingScript/UserTrackingScriptGenerator';
 
 export function WorldView() {
   const { user } = useAuth();
@@ -175,6 +178,21 @@ export function WorldView() {
                 onToggleAllTime={handleToggleAllTime}
               />
               <EventsLegend />
+              
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button size="sm" variant="outline" className="gap-2 w-full">
+                    <Code className="h-4 w-4" />
+                    {t('trackingScriptPage', 'generateScript')}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle>{t('trackingScriptPage', 'generateScript')}</DialogTitle>
+                  </DialogHeader>
+                  <UserTrackingScriptGenerator />
+                </DialogContent>
+              </Dialog>
             </div>
 
             {/* Map */}
