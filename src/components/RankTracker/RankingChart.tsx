@@ -12,6 +12,7 @@ import {
 } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { RankingData } from '@/lib/mockData';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface RankingChartProps {
   data: RankingData[];
@@ -19,6 +20,7 @@ interface RankingChartProps {
 }
 
 export function RankingChart({ data, selectedKeyword }: RankingChartProps) {
+  const { t } = useLanguage();
   const chartData = useMemo(() => {
     if (!data || data.length === 0) return [];
     
@@ -66,12 +68,12 @@ export function RankingChart({ data, selectedKeyword }: RankingChartProps) {
     <Card>
       <CardHeader>
         <CardTitle>
-          {selectedKeyword ? `Rankings for "${selectedKeyword}"` : 'Keyword Rankings'}
+          {selectedKeyword ? t('common', 'rankingsForKeyword').replace('{keyword}', selectedKeyword) : t('common', 'keywordRankings')}
         </CardTitle>
         <CardDescription>
           {selectedKeyword 
-            ? 'Position changes over time for the selected keyword'
-            : 'Position changes over time for all tracked keywords'
+            ? t('common', 'positionChangesSelectedKeyword')
+            : t('common', 'positionChangesOverTime')
           }
         </CardDescription>
       </CardHeader>
@@ -122,7 +124,7 @@ export function RankingChart({ data, selectedKeyword }: RankingChartProps) {
             </ResponsiveContainer>
           ) : (
             <div className="flex h-full items-center justify-center text-gray-500">
-              No ranking data available
+              {t('common', 'noRankingDataAvailable')}
             </div>
           )}
         </div>

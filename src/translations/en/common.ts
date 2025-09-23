@@ -20,4 +20,12 @@ export const commonTranslations = {
   totalKeywords: 'Total Keywords',
   averagePosition: 'Average Position',
   improvingWebsites: 'Improving Websites',
+  // Dashboard UI
+  keywordRankings: 'Keyword Rankings',
+  manageKeywords: 'Manage Keywords',
+  loadingRankingData: 'Loading ranking data...',
+  positionChangesOverTime: 'Position changes over time for all tracked keywords',
+  positionChangesSelectedKeyword: 'Position changes over time for the selected keyword',
+  noRankingDataAvailable: 'No ranking data available',
+  rankingsForKeyword: 'Rankings for "{keyword}"',
 };

@@ -20,4 +20,12 @@ export const commonTranslations = {
   totalKeywords: 'Total mots-clés',
   averagePosition: 'Position moyenne',
   improvingWebsites: 'Sites en amélioration',
+  // Dashboard UI
+  keywordRankings: 'Classements des mots-clés',
+  manageKeywords: 'Gérer les mots-clés',
+  loadingRankingData: 'Chargement des données de classement...',
+  positionChangesOverTime: 'Évolution des positions au fil du temps pour tous les mots-clés suivis',
+  positionChangesSelectedKeyword: 'Évolution des positions au fil du temps pour le mot-clé sélectionné',
+  noRankingDataAvailable: 'Aucune donnée de classement disponible',
+  rankingsForKeyword: 'Classements pour "{keyword}"',
 };
