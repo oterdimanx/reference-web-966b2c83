@@ -258,6 +258,12 @@ export function GroupsManagerDialog({ onGroupsChanged }: GroupsManagerDialogProp
                             <Input
                               value={editGroupValue}
                               onChange={(e) => setEditGroupValue(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' && !loading && editGroupValue.trim()) {
+                                  e.preventDefault();
+                                  handleRenameGroup(group.name, editGroupValue, editGroupColor);
+                                }
+                              }}
                               className="font-medium flex-1"
                               placeholder="Enter group name"
                             />

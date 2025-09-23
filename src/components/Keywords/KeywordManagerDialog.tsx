@@ -246,6 +246,12 @@ export function KeywordManagerDialog({ websiteId, websiteDomain, onKeywordsUpdat
                             <Input
                               value={editKeywordValue}
                               onChange={(e) => setEditKeywordValue(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' && !loading && editKeywordValue.trim()) {
+                                  e.preventDefault();
+                                  handleSaveEditKeyword();
+                                }
+                              }}
                               className="font-medium"
                               placeholder="Enter keyword"
                             />

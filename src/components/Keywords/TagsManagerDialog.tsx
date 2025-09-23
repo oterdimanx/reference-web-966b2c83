@@ -225,6 +225,12 @@ export function TagsManagerDialog({ onTagsChanged }: TagsManagerDialogProps = {}
                               <Input
                                 value={editTagValue}
                                 onChange={(e) => setEditTagValue(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter' && !loading && editTagValue.trim()) {
+                                    e.preventDefault();
+                                    handleRenameTag(tag.name, editTagValue);
+                                  }
+                                }}
                                 className="font-medium"
                                 placeholder="Enter tag name"
                               />
