@@ -43,16 +43,45 @@ export const getImageUrl = (imagePath: string | null): string | null => {
         return localStorageData;
       }
     }
-    // If localStorage data doesn't exist, return null (broken image)
+    console.warn(`Legacy image path found but no localStorage data: ${imagePath}`);
     return null;
   }
   
-  // For new Supabase Storage paths, get the public URL
-  const { data } = supabase.storage
-    .from('website-images')
-    .getPublicUrl(imagePath);
+  try {
+    // For new Supabase Storage paths, get the public URL
+    const { data } = supabase.storage
+      .from('website-images')
+      .getPublicUrl(imagePath);
+    
+    console.log(`Generated image URL for ${imagePath}:`, data.publicUrl);
+    return data.publicUrl;
+  } catch (error) {
+    console.error('Error generating image URL:', error);
+    return null;
+  }
+};
+
+// Check if an image file exists in Supabase Storage
+export const checkImageExists = async (imagePath: string): Promise<boolean> => {
+  if (!imagePath) return false;
   
-  return data.publicUrl;
+  try {
+    const { data, error } = await supabase.storage
+      .from('website-images')
+      .list('', {
+        search: imagePath
+      });
+    
+    if (error) {
+      console.error('Error checking image existence:', error);
+      return false;
+    }
+    
+    return data && data.length > 0;
+  } catch (error) {
+    console.error('Error checking image existence:', error);
+    return false;
+  }
 };
 
 export const deleteImage = async (imagePath: string | null): Promise<void> => {

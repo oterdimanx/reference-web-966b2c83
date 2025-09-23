@@ -1,9 +1,9 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
+import { X, AlertCircle, Upload } from 'lucide-react';
 import { RankingSummary } from '@/lib/mockData';
-import { getImageUrl } from '@/utils/imageUtils';
+import { getImageUrl, checkImageExists } from '@/utils/imageUtils';
 import { useEffect, useState } from 'react';
 
 interface WebsiteDetailsCardProps {
@@ -13,7 +13,47 @@ interface WebsiteDetailsCardProps {
 
 export function WebsiteDetailsCard({ website, onClose }: WebsiteDetailsCardProps) {
   const [isVisible, setIsVisible] = useState(false);
-  const imageUrl = getImageUrl(website.imagePath);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageLoading, setImageLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
+  const [imageExists, setImageExists] = useState<boolean | null>(null);
+  
+  // Check image existence and generate URL
+  useEffect(() => {
+    const checkAndSetImage = async () => {
+      setImageLoading(true);
+      setImageError(false);
+      
+      if (!website.imagePath) {
+        setImageUrl(null);
+        setImageExists(false);
+        setImageLoading(false);
+        return;
+      }
+      
+      try {
+        // Check if file exists in storage
+        const exists = await checkImageExists(website.imagePath);
+        setImageExists(exists);
+        
+        if (exists) {
+          const url = getImageUrl(website.imagePath);
+          setImageUrl(url);
+        } else {
+          console.warn(`Image file not found in storage: ${website.imagePath}`);
+          setImageUrl(null);
+        }
+      } catch (error) {
+        console.error('Error checking image:', error);
+        setImageError(true);
+        setImageUrl(null);
+      } finally {
+        setImageLoading(false);
+      }
+    };
+    
+    checkAndSetImage();
+  }, [website.imagePath]);
   
   // Show modal with animation
   useEffect(() => {
@@ -100,21 +140,49 @@ export function WebsiteDetailsCard({ website, onClose }: WebsiteDetailsCardProps
             
             {/* Image on the right */}
             <div className="flex-shrink-0">
-              {imageUrl ? (
-                <img
-                  src={imageUrl}
-                  alt={website.title || website.domain}
-                  className="w-32 h-32 object-cover rounded-lg"
-                />
-              ) : (
-                <div className="w-32 h-32 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+              <div className="w-32 h-32 rounded-lg relative">
+                {imageLoading ? (
+                  <div className="w-full h-full bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-600"></div>
+                  </div>
+                ) : imageUrl && !imageError ? (
                   <img
-                    src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=400&fit=crop"
-                    alt="Website placeholder"
-                    className="w-full h-full object-cover rounded-lg opacity-50"
+                    src={imageUrl}
+                    alt={website.title || website.domain}
+                    className="w-full h-full object-cover rounded-lg"
+                    onError={() => setImageError(true)}
                   />
-                </div>
-              )}
+                ) : (
+                  <div className="w-full h-full bg-gray-200 dark:bg-gray-700 rounded-lg flex flex-col items-center justify-center p-2">
+                    {website.imagePath && imageExists === false ? (
+                      <>
+                        <AlertCircle className="h-6 w-6 text-red-500 mb-1" />
+                        <span className="text-xs text-red-500 text-center">Image missing</span>
+                      </>
+                    ) : website.imagePath && imageError ? (
+                      <>
+                        <AlertCircle className="h-6 w-6 text-amber-500 mb-1" />
+                        <span className="text-xs text-amber-500 text-center">Load error</span>
+                      </>
+                    ) : (
+                      <img
+                        src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=400&fit=crop"
+                        alt="Website placeholder"
+                        className="w-full h-full object-cover rounded-lg opacity-50"
+                      />
+                    )}
+                  </div>
+                )}
+                
+                {/* Debug info overlay for development */}
+                {process.env.NODE_ENV === 'development' && website.imagePath && (
+                  <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-xs p-1 rounded-b-lg">
+                    <div>Path: {website.imagePath}</div>
+                    <div>Exists: {imageExists ? '✓' : '✗'}</div>
+                    {imageUrl && <div className="truncate">URL: {imageUrl}</div>}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </CardContent>
