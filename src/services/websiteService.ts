@@ -166,7 +166,7 @@ export const saveWebsiteDetailed = async (website: DetailedWebsite): Promise<Det
 };
 
 // Get all websites for the current user
-export const getUserWebsites = async (): Promise<RankingSummary[]> => {
+export const getUserWebsites = async (): Promise<DetailedWebsite[]> => {
   try {
     const { data, error } = await supabase
       .from('websites')
@@ -178,7 +178,9 @@ export const getUserWebsites = async (): Promise<RankingSummary[]> => {
       return [];
     }
     
-    return data.map(mapFromDbWebsite);
+    console.log('Fetched websites from DB:', data);
+    
+    return data.map(mapFromDbDetailedWebsite);
   } catch (error) {
     console.error('Exception fetching websites:', error);
     return [];

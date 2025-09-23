@@ -66,18 +66,20 @@ export const checkImageExists = async (imagePath: string): Promise<boolean> => {
   if (!imagePath) return false;
   
   try {
+    console.log(`Checking if image exists: ${imagePath}`);
+    
+    // Try to get file info using download with a very small range
     const { data, error } = await supabase.storage
       .from('website-images')
-      .list('', {
-        search: imagePath
-      });
+      .download(imagePath);
     
     if (error) {
-      console.error('Error checking image existence:', error);
+      console.log(`Image does not exist: ${imagePath}`, error.message);
       return false;
     }
     
-    return data && data.length > 0;
+    console.log(`Image exists: ${imagePath}`);
+    return true;
   } catch (error) {
     console.error('Error checking image existence:', error);
     return false;

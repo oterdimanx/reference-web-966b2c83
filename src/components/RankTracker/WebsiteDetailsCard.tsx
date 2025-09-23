@@ -21,10 +21,17 @@ export function WebsiteDetailsCard({ website, onClose }: WebsiteDetailsCardProps
   // Check image existence and generate URL
   useEffect(() => {
     const checkAndSetImage = async () => {
+      console.log('WebsiteDetailsCard: Processing website:', {
+        domain: website.domain,
+        imagePath: website.imagePath,
+        title: website.title
+      });
+      
       setImageLoading(true);
       setImageError(false);
       
       if (!website.imagePath) {
+        console.log('No imagePath found for website:', website.domain);
         setImageUrl(null);
         setImageExists(false);
         setImageLoading(false);
@@ -38,6 +45,7 @@ export function WebsiteDetailsCard({ website, onClose }: WebsiteDetailsCardProps
         
         if (exists) {
           const url = getImageUrl(website.imagePath);
+          console.log(`Generated URL for ${website.imagePath}:`, url);
           setImageUrl(url);
         } else {
           console.warn(`Image file not found in storage: ${website.imagePath}`);
