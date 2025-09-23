@@ -1,5 +1,7 @@
 
-// Utility functions for image handling
+import { supabase } from '@/integrations/supabase/client';
+
+// Utility functions for image handling using Supabase Storage
 
 export const saveImageToPublic = async (file: File, filename: string): Promise<string> => {
   try {
@@ -8,19 +10,21 @@ export const saveImageToPublic = async (file: File, filename: string): Promise<s
     const extension = file.name.split('.').pop();
     const uniqueFilename = `${filename}-${timestamp}.${extension}`;
     
-    // In a real application, you would upload to your server or cloud storage
-    // For now, we'll create a data URL and store the path reference
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        // Store the file data in localStorage with the filename as key
-        // This simulates storing in public folder for demo purposes
-        const dataUrl = reader.result as string;
-        localStorage.setItem(`website-image-${uniqueFilename}`, dataUrl);
-        resolve(`/images/websites/${uniqueFilename}`);
-      };
-      reader.readAsDataURL(file);
-    });
+    // Upload to Supabase Storage
+    const { data, error } = await supabase.storage
+      .from('website-images')
+      .upload(uniqueFilename, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
+
+    if (error) {
+      console.error('Error uploading image:', error);
+      throw new Error('Failed to upload image');
+    }
+
+    // Return the storage path (not the full URL)
+    return data.path;
   } catch (error) {
     console.error('Error saving image:', error);
     throw new Error('Failed to save image');
@@ -30,19 +34,49 @@ export const saveImageToPublic = async (file: File, filename: string): Promise<s
 export const getImageUrl = (imagePath: string | null): string | null => {
   if (!imagePath) return null;
   
-  // Extract filename from path
-  const filename = imagePath.split('/').pop();
-  if (!filename) return null;
+  // Check if it's an old localStorage path (migration support)
+  if (imagePath.startsWith('/images/websites/')) {
+    const filename = imagePath.split('/').pop();
+    if (filename) {
+      const localStorageData = localStorage.getItem(`website-image-${filename}`);
+      if (localStorageData) {
+        return localStorageData;
+      }
+    }
+    // If localStorage data doesn't exist, return null (broken image)
+    return null;
+  }
   
-  // Get from localStorage (simulating public folder access)
-  return localStorage.getItem(`website-image-${filename}`) || null;
+  // For new Supabase Storage paths, get the public URL
+  const { data } = supabase.storage
+    .from('website-images')
+    .getPublicUrl(imagePath);
+  
+  return data.publicUrl;
 };
 
-export const deleteImage = (imagePath: string | null): void => {
+export const deleteImage = async (imagePath: string | null): Promise<void> => {
   if (!imagePath) return;
   
-  const filename = imagePath.split('/').pop();
-  if (filename) {
-    localStorage.removeItem(`website-image-${filename}`);
+  // Handle old localStorage paths
+  if (imagePath.startsWith('/images/websites/')) {
+    const filename = imagePath.split('/').pop();
+    if (filename) {
+      localStorage.removeItem(`website-image-${filename}`);
+    }
+    return;
+  }
+  
+  // Delete from Supabase Storage
+  try {
+    const { error } = await supabase.storage
+      .from('website-images')
+      .remove([imagePath]);
+    
+    if (error) {
+      console.error('Error deleting image:', error);
+    }
+  } catch (error) {
+    console.error('Error deleting image:', error);
   }
 };

@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { DirectoryWebsite } from '@/services/directoryService';
 import { ExternalLink, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { getImageUrl } from '@/utils/imageUtils';
 
 interface DirectoryWebsiteCardProps {
   website: DirectoryWebsite;
@@ -12,6 +13,7 @@ interface DirectoryWebsiteCardProps {
 
 export function DirectoryWebsiteCard({ website }: DirectoryWebsiteCardProps) {
   const { t } = useLanguage();
+  const imageUrl = getImageUrl(website.image_path);
 
   const getPositionChangeIcon = () => {
     if (website.position_change > 0) {
@@ -27,11 +29,14 @@ export function DirectoryWebsiteCard({ website }: DirectoryWebsiteCardProps) {
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg font-semibold flex items-center gap-2">
-            {website.image_path && (
+            {imageUrl && (
               <img 
-                src={website.image_path} 
+                src={imageUrl} 
                 alt={`${website.domain} logo`}
                 className="w-6 h-6 rounded"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
               />
             )}
             {website.title || website.domain}
