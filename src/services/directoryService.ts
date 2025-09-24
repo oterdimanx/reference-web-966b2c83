@@ -29,6 +29,35 @@ export interface DirectoryWebsite {
   } | null;
 }
 
+export interface PublicDirectoryWebsite {
+  id: string;
+  domain: string;
+  title: string | null;
+  description: string | null;
+  category_id: string | null;
+  website_id: string | null; // Include this field as null
+  avg_position: number;
+  keyword_count: number;
+  position_change: number;
+  top_keyword: string | null;
+  top_keyword_position: number | null;
+  image_path: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  // Contact fields are excluded for privacy
+  contact_name: null;
+  contact_email: null;
+  phone_number: null;
+  phone_prefix: null;
+  reciprocal_link: null; // Include this field as null
+  category?: {
+    id: string;
+    name: string;
+    description: string | null;
+  } | null;
+}
+
 export interface Category {
   id: string;
   name: string;
@@ -59,9 +88,9 @@ export interface CreateDirectoryWebsiteData {
 
 export const getDirectoryWebsites = async (): Promise<DirectoryWebsite[]> => {
   try {
-    // First get directory websites
+    // Use public view that excludes sensitive contact information
     const { data: directoryData, error: directoryError } = await supabase
-      .from('directory_websites')
+      .from('directory_websites_public')
       .select('*')
       .eq('is_active', true)
       .order('created_at', { ascending: false });
@@ -81,13 +110,19 @@ export const getDirectoryWebsites = async (): Promise<DirectoryWebsite[]> => {
       throw categoriesError;
     }
 
-    // Manually join the data
+    // Manually join the data and ensure all fields are present
     const transformedData = directoryData?.map(item => ({
       ...item,
+      website_id: null, // Not exposed in public view
+      contact_name: null,
+      contact_email: null,
+      phone_number: null,
+      phone_prefix: null,
+      reciprocal_link: null, // Not exposed in public view
       category: item.category_id 
         ? categoriesData?.find(cat => cat.id === item.category_id) || null
         : null
-    })) || [];
+    })) as DirectoryWebsite[] || [];
 
     return transformedData;
   } catch (error) {
