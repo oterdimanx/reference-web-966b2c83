@@ -217,7 +217,7 @@ export const SubscriptionUpgrade = () => {
                 <Button
                   onClick={() => handleUpgrade(plan)}
                   disabled={isCurrentPlan || isDowngrade || upgrading === plan.id}
-                  className="w-full"
+                  className="w-full chrome-accent"
                   variant={isCurrentPlan ? "secondary" : "default"}
                 >
                   {upgrading === plan.id 
