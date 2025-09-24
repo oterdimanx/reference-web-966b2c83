@@ -44,6 +44,7 @@ export type Database = {
           created_at: string
           description: string
           id: string
+          priority_level: string | null
           type: string
           updated_at: string
           user_id: string | null
@@ -53,6 +54,7 @@ export type Database = {
           created_at?: string
           description: string
           id?: string
+          priority_level?: string | null
           type: string
           updated_at?: string
           user_id?: string | null
@@ -62,6 +64,7 @@ export type Database = {
           created_at?: string
           description?: string
           id?: string
+          priority_level?: string | null
           type?: string
           updated_at?: string
           user_id?: string | null

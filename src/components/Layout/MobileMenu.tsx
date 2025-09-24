@@ -58,9 +58,14 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               {t('common', 'profile')}
             </Link>
             {isAdmin && (
-              <Link to="/admin/dashboard-rw" className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal" onClick={onClose}>
-                {t('common', 'admin')}
-              </Link>
+              <>
+                <Link to="/admin/dashboard-rw" className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal" onClick={onClose}>
+                  {t('common', 'admin')}
+                </Link>
+                <Link to="/admin/contact" className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal" onClick={onClose}>
+                  {t('admin', 'contactManagement')}
+                </Link>
+              </>
             )}
             <button
               onClick={() => {

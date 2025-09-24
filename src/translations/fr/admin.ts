@@ -20,4 +20,5 @@ export const adminTranslations = {
   analytics: 'Analytique',
   rankings: 'Gestion des classements',
   seoManagement: 'Gestion SEO',
+  contactManagement: 'Gestion des contacts',
 };

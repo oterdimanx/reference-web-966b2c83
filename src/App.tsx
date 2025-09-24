@@ -29,6 +29,7 @@ import AdminDirectory from "./pages/Admin/Directory";
 import AdminDirectoryCategories from './pages/Admin/DirectoryCategories';
 import AdminRankings from "./pages/Admin/Rankings";
 import AdminSEO from "./pages/Admin/SEO";
+import { ContactManagement } from "./pages/Admin/ContactManagement";
 import Directories from "./pages/Directories";
 import Contact from "./pages/Contact";
 import Sitemap from "./pages/Sitemap";
@@ -138,6 +139,11 @@ const App = () => (
                   <Route path="/admin/seo" element={
                     <ProtectedRoute>
                       <AdminSEO />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/admin/contact" element={
+                    <ProtectedRoute>
+                      <ContactManagement />
                     </ProtectedRoute>
                   } />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
