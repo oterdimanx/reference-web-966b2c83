@@ -192,21 +192,21 @@ export const SubscriptionUpgrade = () => {
           const isDowngrade = currentSubscription && plan.price < currentSubscription.pricing.price;
           
           return (
-            <Card key={plan.id} className={isCurrentPlan ? 'border-primary' : ''}>
-              <CardHeader>
+            <Card key={plan.id} className={isCurrentPlan ? 'chrome-card-subtle card-hover h-full' : ''}>
+              <CardHeader className="text-center">
                 <div className="flex justify-between items-start">
-                  <CardTitle className="text-lg">{getPlanTitle(plan)}</CardTitle>
+                  <CardTitle className="text-2xl gradient-text">{getPlanTitle(plan)}</CardTitle>
                   {isCurrentPlan && (
                     <Badge variant="default">{language === 'fr' ? 'Plan Actuel' : 'Current Plan'}</Badge>
                   )}
                 </div>
                 <CardDescription>
-                  <span className="text-2xl font-bold">€{plan.price}</span>
-                  <span className="text-muted-foreground">{getPaymentFrequency(plan)}</span>
+                  <span className="text-4xl font-bold text-rank-teal gradient-text">€{plan.price}</span>
+                  <span className="text-gray-500 ml-2">{getPaymentFrequency(plan)}</span>
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <ul className="space-y-2 mb-4">
+                <ul className="space-y-3">
                   {getFeatures(plan).map((feature, index) => (
                     <li key={index} className="flex items-center">
                       <span className="text-sm">{feature}</span>
