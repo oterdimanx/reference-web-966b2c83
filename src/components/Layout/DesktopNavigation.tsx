@@ -171,7 +171,12 @@ export function DesktopNavigation() {
         <NavigationMenuList>
           <NavigationMenuItem>
             <NavigationMenuTrigger className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal bg-transparent hover:bg-transparent data-[state=open]:bg-transparent">
-              {t('common', 'directories')}
+                <Link
+                  to="/directories"
+                  className="block px-4 py-2 text-sm text-gray-600 hover:text-rank-teal hover:bg-gray-100 dark:text-gray-300 dark:hover:text-rank-teal dark:hover:bg-gray-700 rounded"
+                >
+                  {t('common', 'directories')}
+                </Link>
             </NavigationMenuTrigger>
             <NavigationMenuContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg">
               <div className="p-2 w-48">
@@ -204,7 +209,12 @@ export function DesktopNavigation() {
           <NavigationMenuList>
             <NavigationMenuItem>
               <NavigationMenuTrigger className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal bg-transparent hover:bg-transparent data-[state=open]:bg-transparent">
-                {t('common', 'allWebsites')}
+                  <Link
+                    to="/all-websites"
+                    className="block px-4 py-2 text-sm text-gray-600 hover:text-rank-teal hover:bg-gray-100 dark:text-gray-300 dark:hover:text-rank-teal dark:hover:bg-gray-700 rounded"
+                  >
+                    {t('common', 'allWebsites')}
+                  </Link>
               </NavigationMenuTrigger>
               <NavigationMenuContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg">
                 <div className="p-2 w-48">
