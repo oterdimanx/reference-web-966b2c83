@@ -17,10 +17,10 @@ export function TranslationManager() {
   
   // Collapsible states for each section group
   const [openSections, setOpenSections] = useState({
-    core: true,
-    pages: true,
-    legal: true,
-    features: true,
+    core: false,
+    pages: false,
+    legal: false,
+    features: false,
   });
   
   // Handle translation text change
