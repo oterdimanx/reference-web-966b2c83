@@ -39,15 +39,15 @@ interface EnrichedRequest {
 
 const TestScheduleRankings = () => {
   const { user, loading } = useAuth();
-  const isAdmin = useAdminStatus(user?.id);
+  const { isAdmin, adminLoading } = useAdminStatus(user?.id);
   const [result, setResult] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [cronLogs, setCronLogs] = useState<CronLog[]>([]);
   const [pendingRequests, setPendingRequests] = useState<EnrichedRequest[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
 
-  // Show loading state while checking authentication
-  if (loading) {
+  // Show loading state while checking authentication and admin status
+  if (loading || adminLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rank-teal"></div>
