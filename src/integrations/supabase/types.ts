@@ -863,6 +863,99 @@ export type Database = {
         }
         Relationships: []
       }
+      directory_websites_public: {
+        Row: {
+          avg_position: number | null
+          category_id: string | null
+          contact_email: string | null
+          contact_name: string | null
+          created_at: string | null
+          description: string | null
+          domain: string | null
+          id: string | null
+          image_path: string | null
+          is_active: boolean | null
+          keyword_count: number | null
+          phone_number: string | null
+          phone_prefix: string | null
+          position_change: number | null
+          title: string | null
+          top_keyword: string | null
+          top_keyword_position: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          avg_position?: number | null
+          category_id?: string | null
+          contact_email?: never
+          contact_name?: never
+          created_at?: string | null
+          description?: string | null
+          domain?: string | null
+          id?: string | null
+          image_path?: string | null
+          is_active?: boolean | null
+          keyword_count?: number | null
+          phone_number?: never
+          phone_prefix?: never
+          position_change?: number | null
+          title?: string | null
+          top_keyword?: string | null
+          top_keyword_position?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          avg_position?: number | null
+          category_id?: string | null
+          contact_email?: never
+          contact_name?: never
+          created_at?: string | null
+          description?: string | null
+          domain?: string | null
+          id?: string | null
+          image_path?: string | null
+          is_active?: boolean | null
+          keyword_count?: number | null
+          phone_number?: never
+          phone_prefix?: never
+          position_change?: number | null
+          title?: string | null
+          top_keyword?: string | null
+          top_keyword_position?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "directory_websites_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_directory_websites_category"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      system_settings_public: {
+        Row: {
+          setting_key: string | null
+          setting_value: Json | null
+        }
+        Insert: {
+          setting_key?: string | null
+          setting_value?: never
+        }
+        Update: {
+          setting_key?: string | null
+          setting_value?: never
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {
