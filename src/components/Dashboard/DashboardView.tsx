@@ -9,7 +9,7 @@ import {
   RankingData 
 } from '@/lib/mockData';
 import { getUserWebsites } from '@/services/websiteService';
-import { getDashboardRankingData } from '@/services/rankingService';
+import { getDashboardRankingData, getWebsitesWithRankingData } from '@/services/rankingService';
 import { useAuth } from '@/contexts/AuthContext';
 import { StatsSection } from './StatsSection';
 import { MainDashboardContent } from './MainDashboardContent';
@@ -23,6 +23,7 @@ export function DashboardView() {
   const [overallStats, setOverallStats] = useState(getOverallStats());
   const [rankingData, setRankingData] = useState<RankingData[]>([]);
   const [isLoadingRankings, setIsLoadingRankings] = useState(false);
+  const [websitesWithData, setWebsitesWithData] = useState<{ websiteId: string; domain: string }[]>([]);
   
   // Fetch websites and ranking data
   useEffect(() => {
@@ -33,8 +34,18 @@ export function DashboardView() {
         
         if (userWebsites.length > 0) {
           setWebsites(userWebsites);
-          setSelectedWebsiteId(userWebsites[0].websiteId);
           updateOverallStats(userWebsites);
+          
+          // Get websites that actually have ranking data
+          const websitesWithRankingData = await getWebsitesWithRankingData(userWebsites);
+          setWebsitesWithData(websitesWithRankingData);
+          
+          // Set the first website with data as selected, fallback to first website
+          if (websitesWithRankingData.length > 0) {
+            setSelectedWebsiteId(websitesWithRankingData[0].websiteId);
+          } else {
+            setSelectedWebsiteId(userWebsites[0].websiteId);
+          }
           
           // Fetch real ranking data
           setIsLoadingRankings(true);
@@ -112,6 +123,7 @@ export function DashboardView() {
             onSelectWebsite={setSelectedWebsiteId}
             websiteRankingData={websiteRankingData}
             isLoadingRankings={isLoadingRankings}
+            websitesWithData={websitesWithData}
           />
           
           {/* Right sidebar */}

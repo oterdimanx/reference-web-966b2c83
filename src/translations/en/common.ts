@@ -24,6 +24,8 @@ export const commonTranslations = {
   // Dashboard UI
   keywordRankings: 'Keyword Rankings',
   manageKeywords: 'Manage Keywords',
+  selectWebsite: 'Select Website',
+  website: 'Website',
   loadingRankingData: 'Loading ranking data...',
   positionChangesOverTime: 'Position changes over time for all tracked keywords',
   positionChangesSelectedKeyword: 'Position changes over time for the selected keyword',
