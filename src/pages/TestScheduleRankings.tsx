@@ -67,11 +67,19 @@ const TestScheduleRankings = () => {
         <Header />
         <main className="flex-grow flex items-center justify-center">
           <Card>
-            <CardHeader>
-              <CardTitle>Access Denied</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>You do not have permission to access this page.</p>
+            <CardContent className="pt-6">
+              <div className="text-center py-10">
+                <h2 className="text-2xl font-semibold mb-4 text-red-600">Access Denied</h2>
+                <p className="mb-6 text-muted-foreground">
+                  You do not have permission to access this page.
+                </p>
+                <Button 
+                  variant="default" 
+                  onClick={() => window.location.href = '/'}
+                >
+                  Return to Dashboard
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </main>
