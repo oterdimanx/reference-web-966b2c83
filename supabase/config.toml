@@ -1,14 +1,17 @@
 
 project_id = "jixmwjplysaqlyzhpcmk"
 
+# Re-enable JWT verification for security
+# Only disable for functions that specifically need webhook access
 [functions.track-event]
-verify_jwt = false
+verify_jwt = false  # Needs to accept public tracking requests
 
+# All other functions should require authentication
 [functions.fetch-rankings]
-verify_jwt = false
+verify_jwt = true
 
 [functions.schedule-rankings]
-verify_jwt = false
+verify_jwt = true
 
 [functions.get-country-from-ip]
-verify_jwt = false
+verify_jwt = true

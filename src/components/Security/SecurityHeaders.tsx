@@ -23,15 +23,15 @@ export const SecurityHeaders = () => {
       meta.content = content;
     };
 
-    // Content Security Policy (restrictive but functional)
+    // Content Security Policy (secure - removed unsafe directives)
     const csp = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.dicebear.com https://esm.sh",
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "script-src 'self' https://api.dicebear.com https://esm.sh",
+      "style-src 'self' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: blob: https: http:",
       "connect-src 'self' https://jixmwjplysaqlyzhpcmk.supabase.co wss://jixmwjplysaqlyzhpcmk.supabase.co https://api.dicebear.com",
-      "frame-ancestors 'none'",
+      "frame-ancestors 'self' https://lovable.dev https://*.lovable.dev",
       "base-uri 'self'",
       "form-action 'self'"
     ].join('; ');
@@ -41,7 +41,7 @@ export const SecurityHeaders = () => {
     // Additional security headers
     setMetaTag('referrer', 'strict-origin-when-cross-origin');
     setHttpEquivTag('X-Content-Type-Options', 'nosniff');
-    setHttpEquivTag('X-Frame-Options', 'DENY');
+    setHttpEquivTag('X-Frame-Options', 'SAMEORIGIN'); // Allow same-origin framing for Lovable
     setHttpEquivTag('X-XSS-Protection', '1; mode=block');
     setHttpEquivTag('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
     setMetaTag('permissions-policy', 'camera=(), microphone=(), geolocation=(), payment=()');

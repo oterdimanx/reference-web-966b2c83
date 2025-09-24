@@ -867,8 +867,6 @@ export type Database = {
         Row: {
           avg_position: number | null
           category_id: string | null
-          contact_email: string | null
-          contact_name: string | null
           created_at: string | null
           description: string | null
           domain: string | null
@@ -876,8 +874,6 @@ export type Database = {
           image_path: string | null
           is_active: boolean | null
           keyword_count: number | null
-          phone_number: string | null
-          phone_prefix: string | null
           position_change: number | null
           title: string | null
           top_keyword: string | null
@@ -887,8 +883,6 @@ export type Database = {
         Insert: {
           avg_position?: number | null
           category_id?: string | null
-          contact_email?: never
-          contact_name?: never
           created_at?: string | null
           description?: string | null
           domain?: string | null
@@ -896,8 +890,6 @@ export type Database = {
           image_path?: string | null
           is_active?: boolean | null
           keyword_count?: number | null
-          phone_number?: never
-          phone_prefix?: never
           position_change?: number | null
           title?: string | null
           top_keyword?: string | null
@@ -907,8 +899,6 @@ export type Database = {
         Update: {
           avg_position?: number | null
           category_id?: string | null
-          contact_email?: never
-          contact_name?: never
           created_at?: string | null
           description?: string | null
           domain?: string | null
@@ -916,8 +906,6 @@ export type Database = {
           image_path?: string | null
           is_active?: boolean | null
           keyword_count?: number | null
-          phone_number?: never
-          phone_prefix?: never
           position_change?: number | null
           title?: string | null
           top_keyword?: string | null
