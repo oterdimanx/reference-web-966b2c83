@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { triggerRankingCheck } from '@/services/rankingService';
 import { RankingHistory } from '@/components/RankTracker/RankingHistory';
+import { RankingDebugTest } from '@/components/Debug/RankingDebugTest';
 
 interface Website {
   id: string;
@@ -269,11 +270,12 @@ const AdminRankingsPage = () => {
         </div>
 
         {selectedWebsite && (
-          <div className="mt-6">
+          <div className="mt-6 space-y-6">
             <RankingHistory 
               websiteId={selectedWebsite.id} 
               websiteDomain={selectedWebsite.domain} 
             />
+            <RankingDebugTest />
           </div>
         )}
       </main>
