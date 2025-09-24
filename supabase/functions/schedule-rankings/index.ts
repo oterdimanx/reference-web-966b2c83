@@ -73,7 +73,7 @@ serve(async (req) => {
       .eq('status', 'pending')
       .order('priority', { ascending: false })
       .order('requested_at', { ascending: true })
-      .limit(10); // Process max 10 requests per run to avoid timeout
+      .limit(50); // Process max 50 requests per run to avoid timeout
 
     if (requestsError) {
       console.error('Error fetching pending requests:', requestsError);
