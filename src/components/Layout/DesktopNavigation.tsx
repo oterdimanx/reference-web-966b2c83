@@ -200,14 +200,31 @@ export function DesktopNavigation() {
       )}
       
       {user && (
-        <>
-          <Link to="/all-websites" className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal">
-            {t('common', 'allWebsites')}
-          </Link>
-          <Link to="/add-website" className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal">
-            {t('common', 'addWebsite')}
-          </Link>
-        </>
+        <NavigationMenu>
+          <NavigationMenuList>
+            <NavigationMenuItem>
+              <NavigationMenuTrigger className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal bg-transparent hover:bg-transparent data-[state=open]:bg-transparent">
+                {t('common', 'allWebsites')}
+              </NavigationMenuTrigger>
+              <NavigationMenuContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg">
+                <div className="p-2 w-48">
+                  <Link
+                    to="/all-websites"
+                    className="block px-4 py-2 text-sm text-gray-600 hover:text-rank-teal hover:bg-gray-100 dark:text-gray-300 dark:hover:text-rank-teal dark:hover:bg-gray-700 rounded"
+                  >
+                    {t('common', 'allWebsites')}
+                  </Link>
+                  <Link
+                    to="/add-website"
+                    className="block px-4 py-2 text-sm text-gray-600 hover:text-rank-teal hover:bg-gray-100 dark:text-gray-300 dark:hover:text-rank-teal dark:hover:bg-gray-700 rounded"
+                  >
+                    {t('common', 'addWebsite')}
+                  </Link>
+                </div>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
       )}
     </nav>
   );

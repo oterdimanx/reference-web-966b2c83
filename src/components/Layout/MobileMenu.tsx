@@ -13,6 +13,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const { user, signOut, isAdmin } = useAuth();
   const { t } = useLanguage();
   const [isDirectoriesOpen, setIsDirectoriesOpen] = useState(false);
+  const [isWebsitesOpen, setIsWebsitesOpen] = useState(false);
 
   if (!isOpen) return null;
 
@@ -48,12 +49,25 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         
         {user ? (
           <>
-            <Link to="/all-websites" className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal" onClick={onClose}>
-              {t('common', 'allWebsites')}
-            </Link>
-            <Link to="/add-website" className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal" onClick={onClose}>
-              {t('common', 'addWebsite')}
-            </Link>
+            <div>
+              <button
+                onClick={() => setIsWebsitesOpen(!isWebsitesOpen)}
+                className="flex items-center justify-between w-full text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal"
+              >
+                {t('common', 'allWebsites')}
+                {isWebsitesOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </button>
+              {isWebsitesOpen && (
+                <div className="ml-4 mt-2 space-y-2">
+                  <Link to="/all-websites" className="block text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal" onClick={onClose}>
+                    {t('common', 'allWebsites')}
+                  </Link>
+                  <Link to="/add-website" className="block text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal" onClick={onClose}>
+                    {t('common', 'addWebsite')}
+                  </Link>
+                </div>
+              )}
+            </div>
             <Link to="/profile" className="text-gray-600 hover:text-rank-teal dark:text-gray-300 dark:hover:text-rank-teal" onClick={onClose}>
               {t('common', 'profile')}
             </Link>
