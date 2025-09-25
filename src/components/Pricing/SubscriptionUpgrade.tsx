@@ -186,7 +186,7 @@ export const SubscriptionUpgrade = () => {
         </p>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-4">
+      <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
         {pricingPlans.map((plan) => {
           const websitesAllowed = getWebsitesAllowed(plan.price);
           const isCurrentPlan = currentSubscription?.pricing_id === plan.id;
