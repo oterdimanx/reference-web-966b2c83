@@ -193,50 +193,48 @@ export const SubscriptionUpgrade = () => {
           const isDowngrade = currentSubscription && plan.price < currentSubscription.pricing.price;
           
           return (
-            <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-              <Card key={plan.id} className={isCurrentPlan ? 'chrome-card-subtle card-hover h-full' : ''}>
+            <Card key={plan.id} className={isCurrentPlan ? 'chrome-card-subtle card-hover h-full' : ''}>
+              
+              {isCurrentPlan && (
+                <Badge variant="default" className="metallic-badge absolute -top-3 left-1/2 transform -translate-x-1/2 z-[200]">{language === 'fr' ? 'Plan Actuel' : 'Current Plan'}</Badge>
+              )}
+              
+              <CardHeader className="text-center">
+                <div className="flex justify-between items-start">
+                  <CardTitle className="text-2xl gradient-text">{getPlanTitle(plan)}</CardTitle>
+                </div>
+                <CardDescription>
+                  <span className="text-4xl font-bold text-rank-teal gradient-text">€{plan.price}</span>
+                  <span className="text-gray-500 ml-2">{getPaymentFrequency(plan)}</span>
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-3">
+                  {getFeatures(plan).map((feature, index) => (
+                    <li key={index} className="flex items-center">
+                      <Check className="h-5 w-5 text-rank-teal mr-3" />
+                      <span className="text-sm">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
                 
-                {isCurrentPlan && (
-                  <Badge variant="default" className="metallic-badge absolute -top-3 left-1/2 transform -translate-x-1/2 z-[200]">{language === 'fr' ? 'Plan Actuel' : 'Current Plan'}</Badge>
-                )}
-                
-                <CardHeader className="text-center">
-                  <div className="flex justify-between items-start">
-                    <CardTitle className="text-2xl gradient-text">{getPlanTitle(plan)}</CardTitle>
-                  </div>
-                  <CardDescription>
-                    <span className="text-4xl font-bold text-rank-teal gradient-text">€{plan.price}</span>
-                    <span className="text-gray-500 ml-2">{getPaymentFrequency(plan)}</span>
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3">
-                    {getFeatures(plan).map((feature, index) => (
-                      <li key={index} className="flex items-center">
-                        <Check className="h-5 w-5 text-rank-teal mr-3" />
-                        <span className="text-sm">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  
-                  <Button
-                    onClick={() => handleUpgrade(plan)}
-                    disabled={isCurrentPlan || isDowngrade || upgrading === plan.id}
-                    className="w-full chrome-accent"
-                    variant={isCurrentPlan ? "secondary" : "default"}
-                  >
-                    {upgrading === plan.id 
-                      ? (language === 'fr' ? 'Redirection vers le paiement...' : 'Redirecting to payment...')
-                      : isCurrentPlan 
-                        ? (language === 'fr' ? 'Plan Actuel' : 'Current Plan')
-                        : isDowngrade 
-                          ? (language === 'fr' ? 'Rétrogradation non disponible' : 'Downgrade not available')
-                          : (language === 'fr' ? `Passer à €${plan.price}${getPaymentFrequency(plan)}` : `Upgrade for €${plan.price}${getPaymentFrequency(plan)}`)
-                    }
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
+                <Button
+                  onClick={() => handleUpgrade(plan)}
+                  disabled={isCurrentPlan || isDowngrade || upgrading === plan.id}
+                  className="w-full chrome-accent"
+                  variant={isCurrentPlan ? "secondary" : "default"}
+                >
+                  {upgrading === plan.id 
+                    ? (language === 'fr' ? 'Redirection vers le paiement...' : 'Redirecting to payment...')
+                    : isCurrentPlan 
+                      ? (language === 'fr' ? 'Plan Actuel' : 'Current Plan')
+                      : isDowngrade 
+                        ? (language === 'fr' ? 'Rétrogradation non disponible' : 'Downgrade not available')
+                        : (language === 'fr' ? `Passer à €${plan.price}${getPaymentFrequency(plan)}` : `Upgrade for €${plan.price}${getPaymentFrequency(plan)}`)
+                  }
+                </Button>
+              </CardContent>
+            </Card>
           );
         })}
       </div>
