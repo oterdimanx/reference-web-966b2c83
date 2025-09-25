@@ -193,12 +193,14 @@ export const SubscriptionUpgrade = () => {
           
           return (
             <Card key={plan.id} className={isCurrentPlan ? 'chrome-card-subtle card-hover h-full' : ''}>
+              
+              {isCurrentPlan && (
+                <Badge variant="default" className="metallic-badge absolute -top-3 left-1/2 transform -translate-x-1/2 z-[200]">{language === 'fr' ? 'Plan Actuel' : 'Current Plan'}</Badge>
+              )}
+              
               <CardHeader className="text-center">
                 <div className="flex justify-between items-start">
                   <CardTitle className="text-2xl gradient-text">{getPlanTitle(plan)}</CardTitle>
-                  {isCurrentPlan && (
-                    <Badge variant="default">{language === 'fr' ? 'Plan Actuel' : 'Current Plan'}</Badge>
-                  )}
                 </div>
                 <CardDescription>
                   <span className="text-4xl font-bold text-rank-teal gradient-text">€{plan.price}</span>
@@ -209,6 +211,7 @@ export const SubscriptionUpgrade = () => {
                 <ul className="space-y-3">
                   {getFeatures(plan).map((feature, index) => (
                     <li key={index} className="flex items-center">
+                      <Check className="h-5 w-5 text-rank-teal mr-3" />
                       <span className="text-sm">{feature}</span>
                     </li>
                   ))}
