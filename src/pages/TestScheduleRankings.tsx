@@ -155,12 +155,20 @@ const TestScheduleRankings = () => {
     setResult("Triggering cron job manually...");
     
     try {
-      // Use direct HTTP call to simulate cron job
+      // Get the user's session token
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        setResult("Error: No active session found. Please refresh the page and try again.");
+        return;
+      }
+
+      // Use direct HTTP call with the user's session token
       const response = await fetch('https://jixmwjplysaqlyzhpcmk.supabase.co/functions/v1/schedule-rankings', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppeG13anBseXNhcWx5emhwY21rIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NjQzNzYyNCwiZXhwIjoyMDYyMDEzNjI0fQ.KuvbemiiLfpGDdb5D0DhBoWKhf8IUERILlUqJcIoOXw'
+          'Authorization': `Bearer ${session.access_token}`
         },
         body: JSON.stringify({ triggered_by: 'manual_cron_simulation' })
       });
