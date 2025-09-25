@@ -31,7 +31,8 @@ export const useUserSubscription = () => {
           *,
           pricing (
             title,
-            price
+            price,
+            websites_allowed
           )
         `)
         .eq('user_id', user.id)
@@ -64,9 +65,8 @@ export const useUserSubscription = () => {
         };
       }
       
-      // Calculate websites allowed based on pricing
-      const websitesAllowed = subData.pricing.price === 1 ? 1 : 
-                             subData.pricing.price < 10 ? 5 : 999;
+      // Use websites_allowed from pricing table
+      const websitesAllowed = (subData.pricing as any).websites_allowed || 0;
       
       return {
         hasSubscription: true,
@@ -75,8 +75,8 @@ export const useUserSubscription = () => {
         canAddWebsite: isAdmin || (websiteCount || 0) < websitesAllowed,
         subscription: {
           ...subData,
-          pricing_title: subData.pricing.title,
-          pricing_price: subData.pricing.price,
+          pricing_title: (subData.pricing as any).title,
+          pricing_price: (subData.pricing as any).price,
           websites_allowed: websitesAllowed
         }
       };
