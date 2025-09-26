@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -200,9 +200,7 @@ export const SubscriptionUpgrade = () => {
               )}
               
               <CardHeader className="text-center">
-                <div className="flex justify-between items-start">
-                  <CardTitle className="text-2xl gradient-text">{getPlanTitle(plan)}</CardTitle>
-                </div>
+                <CardTitle className="text-2xl gradient-text">{getPlanTitle(plan)}</CardTitle>
                 <CardDescription>
                   <span className="text-4xl font-bold text-rank-teal gradient-text">€{plan.price}</span>
                   <span className="text-gray-500 ml-2">{getPaymentFrequency(plan)}</span>
@@ -217,7 +215,8 @@ export const SubscriptionUpgrade = () => {
                     </li>
                   ))}
                 </ul>
-                
+              </CardContent>
+              <CardFooter>
                 <Button
                   onClick={() => handleUpgrade(plan)}
                   disabled={isCurrentPlan || isDowngrade || upgrading === plan.id}
@@ -233,7 +232,7 @@ export const SubscriptionUpgrade = () => {
                         : (language === 'fr' ? `Passer à €${plan.price}${getPaymentFrequency(plan)}` : `Upgrade for €${plan.price}${getPaymentFrequency(plan)}`)
                   }
                 </Button>
-              </CardContent>
+              </CardFooter>
             </Card>
           );
         })}
