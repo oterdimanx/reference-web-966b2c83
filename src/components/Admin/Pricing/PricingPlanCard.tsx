@@ -60,7 +60,7 @@ const PricingPlanCard = ({ plan }: PricingPlanCardProps) => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-3xl font-bold">${plan.price.toFixed(2)}</p>
+          <p className="text-3xl font-bold">{plan.price.toFixed(2)}€</p>
           <p className="text-sm text-muted-foreground mt-1">
             {language === 'fr' && plan.frequency_fr 
               ? plan.frequency_fr 
