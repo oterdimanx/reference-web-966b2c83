@@ -61,6 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const checkAdminStatus = async () => {
       if (!user) {
         setIsAdmin(false);
+        sessionStorage.removeItem('isAdmin');
         return;
       }
 
@@ -75,12 +76,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (error) {
           console.error('Error checking admin status:', error);
           setIsAdmin(false);
+          sessionStorage.removeItem('isAdmin');
         } else {
-          setIsAdmin(data ? true : false);
+          const adminStatus = data ? true : false;
+          setIsAdmin(adminStatus);
+          
+          // Set sessionStorage flag to exclude tracking
+          if (adminStatus) {
+            sessionStorage.setItem('isAdmin', 'true');
+          } else {
+            sessionStorage.removeItem('isAdmin');
+          }
         }
       } catch (error) {
         console.error('Error checking admin role:', error);
         setIsAdmin(false);
+        sessionStorage.removeItem('isAdmin');
       }
     };
 
@@ -149,6 +160,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     try {
+      // Clear admin flag from sessionStorage on logout
+      sessionStorage.removeItem('isAdmin');
+      
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
     } catch (error: any) {

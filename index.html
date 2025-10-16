@@ -138,6 +138,15 @@
         }
         
         function trackEvent(eventData) {
+          // Check if we should skip tracking (development or admin user)
+          var hostname = window.location.hostname;
+          var isDevelopment = hostname === 'localhost' || hostname.endsWith('.lovable.app');
+          var isAdmin = sessionStorage.getItem('isAdmin') === 'true';
+          
+          if (isDevelopment || isAdmin) {
+            return; // Skip tracking for development and admin users
+          }
+          
           // First check session-based deduplication
           if (isSessionDuplicate(eventData)) {
             return; // Skip session duplicate
